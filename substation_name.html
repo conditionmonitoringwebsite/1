@@ -86,8 +86,15 @@
 <body>
   <h1>New Condition Monitoring Entry</h1>
 
-  <label for="zone">Zone Name</label>
-  <input type="text" id="zone" value="Kolkata Zone" />
+<label for="zone">Zone Name</label>
+<select id="zone" onchange="updateRegions()">
+  <option value="Kolkata Zone" selected>Kolkata Zone</option>
+  <option value="Siliguri Zone">Siliguri Zone</option>
+  <option value="Malda Zone">Malda Zone</option>
+  <option value="Berhampore Zone">Berhampore Zone</option>
+  <option value="Burdwan Zone">Burdwan Zone</option>
+  <option value="Midnapur Zone">Midnapur Zone</option>
+</select>
 
   <label for="region">Region Name</label>
   <select id="region" onchange="updateDivisions()"></select>
@@ -143,48 +150,130 @@ const data = {
         "Howrah-I Division": ["Sankrail Utsab park Substation", "Bally Substation", "Belgachia Substation", "Liluah Substation", "Laxmanpur Substation", "Alampur Substation", "KWIC Substation", "Kona Substation", "Kona TT Substation", "Anmol Hosiery Park Substation", "Rubber Park Substation", "Baltikuri Substation"],
         "Howrah-II Division": ["James Jewellary Substation", "Srijan Logistics Substation", "Jangalpur-I Substation", "Jangalpur-II Substation", "Singti Substation", "Sehaguri Substation", "Amta Substation", "Makardah Substation", "Munshirhat Substation", "Gumadandi Substation", "Domjhur GIS Substation"],
         "Uluberia Division": ["Islampur Substation", "Food Park Substation", "Poly Park Substation", "Banitabla Substation", "Foundry Park Substation", "Shyampur Substation", "Baganda Substation", "Mugkalyan Substation", "Borogram Substation", "Ranihati Substation", "Sankrail Industrial Park Substation", "Ganesh Complex Substation", "UIGC Substation", "Bagnan Substation", "Kalyanpur Substation", "ESR Substation", "EFC Park Substation"]
-      }
+      },
+
+  "Birbhum Region": {
+    "Bolpur Division": [],
+    "Rampurhat Division": [],
+    "Suri Division": []
+  },
+  "Burdwan Region": {
+    "Burdwan North Division": [],
+    "Burdwan South Division": [],
+    "Kalna Division": [],
+    "Katwa Division": [],
+    "Memari Division": []
+  },
+  "Hooghly Region": {
+    "Arambagh Division": [],
+    "Chandannagar Division": [],
+    "Mogra Division": [],
+    "Singur-Haripal Division": ["Kaikala Substation", "Khasher Bheri Substation", "Malia Substation", "Singur Substation" ],
+    "Srirampore Division": ["Arrjavv Substation", "Chanditala GSS Substation", "Dankuni Coal Complex Substation", "HNG Substation", "Kalachara Substation", "Keventers Substation", "Mother Dairy Substation", "Raghunathpur(Hooghly) Substation", "Rishra Substation", "Sheoraphuly Substation", "Shriram Grand City" ],
+    "Tarakeshwar Division": ["Belmuri Substation", "Belmuri GSS Substation", "Dasghara Substation", "Harit Substation", "Jangipara Substation", "Jangipara GSS Substation", "Maheswarpur Substation", "Seakhala Substation", "Tarakeshwar GSS Substation", "Vastara Substation" ]
+  },
+  "Paschim Burdwan Region": {
+    "Asansol Division": [],
+    "Durgapur Division": []
+  }
+
+
     };
 
-    const regionSelect = document.getElementById("region");
-    const divisionSelect = document.getElementById("division");
-    const substationSelect = document.getElementById("substation");
 
-    Object.keys(data).sort().forEach(region => {
-      const option = document.createElement("option");
-      option.value = region;
-      option.text = region;
-      regionSelect.add(option);
-    });
+// new: mapping of Zones to their Regions
+const zonesData = {
+  "Kolkata Zone": [
+    "Bidhannagar Region",
+    "North 24 Parganas Region",
+    "South 24 Parganas Region",
+    "Howrah Region"
+  ],
+  "Siliguri Zone": [
+    "Alipurduar Region",
+    "Coochbehar Region",
+    "Darjeeling Region",
+    "Jalpaiguri Region",
+    "Kalimpong Region"
+  ],
+  "Malda Zone": [
+    "Uttar Dinajpur Region",
+    "Dakshin Dinajpur Region",
+    "Malda Region"
+  ],
+  "Berhampore Zone": [
+    "Murshidabad Region",
+    "Nadia Region"
+  ],
+  "Burdwan Zone": [
+    "Birbhum Region",
+    "Burdwan Region",
+    "Hooghly Region",
+    "Paschim Burdwan Region"
+  ],
+  "Midnapur Zone": [
+    "Bankura Region",
+    "Jhargram Region",
+    "Purulia Region",
+    "Purba Medinipur Region",
+    "Paschim Midnapur"
+  ]
+};
 
-    function updateDivisions() {
-      divisionSelect.innerHTML = "";
-      substationSelect.innerHTML = "";
-      const selectedRegion = regionSelect.value;
-      const divisions = Object.keys(data[selectedRegion]).sort();
-      divisions.forEach(division => {
-        const option = document.createElement("option");
-        option.value = division;
-        option.text = division;
-        divisionSelect.add(option);
-      });
-      updateSubstations();
-    }
 
-    function updateSubstations() {
-      substationSelect.innerHTML = "";
-      const selectedRegion = regionSelect.value;
-      const selectedDivision = divisionSelect.value;
-      const substations = data[selectedRegion][selectedDivision].sort();
-      substations.forEach(substation => {
-        const option = document.createElement("option");
-        option.value = substation;
-        option.text = substation;
-        substationSelect.add(option);
-      });
-    }
 
-    updateDivisions();
+
+    const zoneSelect       = document.getElementById("zone");
+const regionSelect     = document.getElementById("region");
+const divisionSelect   = document.getElementById("division");
+const substationSelect = document.getElementById("substation");
+
+function updateRegions() {
+  regionSelect.innerHTML = "";
+  const regions = zonesData[zoneSelect.value] || [];
+  regions.forEach(r => {
+    const opt = document.createElement("option");
+    opt.value = r;  opt.text = r;
+    regionSelect.add(opt);
+  });
+  updateDivisions();
+}
+
+function updateDivisions() {
+  divisionSelect.innerHTML   = "";
+  substationSelect.innerHTML = "";
+  const selReg = regionSelect.value;
+  const divs   = data[selReg] ? Object.keys(data[selReg]).sort() : [];
+  divs.forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d;  opt.text = d;
+    divisionSelect.add(opt);
+  });
+  updateSubstations();
+}
+
+function updateSubstations() {
+  substationSelect.innerHTML = "";
+  const selReg = regionSelect.value;
+  const selDiv = divisionSelect.value;
+  const subs   = (data[selReg] && data[selReg][selDiv])
+               ? data[selReg][selDiv].sort()
+               : [];
+  subs.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s;  opt.text = s;
+    substationSelect.add(opt);
+  });
+}
+
+// wire up events
+zoneSelect.addEventListener("change", updateRegions);
+regionSelect.addEventListener("change", updateDivisions);
+divisionSelect.addEventListener("change", updateSubstations);
+
+// bootstrap on load
+updateRegions();
+
     const entryDateInput = document.getElementById("entryDate");
     const today = new Date().toISOString().split("T")[0];
     entryDateInput.value = today;
