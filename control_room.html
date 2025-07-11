@@ -820,8 +820,8 @@ h2.compact-live-heading {
 
 #liveTable th:nth-child(20),
 #liveTable td:nth-child(20) {
-  width: 600px;
-  max-width: 600px;
+  width: 30px;
+  max-width: 30px;
 }
 
 /* Narrow only Tb1, Tb2, TPT, TS1 & TS2 sub-columns to 30px */
@@ -1027,6 +1027,51 @@ h2.compact-live-heading {
   background-color: #00f2ff;
   color:            #000;
   transform:        scale(1.05);
+}
+
+
+
+
+
+/* ── 1) make the Temp tables scrollable in their 90vw container ── */
+#temp .table-container {
+  overflow-x: auto;
+}
+
+/* ── 2) redistribute the five “(in °C)” columns equally (~9.2% each) ── */
+/*    targets cols 5–9 (F1, B1, B2, S1/S2, PT) in both Temp tables */
+#tableTemp11 th:nth-child(n+5),
+#tableTemp11 td:nth-child(n+5),
+#tableTemp33 th:nth-child(n+5),
+#tableTemp33 td:nth-child(n+5) {
+  width: 9.2%;
+}
+
+/* ── 3) override the inline 76px so inputs will shrink to their cells ── */
+#tableTemp11 td > div input[type="number"],
+#tableTemp33 td > div input[type="number"] {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+
+/* ─── make Temp fields wider & stack H below the input ─── */
+#tableTemp11 td > div,
+#tableTemp33 td > div {
+  display:         flex !important;
+  flex-direction:  column !important;
+  align-items:     center !important;
+  gap:             0.25rem !important;
+}
+#tableTemp11 td > div input[type="number"],
+#tableTemp33 td > div input[type="number"] {
+  width:     100%   !important;  /* break out of the old 76px */
+  max-width: 100px  !important;  /* adjust as you like */
+  box-sizing: border-box;
+}
+#tableTemp11 td > div input[type="checkbox"],
+#tableTemp33 td > div input[type="checkbox"] {
+  margin-top: 0.25rem !important;
 }
 
 
@@ -1413,6 +1458,8 @@ h2.compact-live-heading {
             <th>F1 (in <sup>°</sup>C)</th>
             <th>B1 (in <sup>°</sup>C)</th>
             <th>B2 (in <sup>°</sup>C)</th>
+            <th>S1/S2 (in <sup>°</sup>C)</th>
+            <th>PT (in <sup>°</sup>C)</th>
           </tr>
         </thead>
         <tbody>
@@ -1474,6 +1521,8 @@ h2.compact-live-heading {
             <th>F1 (in <sup>°</sup>C)</th>
             <th>B1 (in <sup>°</sup>C)</th>
             <th>B2 (in <sup>°</sup>C)</th>
+            <th>S1/S2 (in <sup>°</sup>C)</th>
+            <th>PT (in <sup>°</sup>C)</th>
           </tr>
         </thead>
         <tbody>
@@ -2031,13 +2080,13 @@ h2.compact-live-heading {
         <th rowspan="2">VCB State</th>
         <th rowspan="2">Load (A)</th>
         <th colspan="6">Transient Earth Voltage (in dB)</th>
-        <th colspan="3">Temperature (in °C)</th>
+        <th colspan="5">Temperature (in °C)</th>
         <th colspan="6">Ultrasound (in dB)</th>
         <th rowspan="2">Action to be Taken</th>
       </tr>
       <tr>
         <th>TF1</th><th>Tb1</th><th>Tb2</th><th>TPT</th><th>TS1</th><th>TS2</th>
-        <th>F1</th><th>b1</th><th>b2</th>
+        <th>F1</th><th>b1</th><th>b2</th><th>S1/S2</th><th>PT</th>
         <th>UF1</th><th>Ub1</th><th>Ub2</th><th>UPT</th><th>Us1</th><th>Us2</th>
       </tr>
     </thead>
