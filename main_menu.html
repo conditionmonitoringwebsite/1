@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Main Menu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+      background-color: #0a0f2c;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      color: white;
+    }
+    h1 {
+      margin-bottom: 30px;
+      color: #00f2ff;
+      text-shadow: 0 0 10px #000;
+    }
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .btn {
+      background-color: #00f2ff;
+      border: none;
+      padding: 15px 40px;
+      font-size: 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      color: black;
+      transition: background-color 0.3s, transform 0.3s;
+      box-shadow: 0 0 15px #00f2ff;
+    }
+    .btn:hover {
+      background-color: #0ff;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <h1>Condition Monitoring Menu</h1>
+  <div class="button-container">
+    <button class="btn" onclick="window.location.href='substation_name.html'">New Condition Monitoring Entry</button>
+
+    <button class="btn" onclick="window.location.href='view_reports.html'">View Reports</button>
+
+  </div>
+</body>
+</html>

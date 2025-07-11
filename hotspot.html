@@ -1,0 +1,132 @@
+<!-- hotspot.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hotspot Inspection Entry</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin:0; padding:10px; font-family:'Orbitron',sans-serif; background:#0a0f2c; color:#fff }
+    .header { text-align:right; padding:8px; font-size:14px; color:#00f2ff; background:#111836; box-shadow:0 0 8px #00f2ff; }
+    h1,h2 { margin:8px 0; text-align:center; color:#00f2ff; text-shadow:0 0 8px #00f2ff }
+    .table-container { overflow-x:auto; -webkit-overflow-scrolling:touch; margin-bottom:12px }
+    table { width:100%; border-collapse:collapse; }
+    th, td { border:1px solid #00f2ff; padding:6px; text-align:center }
+    #hotspotTable thead th { font-size:12px }          /* smaller entry header */
+    #hotspotLiveTable th, #hotspotLiveTable td { font-size:10px; padding:4px }  /* small live table */
+    th { background:#111836 }
+    select, input[type="text"], input[type="number"] {
+      width:100%; padding:4px; border:none; border-radius:4px;
+      background:#111836; color:#fff; font-family:Cambria,serif
+    }
+    button {
+      margin:6px 4px 0 0; padding:6px 12px; border:none; border-radius:6px;
+      background:#00f2ff; color:#000; font-family:'Orbitron',sans-serif; cursor:pointer;
+      box-shadow:0 0 6px #00f2ff
+    }
+    button:hover { background:#0ff }
+    .remove-btn { background:red; color:#fff }
+    @media (max-width:600px) {
+      #hotspotTable th,#hotspotTable td,#hotspotLiveTable th,#hotspotLiveTable td { font-size:10px; padding:4px }
+      button { width:100%; }
+      .header { font-size:12px }
+    }
+
+
+/* ↓ feeder-isolator checkboxes & labels smaller ↓ */
+.feeder-cb-container {
+  font-size: 10px;            /* shrink label text */
+}
+.feeder-cb-container label {
+  margin-right: 8px;          /* space between boxes */
+}
+.feeder-cb-container input[type="checkbox"] {
+  transform: scale(0.75);     /* shrink the box itself */
+  margin-right: 4px;          /* fine-tune gap before label text */
+  vertical-align: middle;     /* keep checkbox aligned with text */
+}
+
+
+
+
+  </style>
+</head>
+<body>
+
+  <div class="header" id="substationHeader"></div>
+
+
+
+<!-- Reset Button -->
+<div style="position: absolute; top: 20px; right: 20px;">
+  <button id="resetBtn"
+          style="background-color: red;
+                 color: white;
+                 padding: 6px 12px;
+                 border: none;
+                 border-radius: 4px;
+                 cursor: pointer;">
+    Reset
+  </button>
+</div>
+
+
+
+  <h1>Hotspot Inspection Entry</h1>
+
+  <div class="table-container">
+    <table id="hotspotTable">
+      <thead>
+        <tr>
+          <th>Sl. No.</th>
+          <th>Hotspot Location</th>
+          <th>Ambient Temp (°C)</th>
+          <th>R Phase (°C)</th>
+          <th>Y Phase (°C)</th>
+          <th>B Phase (°C)</th>
+          <th>Neutral (°C)</th>
+          <th>Image Code</th>
+          <th>Remarks</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button onclick="addRow()">Add Row</button>
+    <button onclick="saveHotspotData()">Save</button>
+    <button onclick="location.href='switchyard.html'">Back</button>
+  </div>
+
+  <h2>Live Hotspot Data</h2>
+  <div class="table-container">
+    <table id="hotspotLiveTable" contenteditable="true">
+      <thead>
+        <tr>
+          <th>Sl. No.</th>
+          <th>Hotspot Location</th>
+          <th>Ambient Temp (in °C)</th>
+          <th>R Phase (°C)</th>
+          <th>Y Phase (°C)</th>
+          <th>B Phase (°C)</th>
+          <th>Neutral (°C)</th>
+          <th>Image Code</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button id="downloadExcelBtn">Download Excel</button>
+    <button id="downloadDocBtn">Download Doc</button>
+    <button id="downloadPdfBtn">Download PDF</button>
+  </div>
+
+  <!-- libs -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <!-- your JS -->
+  <script src="hotspot.js"></script>
+</body>
+</html>

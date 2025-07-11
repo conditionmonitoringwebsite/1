@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visual Findings Entry</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin:0; padding:20px; font-family:'Orbitron',sans-serif; background:#0a0f2c; color:#fff; }
+    .header { text-align:right; font-size:14px; color:#00f2ff; background:#111836; padding:8px; box-shadow:0 0 8px #00f2ff; }
+    h1 { text-align:center; color:#00f2ff; text-shadow:0 0 8px #00f2ff; margin:16px 0; }
+    .toggle-container { display:flex; justify-content:center; gap:20px; margin-bottom:20px; }
+    .toggle-btn { background:#111836; color:#00f2ff; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; box-shadow:0 0 6px #00f2ff; transition:background 0.3s; }
+    .toggle-btn.active { background:#00f2ff; color:#000; }
+    .section { display:none; }
+    .section.active { display:block; }
+
+    .button-container { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:20px; }
+    .button-container button { background: #111836; color: #00f2ff; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; box-shadow: 0 0 6px #00f2ff;transition: background 0.3s, transform 0.3s;}
+
+    .button-container button.active {background: #00f2ff; color: #000; box-shadow: 0 0 8px #00f2ff; transform: scale(1.05); }
+
+    .form-container { background:#111836; border:1px solid #00f2ff; border-radius:8px; padding:16px; margin-bottom:20px; }
+    .form-section { margin-bottom:16px; }
+    .form-section h2 { color:#00f2ff; margin-bottom:8px; }
+    .form-section h3 { text-align: center; color: #00f2ff; margin: 12px 0;}
+    .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+    .grid label { display:flex; align-items:center; gap:6px; font-size:12px; }
+    input[type=text], input[type=number] { width:100%; padding:6px; background:#0a0f2c; border:1px solid #00f2ff; color:#fff; border-radius:4px; }
+    table.report { width:100%; border-collapse:collapse; margin-top:20px; }
+    table.report th, table.report td { border:1px solid #00f2ff; padding:4px; font-size: 10px; }
+    table.report th { background:#111836; color:#00f2ff; }
+    .export-btns { display:flex; gap:10px; justify-content:center; margin-top:10px; }
+
+/* Accordion group buttons */
+.accordion-btn {
+  background:#111836;
+  color:#00f2ff;
+  border:none;
+  width:100%;
+  text-align:left;
+  padding:8px 12px;
+  margin:4px 0;
+  border-radius:4px;
+  cursor:pointer;
+  box-shadow:0 0 4px #00f2ff;
+  transition:background 0.3s;
+}
+.accordion-btn.active {
+  background:#00f2ff;
+  color:#000;
+  box-shadow:0 0 6px #00f2ff;
+}
+
+
+@media (max-width: 600px) {
+  /* Collapse all 4-col grids to 2 columns for mobile */
+  .grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 4px !important;
+  }
+  /* Smaller labels and inputs */
+  .grid label {
+    font-size: 10px !important;
+    padding: 2px !important;
+  }
+  /* Shrink the checkboxes themselves */
+  .grid input[type="checkbox"] {
+    transform: scale(0.8);
+    margin-right: 4px;
+  }
+}
+
+/* ─── Custom dropdown styling ───────────────────────────────────────────────── */
+/* ─── Glow & Zoom Slide Gradient Dropdown ─────────────────────────────────── */
+.custom-select {
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  appearance: none;
+  border: none;
+  outline: none;
+  background: linear-gradient(to right, #0078ff, #00f2ff);
+  background-size: 200% auto;
+  color: #000;
+  font-family: 'Orbitron', sans-serif;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 5px rgba(0, 242, 255, 0.6);
+}
+
+.custom-select:hover {
+  background-position: right center;
+  transform: scale(1.04);
+  box-shadow: 0 0 12px #00f2ff;
+}
+
+
+.custom-select:hover {
+  border-color: #999;
+}
+
+.custom-select:focus {
+  outline: none;
+  border-color: #007BFF;
+  box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+/* ───────────────────────────────────────────────────────────────────────────── */
+ /* ─── Mobile dropdown wrap & full-width on ≤600px ───────────────────────────── */
+ @media (max-width: 600px) {
+   /* allow the Location/Phase/HV-LV flex rows to wrap */
+   .form-container .form-section > div {
+     display: flex !important;
+     flex-wrap: wrap !important;
+     gap: 8px;
+   }
+
+   /* make each dropdown fill 100% of its row */
+   .form-container .form-section > div select {
+     flex: 1 1 100% !important;
+     width: 100% !important;
+     box-sizing: border-box;
+   }
+ }
+
+  </style>
+</head>
+<body>
+  <div class="header" id="substationHeader"></div>
+<div style="position: absolute; top: 65px; right: 20px;">
+  <button id="resetBtn" style="background-color: red; color: white; padding: 6px 12px; border: none; border-radius: 4px;">Reset</button>
+</div>
+
+
+  <h1>Visual Findings Entry</h1>
+
+  <div class="toggle-container">
+    <button id="ptrToggle" class="toggle-btn active">PTR Observations</button>
+    <button id="otherToggle" class="toggle-btn">Other Observations</button>
+  </div>
+
+  <!-- PTR Section -->
+  <div id="ptrSection" class="section active">
+    <div id="ptrButtons" class="button-container"></div>
+    <div id="ptrFormContainer"></div>
+  </div>
+
+  <!-- Other Section -->
+  <div id="otherSection" class="section">
+    <div id="otherButtons" class="button-container"></div>
+    <div id="otherFormContainer" class="form-container"></div>
+  </div>
+
+
+  <!-- Save & Back buttons -->
+  <div class="action-buttons" style="display:flex;justify-content:center;gap:10px;margin-bottom:12px;">
+    <button id="saveBtn" class="toggle-btn">Save</button>
+    <button id="backBtn" class="toggle-btn">Back</button>
+  </div>
+
+ 
+  <h2>Live Findings</h2>
+  <table id="liveTable" class="report">
+    <thead>
+      <tr><th>Sl. no.</th><th>Equipment/Material</th><th>Action to be taken</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="export-btns">
+    <button id="exportExcel">Download Excel</button>
+    <button id="exportDoc">Download Doc</button>
+    <button id="exportPdf">Download PDF</button>
+  </div>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+  <script src="visual_findings.js" defer></script>
+</body>
+</html>

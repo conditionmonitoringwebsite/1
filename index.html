@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Substation Condition Monitoring - Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+      background-color: #0a0f2c; /* Dark electric blue */
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-container {
+      background: #111836;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #00f2ff;
+      text-align: center;
+    }
+    .login-container h2 {
+      margin-bottom: 20px;
+      color: #00f2ff;
+    }
+    input[type="text"], input[type="password"] {
+      padding: 10px;
+      width: 250px;
+      border: none;
+      border-radius: 5px;
+      margin: 10px 0;
+      outline: none;
+    }
+    button {
+      padding: 10px 30px;
+      background-color: #00f2ff;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      color: #000;
+    }
+    button:hover {
+      background-color: #0ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Substation Monitoring Login</h2>
+    <input type="text" id="username" placeholder="Username" /><br />
+    <input type="password" id="password" placeholder="Password" /><br />
+    <button onclick="login()">Login</button>
+  </div>
+
+  <script>
+    const credentials = {
+      admin: "admin123",
+      user1: "pass1"
+    };
+
+    function login() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      if (credentials[username] && credentials[username] === password) {
+        window.location.href = "main_menu.html";
+      } else {
+        alert("Invalid credentials. Please try again.");
+      }
+    }
+  </script>
+</body>
+</html>

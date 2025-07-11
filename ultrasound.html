@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ultrasound Inspection Entry</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <style>
+    /* your existing styles */
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 20px; font-family: 'Orbitron', sans-serif; background-color: #0a0f2c; color: #fff; }
+    .header { width:100%; text-align:right; padding:10px; font-size:14px; color:#00f2ff; background:#111836; box-shadow:0 0 10px #00f2ff; }
+    h1 { text-align:center; color:#00f2ff; text-shadow:0 0 10px #00f2ff; margin:10px 0; font-size:24px; }
+    .table-container, .live-table-container { overflow-x:auto; -webkit-overflow-scrolling:touch; padding:0 10px; margin-top:20px; }
+    table { width:100%; min-width:900px; border-collapse:collapse; margin-top:10px; }
+    th, td { padding:6px; text-align:left; border:1px solid #00f2ff; vertical-align:top; font-size:12px; }
+    th { background:#111836; font-weight:normal; }
+    select, input[type="text"], input[type="number"] {
+      width:100%; padding:4px; margin-top:4px;
+      border:1px solid #00f2ff; border-radius:4px;
+      background:#111836; color:#fff;
+      font-family:Cambria, serif; font-size:14px;
+    }
+    .checkbox-container { display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; }
+    .checkbox-container label { font-size:10px; display:inline-flex; align-items:center; gap:2px; }
+    button {
+      padding:6px 12px; margin:10px 5px 0 0;
+      border:none; border-radius:6px;
+      background:#00f2ff; color:black;
+      font-size:12px; cursor:pointer;
+      font-family:'Orbitron',sans-serif;
+      box-shadow:0 0 6px #00f2ff;
+    }
+    button:hover { background:#0ff; }
+    .remove-btn { background:red; color:white; font-size:10px; padding:4px 6px; }
+    .remove-btn:hover { background:darkred; }
+    @media screen and (max-width:600px) {
+      th, td { font-size:10px; padding:4px; min-width:60px; }
+      select, input[type="text"], input[type="number"] { font-size:12px; padding:3px; }
+      button { font-size:10px; padding:4px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header" id="substationHeader"></div>
+
+<!-- Reset Button -->
+<div style="position: absolute; top: 20px; right: 20px;">
+  <button id="resetBtn"
+          style="background-color: red;
+                 color: white;
+                 padding: 6px 12px;
+                 border: none;
+                 border-radius: 4px;
+                 cursor: pointer;">
+    Reset
+  </button>
+</div>
+
+
+  <h1>Ultrasound Inspection Entry</h1>
+
+  <div class="table-container">
+    <table id="ultrasoundTable">
+      <thead>
+        <tr>
+          <th>Equipment Details</th><th>Location</th><th>Precise Location</th>
+          <th>Side</th><th>R Phase</th><th>Y Phase</th><th>B Phase</th>
+          <th>Neutral</th><th>Remarks</th><th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button id="addRowBtn">Add Row</button>
+    <button id="saveBtn">Save</button>
+    <button onclick="location.href='switchyard.html'">Back</button>
+  </div>
+
+  <div class="live-table-container">
+    <h2>Ultrasonic PD Measurements</h2>
+    <table id="liveTable" contenteditable="true">
+      <thead>
+        <tr>
+          <th>Sl. No.</th><th>Equipment Details</th><th>Location</th>
+          <th>R Phase (in dB)</th><th>Y Phase (in dB)</th><th>B Phase (in dB)</th>
+          <th>Neutral (in dB)</th><th>Action to be taken</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button id="downloadExcelBtn">Download Excel</button>
+    <button id="downloadDocBtn">Download Doc</button>
+    <button id="downloadPdfBtn">Download PDF</button>
+
+  </div>
+
+  <!-- JavaScript -->
+  <script src="ultrasound.js"></script>
+  <script>
+  document.getElementById('addRowBtn').onclick = addRow;
+  document.getElementById('saveBtn').onclick   = saveFormData;
+  window.onload = () => {
+    document.getElementById('substationHeader').innerText =
+      "Entering data for '" + (localStorage.getItem('selectedSubstation')||'') + "'";
+    loadFormData();
+    // only add a new empty row if we found no saved data
+    if (!localStorage.getItem('ultrasoundData')) {
+      addRow();
+    }
+
+    loadLiveTableHTML();
+
+  };
+</script>
+
+<!-- html2pdf: HTML→Canvas→PDF helper -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+
+
+</body>
+</html>

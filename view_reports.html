@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Reports</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+      background-color: #0a0f2c;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    h1 {
+      color: #00f2ff;
+      text-shadow: 0 0 10px #00f2ff;
+      margin-bottom: 40px;
+    }
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 90vw;
+      max-width: 400px;
+    }
+    .button-container button {
+      padding: 15px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background-color: #111836;
+      color: #00f2ff;
+      font-family: 'Orbitron', sans-serif;
+      cursor: pointer;
+      box-shadow: 0 0 15px #00f2ff;
+      transition: all 0.3s ease;
+    }
+    .button-container button:hover {
+      background-color: #00f2ff;
+      color: #000;
+      transform: scale(1.05);
+    }
+    .back-button {
+      margin-top: 40px;
+      padding: 10px 25px;
+      border: none;
+      border-radius: 10px;
+      background-color: #00f2ff;
+      color: #000;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00f2ff;
+    }
+    .back-button:hover {
+      background-color: #0ff;
+    }
+  </style>
+</head>
+<body>
+  <h1>View Reports</h1>
+  <div class="button-container">
+    <button onclick="alert('Draft Reports Clicked')">Draft Reports</button>
+    <button onclick="alert('Final Reports Clicked')">Final Reports</button>
+    <button onclick="alert('Analytics Clicked')">Analytics</button>
+  </div>
+  <button class="back-button" onclick="window.location.href='main_menu.html'">Back</button>
+</body>
+</html>
