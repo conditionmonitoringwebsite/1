@@ -196,26 +196,23 @@ function populateTemp11() {
   const tbody = document.querySelector('#tableTemp11 tbody');
 
 
-// ─── PRESERVE existing readings by name AND by index ───
+// ─── PRESERVE existing readings (F1, B1, B2, S1/S2 & PT) by name AND by index ───
 const oldTempByName  = {};
 const oldTempByIndex = [];
 tbody.querySelectorAll('tr').forEach((row, idx) => {
-  const entry = {
-    values: [
-      row.cells[4].querySelector('input').value,
-      row.cells[5].querySelector('input').value,
-      row.cells[6].querySelector('input').value
-    ],
-    checks: [
-      row.cells[4].querySelector('input[type="checkbox"]').checked,
-      row.cells[5].querySelector('input[type="checkbox"]').checked,
-      row.cells[6].querySelector('input[type="checkbox"]').checked
-    ]
-  };
+  const entry = { values: [], checks: [] };
+  // capture columns 4→8 (F1, B1, B2, S1/S2, PT)
+  for (let j = 4; j <= 8; j++) {
+    const inp = row.cells[j].querySelector('input');
+    const cb  = row.cells[j].querySelector('input[type="checkbox"]');
+    entry.values.push( inp  ? inp.value       : '' );
+    entry.checks.push( cb    ? cb.checked      : false );
+  }
   const name = row.cells[1].textContent.trim();
-  oldTempByName[name]   = entry;
-  oldTempByIndex[idx]   = entry;
+  oldTempByName[name] = entry;
+  oldTempByIndex[idx] = entry;
 });
+
 
 
 
@@ -294,6 +291,45 @@ if (prev) {
   tr.appendChild(td);
 }
 
+  // S1/S2 and PT → same pattern as F1/B1/B2
+  for (let j = 3; j < 5; j++) {
+    const td = document.createElement('td');
+    const wrapper = document.createElement('div');
+    wrapper.style.display        = 'flex';
+    wrapper.style.alignItems     = 'center';
+    wrapper.style.justifyContent = 'center';
+    wrapper.style.gap            = '0.25rem';
+    wrapper.style.whiteSpace     = 'nowrap';
+
+    const inp = document.createElement('input');
+    inp.type        = 'number';
+    inp.placeholder = '°C';
+    inp.style.width    = '76px';
+    inp.style.fontSize = '0.75rem';
+    inp.style.padding  = '2px 4px';
+    wrapper.appendChild(inp);
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.name = `h${j+1}`;  // j=3→h4, j=4→h5
+    wrapper.appendChild(cb);
+
+    const lbl = document.createElement('span');
+    lbl.textContent    = 'H';
+    lbl.style.fontSize = '0.75rem';
+    wrapper.appendChild(lbl);
+
+    // restore old values if any
+    const prev = oldTempByName[panelName] || oldTempByIndex[i];
+    if (prev) {
+      inp.value  = prev.values[j]  || '';
+      cb.checked = prev.checks[j]  || false;
+    }
+
+    td.appendChild(wrapper);
+    tr.appendChild(td);
+  }
+
 
 
     tbody.appendChild(tr);
@@ -312,7 +348,11 @@ document.getElementById('saveTemp11').addEventListener('click', () => {
     b1:        r.cells[5].querySelector('input').value,
     b1H:       r.cells[5].querySelector('input[type="checkbox"]').checked,
     b2:        r.cells[6].querySelector('input').value,
-    b2H:       r.cells[6].querySelector('input[type="checkbox"]').checked
+    b2H:       r.cells[6].querySelector('input[type="checkbox"]').checked,	
+    s1s2:      r.cells[7].querySelector('input').value,
+    s1s2H:     r.cells[7].querySelector('input[type="checkbox"]').checked,
+    pt:        r.cells[8].querySelector('input').value,
+    ptH:       r.cells[8].querySelector('input[type="checkbox"]').checked
   }));
   localStorage.setItem('temp11Data', JSON.stringify(tempData11));
   alert('11KV Temp data saved');
@@ -320,27 +360,23 @@ document.getElementById('saveTemp11').addEventListener('click', () => {
 
 function populateTemp33() {
   const tbody = document.querySelector('#tableTemp33 tbody');
-
-// ─── PRESERVE existing readings by name AND by index ───
+// ─── PRESERVE existing readings (F1, B1, B2, S1/S2 & PT) by name AND by index ───
 const oldTempByName  = {};
 const oldTempByIndex = [];
 tbody.querySelectorAll('tr').forEach((row, idx) => {
-  const entry = {
-    values: [
-      row.cells[4].querySelector('input').value,
-      row.cells[5].querySelector('input').value,
-      row.cells[6].querySelector('input').value
-    ],
-    checks: [
-      row.cells[4].querySelector('input[type="checkbox"]').checked,
-      row.cells[5].querySelector('input[type="checkbox"]').checked,
-      row.cells[6].querySelector('input[type="checkbox"]').checked
-    ]
-  };
+  const entry = { values: [], checks: [] };
+  // capture columns 4→8 (F1, B1, B2, S1/S2, PT)
+  for (let j = 4; j <= 8; j++) {
+    const inp = row.cells[j].querySelector('input');
+    const cb  = row.cells[j].querySelector('input[type="checkbox"]');
+    entry.values.push( inp  ? inp.value       : '' );
+    entry.checks.push( cb    ? cb.checked      : false );
+  }
   const name = row.cells[1].textContent.trim();
-  oldTempByName[name]   = entry;
-  oldTempByIndex[idx]   = entry;
+  oldTempByName[name] = entry;
+  oldTempByIndex[idx] = entry;
 });
+
 
 
 
@@ -414,6 +450,47 @@ if (prev) {
   tr.appendChild(td);
 }
 
+  // S1/S2 and PT → same pattern as F1/B1/B2
+  for (let j = 3; j < 5; j++) {
+    const td = document.createElement('td');
+    const wrapper = document.createElement('div');
+    wrapper.style.display        = 'flex';
+    wrapper.style.alignItems     = 'center';
+    wrapper.style.justifyContent = 'center';
+    wrapper.style.gap            = '0.25rem';
+    wrapper.style.whiteSpace     = 'nowrap';
+
+    const inp = document.createElement('input');
+    inp.type        = 'number';
+    inp.placeholder = '°C';
+    inp.style.width    = '76px';
+    inp.style.fontSize = '0.75rem';
+    inp.style.padding  = '2px 4px';
+    wrapper.appendChild(inp);
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.name = `h${j+1}`;  // j=3→h4, j=4→h5
+    wrapper.appendChild(cb);
+
+    const lbl = document.createElement('span');
+    lbl.textContent    = 'H';
+    lbl.style.fontSize = '0.75rem';
+    wrapper.appendChild(lbl);
+
+    // restore old values if any
+    const prev = oldTempByName[panelName] || oldTempByIndex[i];
+    if (prev) {
+      inp.value  = prev.values[j]  || '';
+      cb.checked = prev.checks[j]  || false;
+    }
+
+    td.appendChild(wrapper);
+    tr.appendChild(td);
+  }
+
+
+
     tbody.appendChild(tr);
   });
 }
@@ -429,7 +506,11 @@ document.getElementById('saveTemp33').addEventListener('click', () => {
     b1:        r.cells[5].querySelector('input').value,
     b1H:       r.cells[5].querySelector('input[type="checkbox"]').checked,
     b2:        r.cells[6].querySelector('input').value,
-    b2H:       r.cells[6].querySelector('input[type="checkbox"]').checked
+    b2H:       r.cells[6].querySelector('input[type="checkbox"]').checked,
+    s1s2:      r.cells[7].querySelector('input').value,
+    s1s2H:     r.cells[7].querySelector('input[type="checkbox"]').checked,
+    pt:        r.cells[8].querySelector('input').value,
+    ptH:       r.cells[8].querySelector('input[type="checkbox"]').checked
   }));
   localStorage.setItem('temp33Data', JSON.stringify(tempData33));
   alert('33KV Temp data saved');
@@ -1595,7 +1676,7 @@ otherSection.querySelectorAll('.sub-tab-btn').forEach(btn => {
 
  function populateLiveTable() {
   liveTbody.innerHTML = '';  
-  const COL_COUNT = 20;
+  const COL_COUNT = 22;
 
   function buildPanelRow(r, is11KV) {
     const tr = document.createElement('tr');
@@ -1640,17 +1721,25 @@ document.querySelectorAll('#liveTable tbody td').forEach(td => {
 
 
     const tempRows = document.querySelectorAll(`#tableTemp${tableId} tbody tr`);
-    const tempRow = tempRows[r.index] || null;
-[4, 5, 6].forEach(colIdx => {
-  const td = document.createElement('td');
-  if (tempRow) {
-    const val = tempRow.cells[colIdx].querySelector('input')?.value;
-    td.textContent = val ? val : '---';
-  } else {
-    td.textContent = '---';
-  }
-  tr.appendChild(td);
-});
+    const tempRow  = tempRows[r.index] || null;
+    [4,5,6,7,8].forEach(colIdx => {
+      const td = document.createElement('td');
+      if (tempRow) {
+        // grab the numeric input and its “H” checkbox
+        const inp   = tempRow.cells[colIdx].querySelector('input[type="number"]');
+        const check = tempRow.cells[colIdx].querySelector('input[type="checkbox"]');
+        const val   = inp.value ? inp.value : '---';
+        // always set the text
+        td.textContent = val;
+        // if “H” is checked AND there’s a value, make it bold
+        if (check && check.checked && inp.value) {
+          td.style.fontWeight = 'bold';
+        }
+      } else {
+        td.textContent = '---';
+      }
+      tr.appendChild(td);
+    });
 
 
     const usRows = document.querySelectorAll(`#tableUltrasound${tableId} tbody tr`);
@@ -1695,6 +1784,25 @@ if (tempRow) {
   if (b2H) {
     actions.push("Hotspot has been detected at CT/Cable chamber. All the CT/cable contact points & nut bolts of CT/Cable Chamber are needed to be tightened. Thorough Cleaning & maintenance of the said CT/cable chambers also should be done.");
   }
+// ── Add S1/S2 and PT “H” logic ──
+const s12H = tempRow.cells[7]
+                 .querySelector('input[type="checkbox"]')
+                 .checked;
+if (s12H) {
+  actions.push(
+    "Hotspot has been detected at side bus section. Thorough checking of bus chambers, bus spouts and bus support insulators should be done. Cleaning & maintenance of the bus chamber also should be done. Further, Male-female contact point between Bus & VCB of the adjacent panel is also to be checked."
+  );
+}
+
+const ptH = tempRow.cells[8]
+               .querySelector('input[type=\"checkbox\"]')
+               .checked;
+if (ptH) {
+  actions.push(
+    "Hotspot has been detected at PT chamber of the panel. Necessary maintenance of the said PT chamber including fixed and moving parts is to be done. Tightness of all PT terminals, lugs and busbar connections are to be checked."
+  );
+}
+
 }
 
 // NEW: Ultrasound-based Action logic
@@ -1924,6 +2032,10 @@ populateUS33();
         r.cells[5].querySelector('input[type="checkbox"]').checked = !!item.b1H;
         r.cells[6].querySelector('input').value = item.b2;
         r.cells[6].querySelector('input[type="checkbox"]').checked = !!item.b2H;
+        r.cells[7].querySelector('input').value                    = item.s1s2;
+        r.cells[7].querySelector('input[type="checkbox"]').checked = !!item.s1s2H;
+        r.cells[8].querySelector('input').value                    = item.pt;
+        r.cells[8].querySelector('input[type="checkbox"]').checked = !!item.ptH;
       });
 
     const t33 = document.querySelectorAll('#tableTemp33 tbody tr');
@@ -1937,6 +2049,10 @@ populateUS33();
       r.cells[5].querySelector('input[type="checkbox"]').checked = !!item.b1H;
       r.cells[6].querySelector('input').value = item.b2;
       r.cells[6].querySelector('input[type="checkbox"]').checked = !!item.b2H;
+      r.cells[7].querySelector('input').value                    = item.s1s2;
+      r.cells[7].querySelector('input[type="checkbox"]').checked = !!item.s1s2H;
+      r.cells[8].querySelector('input').value                    = item.pt;
+      r.cells[8].querySelector('input[type="checkbox"]').checked = !!item.ptH;
       });
   })();
 
@@ -2487,10 +2603,16 @@ document.getElementById('downloadDocBtn').addEventListener('click', () => {
    }
 
    /* “Action to be Taken” is last column */
-   td:last-child {
-     font-size: 9pt;
-   }
-
+  /* widen the “Action to be Taken” column */
+  th[rowspan="2"],
+  td:last-child {
+    /* choose a width that suits your content */
+    width: 200px !important;
+  }
+  td:last-child {
+    font-family: Cambria;
+    font-size: 9pt;
+  }
        /* 11KV & 33KV panels data rows */
        tr.kv-11 td,
        tr.kv-33 td {
@@ -2558,7 +2680,7 @@ document.getElementById('downloadPdfBtn').addEventListener('click', () => {
   document.head.appendChild(pdfStyle);
 
   // 3) Compute a CSS scale so the table fits into (14" – 2×0.5") of printable width
-  const DPI = 96;
+  const DPI = 95;
   const LEGAL_WIDTH_IN = 17.5;           // legal in landscape
   const MARGIN_IN = 0.5;               // ½" left & right
   const availablePx = (LEGAL_WIDTH_IN - MARGIN_IN * 2) * DPI;
