@@ -1714,6 +1714,9 @@ document.querySelectorAll('#liveTable tbody td').forEach(td => {
   td.setAttribute('contenteditable', 'true');
 });
 
+
+
+
   }
 
   tr.appendChild(td);
@@ -2535,6 +2538,15 @@ populateLiveTable = function() {
   const COL_COUNT = 20;
   const liveTbody  = document.querySelector('#liveTable tbody');
   const rtccObs    = otherActionsStore['RTCC'] || [];
+
+
+  // Persist updated live-table HTML snapshot for download_report.html
+  localStorage.setItem(
+    'controlRoomDocHTML',
+    document.getElementById('liveTableContainer').innerHTML
+  );
+
+
   
 };
 
@@ -2565,6 +2577,8 @@ populateLiveTable();
   // ── Download Live Table as .docx ──
 document.getElementById('downloadDocBtn').addEventListener('click', () => {
   const content = document.getElementById('liveTableContainer').innerHTML;
+  localStorage.setItem('controlRoomDocHTML', content);
+
   const fullHtml = `
     <!DOCTYPE html>
     <html>
