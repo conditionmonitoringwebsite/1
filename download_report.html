@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=l3uJcOjP5GMQUQAwx8jJJGF9nu_ydEDdIOiSiil5Gj_k4nCpf6hMUXn2bCFG5r3es15CGKbfQsMeeJKgh0sSCfm6yYrGhBCUUVrihLFhnVeyZ7c2Vgq_KKiS6AeZNO1zreF1HcRN0gng_qKgE_MejR5biov-g5nMasmKmqcxaMlqfNM0S9OzgY-PCWZCdIXI_DzejmL8y-n84zFl8zDdnDuc-4TI4SceJV1mnVXpkPOIcuRpKIzf5v4zJARwbZes" charset="UTF-8"></script><style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+      background-color: #0a0f2c;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 10px;
+    }
+    .header {
+      width: 100%;
+      text-align: right;
+      padding: 10px 20px;
+      font-size: 16px;
+      color: #00f2ff;
+      background-color: #111836;
+      box-shadow: 0 0 10px #00f2ff;
+      margin-bottom: 40px;
+    }
+    h1 {
+      color: #00f2ff;
+      text-shadow: 0 0 10px #00f2ff;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 90vw;
+      max-width: 400px;
+    }
+    .button-container button {
+      padding: 15px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background-color: #111836;
+      color: #00f2ff;
+      font-family: 'Orbitron', sans-serif;
+      cursor: pointer;
+      box-shadow: 0 0 15px #00f2ff;
+      transition: all 0.3s ease;
+    }
+    .button-container button:hover {
+      background-color: #00f2ff;
+      color: #000;
+      transform: scale(1.05);
+    }
+  </style>
+
+
+<!-- NEW -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<!-- pulls in htmlDocx → window.htmlDocx -->
+<script src="https://unpkg.com/html-docx-js@0.3.1/dist/html-docx.js"></script> 
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- html2canvas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+
+</head>
+
+
+<body>
+  <div class="header" id="substationHeader">
+    <!-- Substation name will appear here -->
+  </div>
+
+  <h1>Download Report</h1>
+
+  <div class="button-container">
+    <button onclick="downloadDoc()">Download Report in Doc</button>
+    <button onclick="downloadPDF()">Download Report in PDF</button>
+  </div>
+
+<script>
+  const subName = localStorage.getItem("selectedSubstation") || "[Substation Not Set]";
+  document.getElementById('substationHeader').textContent = subName;
+
+  async function downloadDoc() {
+    // 1) build our container
+    const container = document.createElement('div');
+const title = document.createElement('h1');
+title.textContent = `Condition Monitoring Report for ${subName}`;
+title.style.fontFamily = 'Cambria';
+title.style.fontSize = '16pt';
+title.style.fontWeight = 'bold';
+title.style.textDecoration = 'underline';
+title.style.textAlign = 'center';
+container.appendChild(title);
+
+
+    // 2) pull in each page’s saved-HTML
+    const sections = [
+      { key: 'controlRoomDocHTML', title: 'Measurement Of Partial Discharge At In-Door Panels, Temperature Recorded and Other Observations' },
+      { key: 'ultrasoundDocHTML',  title: 'Ultrasonic PD Measurement on Outdoor Equipments'   },
+      { key: 'hotspotDocHTML',     title: 'Hotspot Detected by Thermal Imaging Camera'      },
+      { key: 'visualDocHTML',      title: 'Action to be Taken by Division Authority as per Visual Inspection Findings'         }
+    ];
+
+
+    for (let { key, title: secTitle } of sections) {
+      const html = localStorage.getItem(key);
+      if (html) {
+        const h2 = document.createElement('h2');
+        h2.textContent = secTitle;
+        container.appendChild(h2);
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = html;
+        container.appendChild(wrapper);
+      } else {
+        console.warn(`No data for ${secTitle} (key="${key}")`);
+      }
+    }
+
+
+// ── ADD ULTRASOUND LIVE TABLE WITH ROW GROUP COLOURING ──
+const usLiveHTML = localStorage.getItem('ultrasoundLiveTableHTML');
+if (usLiveHTML) {
+  const h2 = document.createElement('h2');
+  h2.textContent = 'Ultrasonic PD Measurement on Outdoor Equipments';
+  container.appendChild(h2);
+
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Sl. No.</th>
+          <th>Equipment Details</th>
+          <th>Location</th>
+          <th>R Phase (in dB)</th>
+          <th>Y Phase (in dB)</th>
+          <th>B Phase (in dB)</th>
+          <th>Neutral (in dB)</th>
+          <th>Action to be taken</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${usLiveHTML}
+      </tbody>
+    </table>`;
+
+  const colors = [
+    '#f0f8ff','#fafad2','#e6e6fa','#fff0f5',
+    '#f0fff0','#f5f5f5','#fffaf0','#f5fffa',
+    '#f5f5dc','#f0ffff'
+  ];
+
+  let lastEq = null;
+  let currentEq = null;
+  let colorIndex = -1;
+
+  const rows = wrapper.querySelectorAll('tbody tr');
+
+  rows.forEach(tr => {
+    const eqCell = tr.querySelector('td[rowspan]');
+    if (eqCell) {
+      lastEq = eqCell.textContent;
+      currentEq = null; // Trigger new group colour
+    }
+    if (lastEq !== currentEq) {
+      currentEq = lastEq;
+      colorIndex = (colorIndex + 1) % colors.length;
+    }
+    tr.querySelectorAll('td').forEach(td => {
+      td.style.backgroundColor = colors[colorIndex];
+    });
+  });
+
+  container.appendChild(wrapper);
+}
+
+
+
+
+// ── ADD HOTSPOT LIVE TABLE WITH COLOR CODING ──
+const hsLiveHTML = localStorage.getItem('hotspotLiveTableBody');
+if (hsLiveHTML) {
+  const h2 = document.createElement('h2');
+  h2.textContent = 'Hotspot Detected by Thermal Imaging Camera';
+  container.appendChild(h2);
+
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Sl. No.</th>
+          <th>Hotspot Location</th>
+          <th>Ambient Temp (°C)</th>
+          <th>R Phase (°C)</th>
+          <th>Y Phase (°C)</th>
+          <th>B Phase (°C)</th>
+          <th>Neutral (°C)</th>
+          <th>Image Code</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${hsLiveHTML}
+      </tbody>
+    </table>`;
+  
+  // Add color to all rows except header
+  const rows = wrapper.querySelectorAll('tbody tr');
+  rows.forEach(row => {
+    row.style.backgroundColor = '#dbe5f1';
+  });
+
+  container.appendChild(wrapper);
+}
+
+
+
+// ── ADD VISUAL FINDINGS LIVE TABLE WITH ROW GROUP COLOURING ──
+const vfLiveHTML = localStorage.getItem('visualLiveTableHTML');
+if (vfLiveHTML) {
+  const h2 = document.createElement('h2');
+  h2.textContent = 'Action to be Taken by Division Authority as per Visual Inspection Findings';
+  container.appendChild(h2);
+
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Sl. No.</th>
+          <th>Equipment/Material</th>
+          <th>Action to be taken</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${vfLiveHTML}
+      </tbody>
+    </table>`;
+
+  // Row group colouring logic
+  const colors = [
+    '#f0f8ff', '#fafad2', '#e6e6fa', '#fff0f5', '#f0fff0',
+    '#f5f5f5', '#fffaf0', '#f5fffa', '#f5f5dc', '#f0ffff'
+  ];
+
+  let colorIndex = -1;
+  let lastEquipment = null;
+
+  wrapper.querySelectorAll('tbody tr').forEach(tr => {
+    const equipCell = tr.querySelector('td[rowspan]');
+    if (equipCell) {
+      lastEquipment = equipCell.textContent.trim();
+      colorIndex = (colorIndex + 1) % colors.length;
+    }
+
+    tr.querySelectorAll('td').forEach(td => {
+      td.style.backgroundColor = colors[colorIndex];
+    });
+  });
+
+  container.appendChild(wrapper);
+}
+
+
+
+
+
+
+  // 3) inject your Control-Room export CSS so tables render identically
+  const docxStyle = `
+   <style type="text/css">
+   /* define a “Section1” page of Legal × Landscape */
+   @page Section1 {
+     size: 14in 8.5in;    /* width × height = Legal landscape */
+     margin: 1cm;
+   }
+   /* apply that section to our wrapper DIV */
+   div.Section1 {
+     page: Section1;
+   }
+
+      /* “No Spacing” for all table text */
+      body, p, th, td, div {
+        margin: 0;
+        padding: 0;
+        font-family: Cambria;
+        line-height: 1;
+        mso-style-name: "No Spacing";
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        border: 1px solid #000;
+        padding: 5px;
+      }
+      th {
+        background: #d9d9d9;
+        font-size: 11pt;
+      }
+      td {
+        font-size: 11pt;
+      }
+/* widen “Action to be Taken” and ensure font-size specifically for Control Room Table */
+table:nth-of-type(1) tbody td:last-child {
+  width: 200px !important;
+  font-family: Cambria !important;
+  font-size: 9pt !important;
+}
+
+      /* (keep your other row-background rules here) */
+
+/* Control Panel table rows font size */
+table tbody td {
+    font-size: 10pt !important;
+}
+
+
+
+
+
+
+     /* 11KV & 33KV panels data rows */
+     tr.kv-11 td,
+     tr.kv-33 td {
+       background-color: #dbe5f1 !important;
+     }
+     /* Group‐header rows for 11KV/33KV Panels */
+     tr.kv-header td {
+       background-color: #dbe5f1 !important;
+     }
+     /* Observations header row */
+     tr.obs-header td {
+       background-color: #d9d9d9 !important;
+     }
+
+
+  h2 {
+    font-family: Cambria;
+    font-size: 14pt;
+    text-align: center;
+  }
+
+
+    </style>
+  `;
+
+
+
+  // 4) wrap it all up
+  const fullHtml = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8"/>
+        ${docxStyle}
+      </head>
+      <body>
+      <div class="Section1">
+        ${container.innerHTML}
+      </div>
+    </body>
+   </html>
+  `;
+  try {
+    const blob = htmlDocx.asBlob(fullHtml);
+    saveAs(blob, `${subName}-Full-Report.docx`);
+  } catch (e) {
+    console.error(e);
+    alert('Failed to generate DOCX:\n' + e.message);
+  }
+  }
+
+async function downloadPDF() {
+  const subName = localStorage.getItem("selectedSubstation") || "[Substation Not Set]";
+
+  // Create container similar to downloadDoc
+  const container = document.createElement('div');
+
+  // Add Title
+  const title = document.createElement('h1');
+  title.textContent = `Condition Monitoring Report for ${subName}`;
+  title.style.fontFamily = 'Cambria';
+  title.style.fontSize = '16pt';
+  title.style.fontWeight = 'bold';
+  title.style.textDecoration = 'underline';
+  title.style.textAlign = 'center';
+  title.style.color = 'black';
+
+  container.appendChild(title);
+
+  // Sections from storage (Control Room, Ultrasound, Hotspot, Visual Findings)
+  const sections = [
+    { key: 'controlRoomDocHTML', title: 'Measurement Of Partial Discharge At In-Door Panels, Temperature Recorded and Other Observations' },
+    { key: 'ultrasoundDocHTML',  title: 'Ultrasonic PD Measurement on Outdoor Equipments'   },
+    { key: 'hotspotDocHTML',     title: 'Hotspot Detected by Thermal Imaging Camera'      },
+    { key: 'visualDocHTML',      title: 'Action to be Taken by Division Authority as per Visual Inspection Findings' }
+  ];
+
+  for (let { key, title: secTitle } of sections) {
+    const html = localStorage.getItem(key);
+    if (html) {
+      const h2 = document.createElement('h2');
+      h2.textContent = secTitle;
+      container.appendChild(h2);
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = html;
+      container.appendChild(wrapper);
+    }
+  }
+
+// Include Live tables with proper header rows
+const liveTables = [
+  { key: 'controlRoomLiveTableHTML', title: 'Control Room Live Data' },
+  { key: 'ultrasoundLiveTableHTML', title: 'Ultrasonic PD Measurement on Outdoor Equipments' },
+  { key: 'hotspotLiveTableBody', title: 'Hotspot Detected by Thermal Imaging Camera' },
+  { key: 'visualLiveTableHTML', title: 'Action to be Taken by Division Authority as per Visual Inspection Findings' }
+];
+
+liveTables.forEach(({ key, title }) => {
+  const tableHTML = localStorage.getItem(key);
+  if (tableHTML) {
+    const h2 = document.createElement('h2');
+    h2.textContent = title;
+    container.appendChild(h2);
+
+    const wrapper = document.createElement('div');
+    let tableHeader = '';
+
+    if (key === 'ultrasoundLiveTableHTML') {
+      tableHeader = `
+        <thead>
+          <tr>
+            <th>Sl. No.</th>
+            <th>Equipment Details</th>
+            <th>Location</th>
+            <th>R Phase (in dB)</th>
+            <th>Y Phase (in dB)</th>
+            <th>B Phase (in dB)</th>
+            <th>Neutral (in dB)</th>
+            <th>Action to be taken</th>
+          </tr>
+        </thead>`;
+    } else if (key === 'hotspotLiveTableBody') {
+      tableHeader = `
+        <thead>
+          <tr>
+            <th>Sl. No.</th>
+            <th>Hotspot Location</th>
+            <th>Ambient Temp (°C)</th>
+            <th>R Phase (°C)</th>
+            <th>Y Phase (°C)</th>
+            <th>B Phase (°C)</th>
+            <th>Neutral (°C)</th>
+            <th>Image Code</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>`;
+    } else if (key === 'visualLiveTableHTML') {
+      tableHeader = `
+        <thead>
+          <tr>
+            <th>Sl. No.</th>
+            <th>Equipment/Material</th>
+            <th>Action to be taken</th>
+          </tr>
+        </thead>`;
+    }
+
+wrapper.innerHTML = `<table>${tableHeader}<tbody>${tableHTML}</tbody></table>`;
+
+// Apply row color for Control Room table
+if (key === 'controlRoomLiveTableHTML') {
+  const rows = wrapper.querySelectorAll('tbody tr');
+  rows.forEach(row => {
+    row.style.backgroundColor = '#dbe5f1';
+  });
+}
+
+container.appendChild(wrapper);
+
+  }
+});
+
+
+  // Apply identical CSS styles from DOCX to PDF
+  container.style.backgroundColor = "#ffffff";
+  container.style.color = "#000000";
+  container.style.padding = "10px";
+  container.style.fontFamily = "Cambria";
+  container.style.width = "1200px";  // ensures good resolution
+
+  const docxStyle = `
+    <style>
+      body, p, th, td, div { margin:0; padding:0; font-family:Cambria; line-height:1; }
+      table { width:100%; border-collapse:collapse; }
+      th, td { border:1px solid #000; padding:5px; font-size:11pt; }
+      th { background:#d9d9d9; }
+      h1, h2 { text-align:center; }
+    </style>
+  `;
+  container.innerHTML = docxStyle + container.innerHTML;
+
+  document.body.appendChild(container);
+
+  const { jsPDF } = window.jspdf;
+
+  // PDF generation logic
+  html2canvas(container, { scale: 2 }).then(canvas => {
+    const pdf = new jsPDF('p', 'mm', 'legal'); // Portrait & Legal size
+    const imgData = canvas.toDataURL('image/png');
+
+    const imgWidth = 216; // Legal width in mm
+    const pageHeight = 356; // Legal height in mm
+    const imgHeight = canvas.height * imgWidth / canvas.width;
+    let heightLeft = imgHeight;
+    let position = 10;
+
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save(`${subName}-Full-Report.pdf`);
+    document.body.removeChild(container);
+  }).catch(e => {
+    alert('Failed to generate PDF:\n' + e.message);
+    document.body.removeChild(container);
+  });
+}
+
+
+  window.downloadDoc = downloadDoc;
+  window.downloadPDF = downloadPDF;
+</script>
+
+
+
+
+
+</body>
+</html>
