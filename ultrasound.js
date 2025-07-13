@@ -811,6 +811,7 @@ const preamble =
   const closing = '</body></html>';
 
   const html = preamble + clone.outerHTML + closing;
+localStorage.setItem('ultrasoundDocHTML', html);
   const blob = new Blob(
     ['\ufeff', html],
     { type: 'application/msword' }
