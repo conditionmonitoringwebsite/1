@@ -1524,6 +1524,15 @@ if (equip === 'SSTR') {
 
   // Fallback
   tbody.innerHTML = html || '<tr><td colspan="3">No data yet.</td></tr>';
+
+  // Store visual findings live-table rows for consolidated report
+  localStorage.setItem(
+    'visualLiveTableHTML',
+    tbody.innerHTML
+  );
+
+
+
 // ─── make Equipment & Action columns editable ───────────────────────────
 // ─── allow editing on every non-serial cell ───────────────────────────────
 const rows = document.querySelectorAll('#liveTable tbody tr');
@@ -1719,6 +1728,9 @@ function exportDoc() {
   ${clone.outerHTML}
 </body>
 </html>`;
+
+
+ localStorage.setItem('visualDocHTML', html);
 
   // 3) convert & download
   const blob = window.htmlDocx.asBlob(html);
