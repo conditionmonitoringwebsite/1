@@ -767,6 +767,7 @@ Array.from(tbl.querySelectorAll('tbody tr')).forEach(tr => {
    'th,td{border:1px solid #000;}' +
  '</style></head><body>';
   const html=pre+tbl.outerHTML+'</body></html>';
+localStorage.setItem('hotspotDocHTML', html);
   const blob=window.htmlDocx.asBlob(html,{orientation:'landscape',margins:{top:720,right:720,bottom:720,left:720}});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download = makeFilename('docx');
 
