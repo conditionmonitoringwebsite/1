@@ -2383,7 +2383,7 @@ document.getElementById('addRoomManualBtn').addEventListener('click', () => {
  const _origPopulate = populateLiveTable;
  populateLiveTable = function() {
    _origPopulate();
-   const COL_COUNT = 20;
+   const COL_COUNT = 22;
    const liveTbody = document.querySelector('#liveTable tbody');
 
    // gather all four lists
