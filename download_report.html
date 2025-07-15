@@ -1,21 +1,21 @@
-	<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Control Room Inspection</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download Report</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
-  <style>
+  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=l3uJcOjP5GMQUQAwx8jJJGF9nu_ydEDdIOiSiil5Gj_k4nCpf6hMUXn2bCFG5r3es15CGKbfQsMeeJKgh0sSCfm6yYrGhBCUUVrihLFhnVeyZ7c2Vgq_KKiS6AeZNO1zreF1HcRN0gng_qKgE_MejR5biov-g5nMasmKmqcxaMlqfNM0S9OzgY-PCWZCdIXI_DzejmL8y-n84zFl8zDdnDuc-4TI4SceJV1mnVXpkPOIcuRpKIzf5v4zJARwbZes" charset="UTF-8"></script><style>
     body {
       margin: 0;
-      padding: 30px 10px;
+      padding: 0;
       font-family: 'Orbitron', sans-serif;
       background-color: #0a0f2c;
       color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 100vh;
+      padding: 30px 10px;
     }
     .header {
       width: 100%;
@@ -35,20 +35,19 @@
     }
     .button-container {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 20px;
-      justify-content: center;
-      margin-bottom: 20px;
       width: 90vw;
-      max-width: 600px;
+      max-width: 400px;
     }
     .button-container button {
-      padding: 12px 20px;
-      font-size: 16px;
+      padding: 15px;
+      font-size: 18px;
       border: none;
       border-radius: 10px;
       background-color: #111836;
       color: #00f2ff;
+      font-family: 'Orbitron', sans-serif;
       cursor: pointer;
       box-shadow: 0 0 15px #00f2ff;
       transition: all 0.3s ease;
@@ -58,2112 +57,508 @@
       color: #000;
       transform: scale(1.05);
     }
-    .section {
-      display: none;
-      width: 90vw;
-      max-width: 800px;
-      background-color: #111836;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-      margin-bottom: 30px;
-    }
-    .section.active {
-      display: block;
-    }
-@media (max-width:600px) {
-  /* Make main buttons stack full-width */
-  .button-container {
-    flex-direction: column;
-    gap: 10px;
-  }
-  .button-container button {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-  }
-  /* Scale down the title */
-  h1 {
-    font-size: 20px;
-    margin-bottom: 20px;
-  }
-
-  /* Sections full-width and snug padding */
-  .section {
-    width: 100vw;
-    max-width: none;
-    padding: 12px;
-    margin-bottom: 20px;
-  }
-
-  /* Stack sub-tabs vertically */
-  .sub-tab-container {
-    flex-direction: column;
-    gap: 8px;
-  }
-  .sub-tab-btn {
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-  }
-
-  /* Action buttons at bottom of each table */
-  .action-buttons {
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 12px !important;
-  }
-  .action-buttons button {
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-  }
-
-  /* Make every table scrollable horizontally */
-  .table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .table-container table {
-    width: 100%;
-    min-width: 600px;    /* allow scrolling if needed */
-    table-layout: fixed;
-  }
-  .table-container th,
-  .table-container td {
-    padding: 6px 8px;
-    font-size: 12px;
-    word-wrap: break-word;
-  }
-
-  /* Inputs, selects, buttons tappable size */
-  input, select, .section-btn {
-    font-size: 14px !important;
-    padding: 8px 6px !important;
-  }
-
-/* Shrink Temp inputs and let “H” wrap on small screens */
-#tableTemp11 td > div,
-#tableTemp33 td > div {
-  flex-wrap: wrap       !important;
-  gap:       0.2rem     !important;
-}
-#tableTemp11 td > div input[type="number"],
-#tableTemp33 td > div input[type="number"] {
-  width:   40px          !important;
-  padding: 2px 4px      !important;
-}
-#tableTemp11 td > div input[type="checkbox"],
-#tableTemp33 td > div input[type="checkbox"] {
-  transform: scale(0.9) !important;
-  margin:    0          !important;
-}
-#tableTemp11 td > div span,
-#tableTemp33 td > div span {
-  font-size: 0.6rem     !important;
-  margin:    0          !important;
-}
-
-
-
-
-}
-
-
-/* Sub-tabs under “Panel Name & Load” */
-.sub-tab-container {
-  display: flex;
-  justify-content: center;  /* center the buttons */
-  align-items: center;
-  gap: 1rem;
-  width: 100%;               /* make container full-width */
-  margin: 0 auto 1rem auto;  /* vertical margin, auto-center horizontally */
-}
-.sub-tab-btn {
-  /* you can copy your .section-btn styles here or simply inherit */
-  padding: 8px 16px;
-  font-family: 'Orbitron', sans-serif;
-  background: #111836;
-  color: #00f2ff;
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 0 10px #00f2ff;
-  cursor: pointer;
-  transition: 0.3s;
-}
-.sub-tab-btn:hover {
-  background: #00f2ff;
-  color: #000;
-  transform: scale(1.05);
-}
-.sub-section { display: none; }
-.sub-section.active { display: block; }
-
-.sub-tab-btn.active {
-  background-color: #00f2ff;
-  color: #000;
-  box-shadow: 0 0 20px #00f2ff;
-}
-
-/* Highlight the active main tab */
-.section-btn.active {
-  background-color: #00f2ff;
-  color: #000;
-  box-shadow: 0 0 20px #00f2ff;
-}
-
-/* ========== Add to your <style> block or styles.css ========== */
-
-/* Table and cell styling */
-.table-container table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-}
-.table-container th,
-.table-container td {
-  border: 1px solid #00f2ff;
-  padding: 0.5rem;
-  text-align: center;
-  color: #fff;
-}
-.table-container th {
-  background-color: #111836;
-}
-
-/* ========== Battery inputs: center the entered values ========== */
-#battery .table-container input {
-  text-align: center;
-}
-
-/* ========== Temp inputs: center the entered values ========== */
-#temp .table-container input {
-  text-align: center;
-}
-
-
-
-/* Inputs & selects in Panel tables */
-#panelLoad .sub-section input[type="text"],
-#panelLoad .sub-section input[type="number"],
-#panelLoad .sub-section select {
-  width: 100%;
-  background: #0a0f2c;
-  color: #fff;
-  border: 2px solid #00f2ff;
-  border-radius: 6px;
-  padding: 6px 8px;
-  font-family: 'Orbitron', sans-serif;
-  box-shadow: inset 0 0 8px #00f2ff;
-  transition: box-shadow 0.3s ease;
-}
-#panelLoad .sub-section input:focus,
-#panelLoad .sub-section select:focus {
-  outline: none;
-  box-shadow: 0 0 12px #00f2ff;
-}
-
-/* Smaller action buttons in tables */
-#panelLoad .sub-section .section-btn {
-  background-color: #111836;
-  color: #00f2ff;
-  border: 2px solid #00f2ff;
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 0.8rem;
-  box-shadow: 0 0 10px #00f2ff;
-  transition: all 0.3s ease;
-}
-#panelLoad .sub-section .section-btn:hover {
-  background-color: #00f2ff;
-  color: #000;
-  transform: scale(1.05);
-}
-
-/* Match Temp → Save buttons to Panel Name & Load style */
-#temp .sub-section .section-btn {
-  background-color: #111836;
-  color: #00f2ff;
-  border: 2px solid #00f2ff;
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 0.8rem;
-  box-shadow: 0 0 10px #00f2ff;
-  transition: all 0.3s ease;
-}
-#temp .sub-section .section-btn:hover {
-  background-color: #00f2ff;
-  color: #000;
-  transform: scale(1.05);
-}
-
-
-
-
-/* Delete button accent */
-/* glowing red “Delete” button */
-#panelLoad .sub-section .delete-row-btn {
-  background-color: #8B0000;      /* dark red background */
-  color: #fff;                    /* white text */
-  border: none;                   /* override any existing border */
-  padding: 4px 8px;
-  font-size: 0.75rem;
-  border-radius: 4px;
-  /* glow effect */
-  box-shadow:
-    0 0 5px  #ff0000 !important,
-    0 0 15px #ff0000 !important;
-  transition:
-    box-shadow 0.3s ease,
-    transform  0.2s ease;
-}
-
-#panelLoad .sub-section .delete-row-btn:hover {
-  /* intensify glow & pop on hover */
-  box-shadow:
-    0 0 10px #ff0000 !important,
-    0 0 25px #ff0000 !important;
-  transform: scale(1.05);
-}
-
-
-/* =========== Fix table overflow =========== */
-.table-container table {
-  table-layout: fixed;
-}
-.table-container th,
-.table-container td {
-  word-wrap: break-word;
-}
-
-/* Set column widths (adjust % to taste) */
-.table-container th:nth-child(1),
-.table-container td:nth-child(1) { width: 8%;  }  /* SL No */
-.table-container th:nth-child(2),
-.table-container td:nth-child(2) { width: 42%; }  /* Panel Name */
-.table-container th:nth-child(3),
-.table-container td:nth-child(3) { width: 20%; }  /* VCB State */
-.table-container th:nth-child(4),
-.table-container td:nth-child(4) { width: 20%; }  /* Load */
-.table-container th:nth-child(5),
-.table-container td:nth-child(5) { width: 10%; }  /* Action */
-
-/* Make inputs & selects fill their cell but not overflow */
-.table-container input,
-.table-container select {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* ==== TEMP→11KV: equalize F1/B1/B2 & adjust Panel/VCB widths ==== */
-#tableTemp11 { 
-  table-layout: fixed;  /* enforce % widths */
-}
-#tableTemp11 th {
-  white-space: normal !important;  /* allow headers to wrap */
-  word-wrap: break-word;
-}
-
-/* Sl. No.         6% */
-#tableTemp11 th:nth-child(1),
-#tableTemp11 td:nth-child(1) { width: 6%; }
-/* Panel Name    24% */
-#tableTemp11 th:nth-child(2),
-#tableTemp11 td:nth-child(2) { width: 24%; }
-/* VCB State     12% */
-#tableTemp11 th:nth-child(3),
-#tableTemp11 td:nth-child(3) { width: 12%; }
-/* Load (A)      12% */
-#tableTemp11 th:nth-child(4),
-#tableTemp11 td:nth-child(4) { width: 12%; }
-/* F1, B1, B2   15.33% each */
-#tableTemp11 th:nth-child(5),
-#tableTemp11 td:nth-child(5),
-#tableTemp11 th:nth-child(6),
-#tableTemp11 td:nth-child(6),
-#tableTemp11 th:nth-child(7),
-#tableTemp11 td:nth-child(7) { width: 15.3333%; }
-
-/* ==== TEMP→11KV: match input style to Panel Name & Load ==== */
-#temp11 input[type="number"] {
-  width: 100%;
-  box-sizing: border-box;
-  background: #0a0f2c;
-  color: #fff;
-  border: 2px solid #00f2ff;
-  border-radius: 6px;
-  padding: 6px 8px;
-  font-family: 'Orbitron', sans-serif;
-  box-shadow: inset 0 0 8px #00f2ff;
-  transition: box-shadow 0.3s ease;
-}
-#temp11 input[type="number"]:focus {
-  outline: none;
-  box-shadow: 0 0 12px #00f2ff;
-}
-
-/* ==== TEMP→33KV: equalize F1/B1/B2 & adjust Panel/VCB widths ==== */
-#tableTemp33 { 
-  table-layout: fixed;  /* enforce % widths */
-}
-#tableTemp33 th {
-  white-space: normal !important;  /* allow wrapping */
-  word-wrap: break-word;
-}
-
-/* Sl. No.         6% */
-#tableTemp33 th:nth-child(1),
-#tableTemp33 td:nth-child(1) { width: 6%; }
-/* Panel Name    24% */
-#tableTemp33 th:nth-child(2),
-#tableTemp33 td:nth-child(2) { width: 24%; }
-/* VCB State     12% */
-#tableTemp33 th:nth-child(3),
-#tableTemp33 td:nth-child(3) { width: 12%; }
-/* Load (A)      12% */
-#tableTemp33 th:nth-child(4),
-#tableTemp33 td:nth-child(4) { width: 12%; }
-/* F1, B1, B2   15.33% each */
-#tableTemp33 th:nth-child(5),
-#tableTemp33 td:nth-child(5),
-#tableTemp33 th:nth-child(6),
-#tableTemp33 td:nth-child(6),
-#tableTemp33 th:nth-child(7),
-#tableTemp33 td:nth-child(7) { width: 15.3333%; }
-
-/* ==== TEMP→33KV: match input style to Panel Name & Load ==== */
-#temp33 input[type="number"] {
-  width: 100%;
-  box-sizing: border-box;
-  background: #0a0f2c;
-  color: #fff;
-  border: 2px solid #00f2ff;
-  border-radius: 6px;
-  padding: 6px 8px;
-  font-family: 'Orbitron', sans-serif;
-  box-shadow: inset 0 0 8px #00f2ff;
-  transition: box-shadow 0.3s ease;
-}
-#temp33 input[type="number"]:focus {
-  outline: none;
-  box-shadow: 0 0 12px #00f2ff;
-}
-
-
-/* ==== ULTRASOUND → match input & select style to Temp & Panel-Load ==== */
-#us11 input[type="number"],
-#us11 select,
-#us33 input[type="number"],
-#us33 select {
-  background: #0a0f2c;
-  color: #fff;
-  border: 2px solid #00f2ff;
-  border-radius: 6px;
-  padding: 6px 8px;
-  font-family: 'Orbitron', sans-serif;
-  box-shadow: inset 0 0 8px #00f2ff;
-  transition: box-shadow 0.3s ease;
-}
-#us11 input[type="number"]:focus,
-#us11 select:focus,
-#us33 input[type="number"]:focus,
-#us33 select:focus {
-  outline: none;
-  box-shadow: 0 0 12px #00f2ff;
-}
-
-
-
-
-
-/* ==== ULTRASOUND: fix table overflow and set column widths ==== */
-/* make the container scroll horizontally if it still can’t squeeze down */
-#ultrasound .table-container {
-  overflow-x: auto;
-}
-
-/* force the Ultrasound tables to fill their parent and wrap cells */
-#tableUltrasound11,
-#tableUltrasound33 {
-  width: 100%;
-  table-layout: fixed;    /* enforce the % widths below */
-}
-
-/* wrap long header text */
-#tableUltrasound11 th,
-#tableUltrasound33 th {
-  white-space: normal !important;
-  word-wrap: break-word;
-}
-
-/* Sl. No.       5% */
-#tableUltrasound11 th:nth-child(1),
-#tableUltrasound11 td:nth-child(1),
-#tableUltrasound33 th:nth-child(1),
-#tableUltrasound33 td:nth-child(1) {
-  width: 5%;
-}
-
-/* Panel Name   15% */
-#tableUltrasound11 th:nth-child(2),
-#tableUltrasound11 td:nth-child(2),
-#tableUltrasound33 th:nth-child(2),
-#tableUltrasound33 td:nth-child(2) {
-  width: 15%;
-}
-
-/* VCB State    8% */
-#tableUltrasound11 th:nth-child(3),
-#tableUltrasound11 td:nth-child(3),
-#tableUltrasound33 th:nth-child(3),
-#tableUltrasound33 td:nth-child(3) {
-  width: 8%;
-}
-
-/* Load (in A)  8% */
-#tableUltrasound11 th:nth-child(4),
-#tableUltrasound11 td:nth-child(4),
-#tableUltrasound33 th:nth-child(4),
-#tableUltrasound33 td:nth-child(4) {
-  width: 8%;
-}
-
-/* The six dB inputs (F1, B1, B2, PT, S1, S2) → 10.5% each */
-#tableUltrasound11 th:nth-child(n+5),
-#tableUltrasound11 td:nth-child(n+5),
-#tableUltrasound33 th:nth-child(n+5),
-#tableUltrasound33 td:nth-child(n+5) {
-  width: 10.5%;
-}
-
-/* ensure your inputs & selects never overflow their cells */
-#tableUltrasound11 input,
-#tableUltrasound11 select,
-#tableUltrasound33 input,
-#tableUltrasound33 select {
-  width: 100%;
-  box-sizing: border-box; 
-}
-
-
-
-/* ==== TEV: match Temp/Ultrasound styling & fix overflow ==== */
-/* allow horizontal scroll if it still can’t squeeze down */
-#tev .table-container {
-  overflow-x: auto;
-}
-
-/* enforce full width & fixed layout */
-#tableTEV11,
-#tableTEV33 {
-  width: 100%;
-  table-layout: fixed;
-}
-
-/* wrap long header text */
-#tableTEV11 th,
-#tableTEV33 th {
-  white-space: normal !important;
-  word-wrap: break-word;
-}
-
-/* column widths (tweak % as you like) */
-/* Sl. No. */ 
-#tableTEV11 th:nth-child(1),
-#tableTEV11 td:nth-child(1),
-#tableTEV33 th:nth-child(1),
-#tableTEV33 td:nth-child(1) { width: 5%; }
-
-/* Panel Name */ 
-#tableTEV11 th:nth-child(2),
-#tableTEV11 td:nth-child(2),
-#tableTEV33 th:nth-child(2),
-#tableTEV33 td:nth-child(2) { width: 15%; }
-
-/* VCB State */ 
-#tableTEV11 th:nth-child(3),
-#tableTEV11 td:nth-child(3),
-#tableTEV33 th:nth-child(3),
-#tableTEV33 td:nth-child(3) { width: 8%; }
-
-/* Load (in A) */
-#tableTEV11 th:nth-child(4),
-#tableTEV11 td:nth-child(4),
-#tableTEV33 th:nth-child(4),
-#tableTEV33 td:nth-child(4) { width: 8%; }
-
-/* The six “(in dB)” columns share the remaining space (~10.667% each) */
-#tableTEV11 th:nth-child(n+5),
-#tableTEV11 td:nth-child(n+5),
-#tableTEV33 th:nth-child(n+5),
-#tableTEV33 td:nth-child(n+5) {
-  width: 10.6667%;
-}
-
-/* match your inset glow + border + font styling from Temp/Ultrasound */
-#tev11 input[type="number"],
-#tev33 input[type="number"] {
-  width: 100%;
-  box-sizing: border-box;
-  background: #0a0f2c;
-  color: #fff;
-  border: 2px solid #00f2ff;
-  border-radius: 6px;
-  padding: 6px 8px;
-  font-family: 'Orbitron', sans-serif;
-  box-shadow: inset 0 0 8px #00f2ff;
-  transition: box-shadow 0.3s ease;
-}
-#tev11 input[type="number"]:focus,
-#tev33 input[type="number"]:focus {
-  outline: none;
-  box-shadow: 0 0 12px #00f2ff;
-}
-
-
-
-
-
-
-/* ===== BATTERY: split the two voltage columns evenly ===== */
-#battery .table-container table {
-  width: 100%;
-  table-layout: fixed;   /* enforce the widths below */
-}
-#battery .table-container th:nth-child(1),
-#battery .table-container td:nth-child(1),
-#battery .table-container th:nth-child(2),
-#battery .table-container td:nth-child(2) {
-  width: 50%;
-}
-
-/* ===== BATTERY: match Temp/Ultrasound input + select theme ===== */
-#battery .sub-section input[type="number"],
-#battery .sub-section input[type="text"],
-#battery .sub-section select {
-  background: #0a0f2c;
-  color: #fff;
-  border: 2px solid #00f2ff;
-  border-radius: 6px;
-  padding: 6px 8px;
-  font-family: 'Orbitron', sans-serif;
-  box-shadow: inset 0 0 8px #00f2ff;
-  transition: box-shadow 0.3s ease;
-}
-#battery .sub-section input:focus,
-#battery .sub-section select:focus {
-  outline: none;
-  box-shadow: 0 0 12px #00f2ff;
-}
-
-/* ===== BATTERY: style action buttons like Temp & Panel-Load ===== */
-#battery .sub-section .section-btn {
-  background-color: #111836;
-  color: #00f2ff;
-  border: 2px solid #00f2ff;
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 0.8rem;
-  box-shadow: 0 0 10px #00f2ff;
-  transition: all 0.3s ease;
-}
-#battery .sub-section .section-btn:hover {
-  background-color: #00f2ff;
-  color: #000;
-  transform: scale(1.05);
-}
-
-/* —— Super-compact “Others” Observations rows —— */
-/* shrink cell padding & force top alignment */
-#tableOther11 td:nth-child(3),
-#tableOther33 td:nth-child(3) {
-  padding: 0.2rem !important;
-  line-height: 1.1 !important;
-  vertical-align: top !important;
-}
-
-/* collapse each checkbox+label into a dense inline item */
-#tableOther11 td label,
-#tableOther33 td label {
-  display: inline-block !important;
-  margin: 0.1rem 0.4rem 0.1rem 0 !important;
-  font-size: 0.65rem !important;
-  line-height: 1.1 !important;
-  vertical-align: middle !important;
-}
-
-/* pack the “Other” text-field + button onto one tight line */
-#tableOther11 td > div,
-#tableOther33 td > div {
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.25rem !important;
-  margin-top: 0.25rem !important;
-}
-
-/* shrink the input + button themselves */
-#tableOther11 input[type="text"],
-#tableOther33 input[type="text"] {
-  font-size: 0.85rem !important;
-  padding: 6px 10px !important;
-  height: auto !important;
-  line-height: 1.4 !important;
-}
-
-#tableOther11 td > div button,
-#tableOther33 td > div button {
-  margin-top: 4px !important;
-}
-
-
-
-
-/* Tighter manual-entry row */
-#tableOther11 td > div,
-#tableOther33 td > div {
-  margin-top: 0.25rem;
-}
-#tableOther11 input[type="text"],
-#tableOther33 input[type="text"] {
-  padding: 2px 4px !important;
-  font-size: 0.6rem !important;
-  height: 24px !important;
-  line-height: 1.2 !important;
-}
-
-/* ─────────── Live Table Styles ─────────── */
-#liveTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-  margin-bottom: 2rem;
-}
-#liveTable th,
-#liveTable td {
-  border: 1px solid #00f2ff;
-  padding: 0.5rem;
-  text-align: center;
-  color: #fff;
-  vertical-align: middle;
-}
-/* ─────── Compact Live-Table Styles ─────── */
-#liveTableContainer {
-  width: 100%;
-  overflow-x: auto;
-  margin: 1rem auto;
-  padding: 0 1rem;
-}
-
-/* allow the table to grow wider than its container */
-#liveTable {
-  border-collapse: collapse;
-  table-layout: auto;      /* let columns size themselves */
-  width: auto;              /* don’t force it to 100% */
-  min-width: 1200px;        /* ensure at least N pixels for 20 cols */
-  font-size: 0.75rem;
-}
-
-
-#liveTable th,
-#liveTable td {
-  padding: 0.25rem;         /* tighter cells */
-  border: 1px solid #00f2ff;
-  text-align: center;
-  vertical-align: middle;
-  word-wrap: break-word;    /* wrap long headers */
-}
-
-
-/* Reduce font-size for Temp columns: F1, b1, b2, S1/S2 & PT */
-#liveTable td:nth-child(11),
-#liveTable td:nth-child(12),
-#liveTable td:nth-child(13),
-#liveTable td:nth-child(14),
-#liveTable td:nth-child(15) {
-  font-size: 0.60rem !important;
-}
-
-
-
-
-
-
-
-/* Reduce font-size for specific ultrasound columns: UF1, Ub1, Ub2, UPT, US1, US2 */
-#liveTable td:nth-child(16),
-#liveTable td:nth-child(17),
-#liveTable td:nth-child(18),
-#liveTable td:nth-child(19),
-#liveTable td:nth-child(20),
-#liveTable td:nth-child(21) {
-  font-size: 0.55rem !important;
-}
-
-
-
-
-#liveTable th {
-  background-color: #111836;
-  white-space: normal;      /* allow multi-line headings */
-}
-
-/* shrink the heading above the table: */
-#liveTable + h2,
-h2.compact-live-heading {
-  font-size: 1rem !important;
-  margin: 1rem 0;
-}
-
-
-/* ─────── Narrower “Panel Details” Columns ─────── */
-#liveTable th:nth-child(1),
-#liveTable td:nth-child(1) {
-  width: 30px;
-  max-width: 30px;
-}
-
-
-#liveTable th:nth-child(2),
-#liveTable td:nth-child(2) {
-  width: 80px;
-  max-width: 80px;
-}
-
-#liveTable th:nth-child(3),
-#liveTable td:nth-child(3) {
-  width: 50px;
-  max-width: 50px;
-}
-
-#liveTable th:nth-child(4),
-#liveTable td:nth-child(4) {
-  width:  50px;
-  max-width:  50px;
-}
-
-#liveTable th:nth-child(5),
-#liveTable td:nth-child(5) {
-  width:  30px;
-  max-width:  30px;
-}
-
-#liveTable th:nth-child(20),
-#liveTable td:nth-child(20) {
-  width: 30px;
-  max-width: 30px;
-}
-
-/* Narrow only Tb1, Tb2, TPT, TS1 & TS2 sub-columns to 30px */
-#liveTable thead tr:nth-child(2) th:nth-child(2),
-#liveTable tbody td:nth-child(6),
-#liveTable thead tr:nth-child(2) th:nth-child(3),
-#liveTable tbody td:nth-child(7),
-#liveTable thead tr:nth-child(2) th:nth-child(4),
-#liveTable tbody td:nth-child(8),
-#liveTable thead tr:nth-child(2) th:nth-child(5),
-#liveTable tbody td:nth-child(9),
-#liveTable thead tr:nth-child(2) th:nth-child(6),
-#liveTable tbody td:nth-child(10) {
-  width: 30px;
-  max-width: 30px;
-}
-
-/* Narrow only F1, B1 & B2 sub-columns to 30px */
-#liveTable thead tr:nth-child(2) th:nth-child(7),
-#liveTable tbody td:nth-child(11),
-#liveTable thead tr:nth-child(2) th:nth-child(8),
-#liveTable tbody td:nth-child(12),
-#liveTable thead tr:nth-child(2) th:nth-child(9),
-#liveTable tbody td:nth-child(13) {
-  width: 30px;
-  max-width: 30px;
-}
-
-
-/* Narrow UF1, Ub1, Ub2, UPT, Us1, Us2 (columns 14 to 19) to fixed 30px width */
-#liveTable thead tr:nth-child(2) th:nth-child(14),
-#liveTable tbody td:nth-child(14),
-#liveTable thead tr:nth-child(2) th:nth-child(15),
-#liveTable tbody td:nth-child(15),
-#liveTable thead tr:nth-child(2) th:nth-child(16),
-#liveTable tbody td:nth-child(16),
-#liveTable thead tr:nth-child(2) th:nth-child(17),
-#liveTable tbody td:nth-child(17),
-#liveTable thead tr:nth-child(2) th:nth-child(18),
-#liveTable tbody td:nth-child(18),
-#liveTable thead tr:nth-child(2) th:nth-child(19),
-#liveTable tbody td:nth-child(19) {
-  width: 50px;
-  max-width: 50px;
-}
-
-
-
-
-
-
-/* Style "Other" tab dropdowns, inputs, and buttons to match theme */
-#tableOther11 select,
-#tableOther33 select,
-#tableOther11 input[type="text"],
-#tableOther33 input[type="text"] {
-  background: #0a0f2c;
-  color: #fff;
-  border: 2px solid #00f2ff;
-  border-radius: 6px;
-  padding: 8px 10px;
-  font-size: 0.85rem; 
-  font-family: 'Orbitron', sans-serif;
-  box-shadow: inset 0 0 8px #00f2ff;
-  transition: box-shadow 0.3s ease;
-}
-
-
-/* ── Style RTCC Panels dropdowns & manual-entry fields ── */
-#othRTCC select,
-#othRTCC input[type="text"] {
-  background:     #0a0f2c;
-  color:          #fff;
-  border:         2px solid #00f2ff;
-  border-radius:  6px;
-  padding:        6px 8px;
-  font-family:    'Orbitron', sans-serif;
-  box-shadow:     inset 0 0 8px #00f2ff;
-  transition:     box-shadow 0.3s ease;
-}
-#othRTCC select:focus,
-#othRTCC input[type="text"]:focus {
-  outline:        none;
-  box-shadow:     0 0 12px #00f2ff;
-}
-
-/* ── Style RTCC “Add” buttons ── */
-#othRTCC button.section-btn {
-  background-color: #111836;
-  color:            #00f2ff;
-  border:           2px solid #00f2ff;
-  border-radius:    6px;
-  padding:          6px 12px;
-  font-size:        0.8rem;
-  margin-top:       0;
-  box-shadow:       0 0 10px #00f2ff;
-  transition:       all 0.3s ease;
-}
-#othRTCC button.section-btn:hover {
-  background-color: #00f2ff;
-  color:            #000;
-  transform:        scale(1.05);
-}
-
-
-#tableOther11 select:focus,
-#tableOther33 select:focus,
-#tableOther11 input[type="text"]:focus,
-#tableOther33 input[type="text"]:focus {
-  outline: none;
-  box-shadow: 0 0 12px #00f2ff;
-}
-
-/* Style the "Add" buttons */
-
-#tableOther11 button.section-btn,
-#tableOther33 button.section-btn {
-  background-color: #111836;
-  color: #00f2ff;
-  border: 2px solid #00f2ff;
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 0.8rem;
-  margin-top: 0.4rem;
-  box-shadow: 0 0 10px #00f2ff;
-  transition: all 0.3s ease;
-}
-
-#tableOther11 button.section-btn:hover,
-#tableOther33 button.section-btn:hover {
-  background-color: #00f2ff;
-  color: #000;
-  transform: scale(1.05);
-}
-
-#othCRP select,
-#othCRP input[type="text"] {
-  background:     #0a0f2c;
-  color:          #fff;
-  border:         2px solid #00f2ff;
-  border-radius:  6px;
-  padding:        6px 8px;
-  font-family:   'Orbitron', sans-serif;
-  box-shadow:    inset 0 0 8px #00f2ff;
-  transition:    box-shadow 0.3s ease;
-}
-#othCRP select:focus,
-#othCRP input[type="text"]:focus {
-  outline:       none;
-  box-shadow:    0 0 12px #00f2ff;
-}
-
-
-/* Make the CRP “Add” button match other section-btns */
-#othCRP button.section-btn {
-  background-color: #111836;
-  color:           #00f2ff;
-  border:          2px solid #00f2ff;
-  border-radius:   6px;
-  padding:         6px 12px;
-  font-size:       0.8rem;
-  box-shadow:      0 0 10px #00f2ff;
-  transition:      all 0.3s ease;
-  margin-top:      0;    /* align with input */
-}
-#othCRP button.section-btn:hover {
-  background-color: #00f2ff;
-  color:            #000;
-  transform:        scale(1.05);
-}
-
-
-/* ── Panel Room styling ── */
-#othRoom input[type="text"],
-#othRoom input[type="checkbox"],
-#othRoom label {
-  font-family: 'Orbitron', sans-serif;
-  color: #fff;
-}
-
-#othRoom input[type="text"] {
-  background: #0a0f2c;
-  border: 2px solid #00f2ff;
-  border-radius: 6px;
-  padding: 6px 8px;
-  box-shadow: inset 0 0 8px #00f2ff;
-  transition: box-shadow 0.3s ease;
-}
-
-#othRoom input[type="text"]:focus {
-  outline: none;
-  box-shadow: 0 0 12px #00f2ff;
-}
-
-#othRoom label {
-  display: inline-block;
-  margin: 0.2rem 0.4rem;
-  font-size: 0.85rem;
-  line-height: 1.2;
-  vertical-align: middle;
-  cursor: pointer;
-}
-
-
-
-#othRoom button.section-btn:hover {
-  background-color: #00f2ff;
-  color: #000;
-  transform: scale(1.05);
-}
-
-
-/* ── Panel Room “Add” button styling ── */
-#othRoom button.section-btn {
-  background-color: #111836;
-  color:            #00f2ff;
-  border:           2px solid #00f2ff;
-  border-radius:    6px;
-  padding:          6px 12px;
-  font-size:        0.8rem;
-  box-shadow:       0 0 10px #00f2ff;
-  transition:       all 0.3s ease;
-  margin-top:       0; /* keeps it aligned with the input */
-}
-#othRoom button.section-btn:hover {
-  background-color: #00f2ff;
-  color:            #000;
-  transform:        scale(1.05);
-}
-
-
-
-
-
-/* ── 1) make the Temp tables scrollable in their 90vw container ── */
-#temp .table-container {
-  overflow-x: auto;
-}
-
-/* ── 2) redistribute the five “(in °C)” columns equally (~9.2% each) ── */
-/*    targets cols 5–9 (F1, B1, B2, S1/S2, PT) in both Temp tables */
-#tableTemp11 th:nth-child(n+5),
-#tableTemp11 td:nth-child(n+5),
-#tableTemp33 th:nth-child(n+5),
-#tableTemp33 td:nth-child(n+5) {
-  width: 9.2%;
-}
-
-/* ── 3) override the inline 76px so inputs will shrink to their cells ── */
-#tableTemp11 td > div input[type="number"],
-#tableTemp33 td > div input[type="number"] {
-  width: 100% !important;
-  box-sizing: border-box;
-}
-
-
-/* ─── make Temp fields wider & stack H below the input ─── */
-#tableTemp11 td > div,
-#tableTemp33 td > div {
-  display:         flex !important;
-  flex-direction:  column !important;
-  align-items:     center !important;
-  gap:             0.25rem !important;
-}
-#tableTemp11 td > div input[type="number"],
-#tableTemp33 td > div input[type="number"] {
-  width:     100%   !important;  /* break out of the old 76px */
-  max-width: 100px  !important;  /* adjust as you like */
-  box-sizing: border-box;
-}
-#tableTemp11 td > div input[type="checkbox"],
-#tableTemp33 td > div input[type="checkbox"] {
-  margin-top: 0.25rem !important;
-}
-
-
   </style>
 
 
-<style>
-  /* 1a) Location wider, other four equal */
-  #tableTEV11Extra th:first-child,
-  #tableTEV33Extra th:first-child {
-    width: 160px;
-  }
-  #tableTEV11Extra th:nth-child(2),
-  #tableTEV11Extra th:nth-child(3),
-  #tableTEV11Extra th:nth-child(4),
-  #tableTEV11Extra th:nth-child(5),
-  #tableTEV33Extra th:nth-child(2),
-  #tableTEV33Extra th:nth-child(3),
-  #tableTEV33Extra th:nth-child(4),
-  #tableTEV33Extra th:nth-child(5) {
-    width: 120px;
-  }
+<!-- NEW -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<!-- pulls in htmlDocx → window.htmlDocx -->
+<script src="https://unpkg.com/html-docx-js@0.3.1/dist/html-docx.js"></script> 
 
-  /* 1c) center‐align number inputs */
-  #tableTEV11Extra td input[type="number"],
-  #tableTEV33Extra td input[type="number"] {
-    text-align: center;
-  }
-
-  /* 1d) remove spinner arrows */
-  #tableTEV11Extra td input[type="number"]::-webkit-inner-spin-button,
-  #tableTEV11Extra td input[type="number"]::-webkit-outer-spin-button,
-  #tableTEV33Extra td input[type="number"]::-webkit-inner-spin-button,
-  #tableTEV33Extra td input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  #tableTEV11Extra td input[type="number"],
-  #tableTEV33Extra td input[type="number"] {
-    -moz-appearance: textfield;
-  }
-
-/* ── 1c) EXTRA TEV TABLE BORDER COLOR & COLLAPSE ── */
-#tableTEV11Extra,
-#tableTEV11Extra th,
-#tableTEV11Extra td,
-#tableTEV33Extra,
-#tableTEV33Extra th,
-#tableTEV33Extra td {
-  border: 2px solid #4A90E2;      /* contrasting/stylish blue */
-}
-#tableTEV11Extra,
-#tableTEV33Extra {
-  border-collapse: collapse;
-}
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- html2canvas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 
-/* Style the Back button just like your main buttons */
-.action-buttons .section-btn {
-  padding: 12px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 10px;
-  background-color: #111836;
-  color: #00f2ff;
-  cursor: pointer;
-  box-shadow: 0 0 15px #00f2ff;
-  transition: all 0.3s ease;
-}
-.action-buttons .section-btn:hover {
-  background-color: #00f2ff;
-  color: #000;
-  transform: scale(1.05);
-}
-
-
-
-</style>
-
-<style>
-  /* Ensure all text in the table prints black in the PDF */
-  .pdf-black, .pdf-black * {
-    color: #000 !important;
-  }
-</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 
 </head>
+
+
 <body>
-  <div class="header" id="substationHeader"></div>
+  <div class="header" id="substationHeader">
+    <!-- Substation name will appear here -->
+  </div>
 
-<!-- Reset Button -->
-<div style="position: absolute; top: 12px; right: 20px;">
-  <button id="resetBtn"
-          style="background-color: red;
-                 color: white;
-                 padding: 6px 12px;
-                 border: none;
-                 border-radius: 4px;
-                 cursor: pointer;">
-    Reset
-  </button>
-</div>
-
-
-
-  <h1>Control Room Inspection Entry</h1>
+  <h1>Download Report</h1>
 
   <div class="button-container">
-    <button class="section-btn" data-target="panelLoad">Panel Name &amp; Load</button>
-    <button class="section-btn" data-target="tev">TEV</button>
-    <button class="section-btn" data-target="temp">Temp</button>
-    <button class="section-btn" data-target="ultrasound">Ultrasound</button>
-    <button class="section-btn" data-target="battery">Battery &amp; Battery Charger</button>
-    <button class="section-btn" data-target="other">Other</button>
+    <button onclick="downloadDoc()">Download Report in Doc</button>
+    <button onclick="downloadPDF()">Download Report in PDF</button>
   </div>
 
-  <div id="panelLoad" class="section">
-   <div class="sub-tab-container">
-     <button class="sub-tab-btn" data-sub="pan11">11KV Panels</button>
-     <button class="sub-tab-btn" data-sub="pan33">33KV Panels</button>
-   </div>
-   <div id="pan11" class="sub-section">
+<script>
+  const subName = localStorage.getItem("selectedSubstation") || "[Substation Not Set]";
+  document.getElementById('substationHeader').textContent = subName;
 
-     <div class="table-container">
-       <table id="table11">
-         <thead>
-           <tr>
-             <th>Sl. No.</th>
-             <th>11KV Panel Name</th>
-             <th>VCB State</th>
-             <th>Load (in A)</th>
-             <th>Action</th>
-           </tr>
-         </thead>
-         <tbody>
-           <tr>
-             <td>1</td>
-             <td><input type="text" placeholder="11KV Panel Name" /></td>
-             <td>
-               <select>
-                 <option value="" disabled selected hidden></option>
-                 <option>ON</option>
-                 <option>OFF</option>
-                 <option>VCB Missing</option>
-                 <option>Shutdown</option>
-               </select>
-             </td>
-             <td><input type="number" placeholder="Load" /></td>
-             <td><button class="delete-row-btn section-btn">Delete</button></td>
-           </tr>
-         </tbody>
-       </table>
-     </div>
-     <div class="action-buttons" style="margin-top:1rem; display:flex; gap:1rem; justify-content:center;">
-       <button id="addRow11" class="section-btn">Add Row</button>
-       <button id="save11"   class="section-btn">Save</button>
-       </div>
-   </div>
-   <div id="pan33" class="sub-section">
-     <div class="table-container">
-       <table id="table33">
-         <thead>
-           <tr>
-             <th>Sl. No.</th>
-             <th>33KV Panel Name</th>
-             <th>VCB State</th>
-             <th>Load (in A)</th>
-             <th>Action</th>
-           </tr>
-         </thead>
-         <tbody>
-           <tr>
-             <td>1</td>
-             <td><input type="text" placeholder="33KV Panel Name" /></td>
-             <td>
-               <select>
-                 <option value="" disabled selected hidden></option>
-                 <option>ON</option>
-                 <option>OFF</option>
-                 <option>VCB Missing</option>
-                 <option>Shutdown</option>
-               </select>
-             </td>
-             <td><input type="number" placeholder="Load" /></td>
-             <td><button class="delete-row-btn section-btn">Delete</button></td>
-           </tr>
-         </tbody>
-       </table>
-     </div>
-     <div class="action-buttons" style="margin-top:1rem; display:flex; gap:1rem; justify-content:center;">
-       <button id="addRow33" class="section-btn">Add Row</button>
-       <button id="save33"   class="section-btn">Save</button>       
-     </div>
-   </div>
- </div>
-  <div id="tev" class="section">
-    <div class="sub-tab-container">
-      <button class="sub-tab-btn" data-sub="tev11">11KV Panels</button>
-      <button class="sub-tab-btn" data-sub="tev33">33KV Panels</button>
-    </div>
-
-    <div id="tev11" class="sub-section">
-
-    <!-- ── TEV 11KV: Air / Metal readings ── -->
-    <div class="table-container" style="margin-bottom:1rem;">
-      <table id="tableTEV11Extra">
-        <thead>
-          <tr>
-            <th>Location</th>
-            <th>Panel Front Side Left</th>
-            <th>Panel Front Side Right</th>
-            <th>Panel Back Side Left</th>
-            <th>Panel Back Side Right</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Air</td>
-            <td><input type="number" placeholder="Value" /></td>
-            <td><input type="number" placeholder="Value" /></td>
-            <td><input type="number" placeholder="Value" /></td>
-            <td><input type="number" placeholder="Value" /></td>
-          </tr>
-          <tr>
-            <td>Metal</td>
-            <td><input type="number" placeholder="Value" /></td>
-            <td><input type="number" placeholder="Value" /></td>
-            <td><input type="number" placeholder="Value" /></td>
-            <td><input type="number" placeholder="Value" /></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-<div style="text-align:center; margin-bottom:1.5rem;">
-  <button class="YOUR‐EXISTING‐BUTTON‐CLASS">Add</button>
-</div>
-
-      <div class="table-container">
-        <table id="tableTEV11">
-          <thead>
-            <tr>
-              <th>Sl. No.</th>
-              <th>11KV Panel Name</th>
-              <th>VCB State</th>
-              <th>Load (in A)</th>
-              <th>TF1 (in dB)</th>
-              <th>TB1 (in dB)</th>
-              <th>TB2 (in dB)</th>
-              <th>TPT (in dB)</th>
-              <th>TS1 (in dB)</th>
-              <th>TS2 (in dB)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- rows injected by JS -->
-          </tbody>
-        </table>
-      </div>
-      <div class="action-buttons" style="margin-top:1rem; display:flex; gap:1rem; justify-content:center;">
-        <button id="saveTEV11" class="section-btn">Save</button>
-      </div>
-    </div>
-
-    <div id="tev33" class="sub-section">
-
-    <!-- ── TEV 33KV: Air / Metal readings ── -->
-    <div class="table-container" style="margin-bottom:1rem;">
-      <table id="tableTEV33Extra">
-        <thead>
-          <tr>
-            <th>Location</th>
-            <th>Panel Front Side Left</th>
-            <th>Panel Front Side Right</th>
-            <th>Panel Back Side Left</th>
-            <th>Panel Back Side Right</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Air</td>
-            <td><input type="number" placeholder="Value" /></td>
-            <td><input type="number" placeholder="Value" /></td>
-            <td><input type="number" placeholder="Value" /></td>
-            <td><input type="number" placeholder="Value" /></td>
-          </tr>
-          <tr>
-            <td>Metal</td>
-            <td><input type="number" placeholder="Value" /></td>
-            <td><input type="number" placeholder="Value" /></td>
-            <td><input type="number" placeholder="Value" /></td>
-            <td><input type="number" placeholder="Value" /></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-<div style="text-align:center; margin-bottom:1.5rem;">
-  <button class="section-btn">Add</button>
-</div>
+  async function downloadDoc() {
+    // 1) build our container
+    const container = document.createElement('div');
+const title = document.createElement('h1');
+title.textContent = `Condition Monitoring Report for ${subName}`;
+title.style.fontFamily = 'Cambria';
+title.style.fontSize = '16pt';
+title.style.fontWeight = 'bold';
+title.style.textDecoration = 'underline';
+title.style.textAlign = 'center';
+container.appendChild(title);
 
 
-
-      <div class="table-container">
-        <table id="tableTEV33">
-          <thead>
-            <tr>
-              <th>Sl. No.</th>
-              <th>33KV Panel Name</th>
-              <th>VCB State</th>
-              <th>Load (in A)</th>
-              <th>TF1 (in dB)</th>
-              <th>TB1 (in dB)</th>
-              <th>TB2 (in dB)</th>
-              <th>TPT (in dB)</th>
-              <th>TS1 (in dB)</th>
-              <th>TS2 (in dB)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- rows injected by JS -->
-          </tbody>
-        </table>
-      </div>
-      <div class="action-buttons" style="margin-top:1rem; display:flex; gap:1rem; justify-content:center;">
-        <button id="saveTEV33" class="section-btn">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="temp" class="section">
-  <div class="sub-tab-container">
-    <button class="sub-tab-btn" data-sub="temp11">11KV Panels</button>
-    <button class="sub-tab-btn" data-sub="temp33">33KV Panels</button>
-  </div>
-  <div id="temp11" class="sub-section">
-
-<!-- Ambient Temp for 11KV -->
-<div style="
-    margin-bottom:1rem;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:0.5rem;
-">
-  <label for="ambientTemp11"
-         style="font-size:0.9rem; color:#00f2ff; white-space:nowrap;">
-    Ambient Temp.
-  </label>
-  <input
-    id="ambientTemp11"
-    type="number"
-    placeholder="°C"
-    style="
-      width:90px;
-      background:#0a0f2c;
-      color:#fff;
-      border:2px solid #00f2ff;
-      border-radius:6px;
-      padding:4px 6px;
-      font-family:'Orbitron',sans-serif;
-      font-size:0.9rem;
-      box-shadow: inset 0 0 6px #00f2ff;
-    " />
-  <button id="addAmbientTemp11"
-          class="section-btn"
-          style="padding:6px 12px; font-size:0.8rem;">
-    Add
-  </button>
-</div>
+    // 2) pull in each page’s saved-HTML
+    const sections = [
+      { key: 'controlRoomDocHTML', title: 'Measurement Of Partial Discharge At In-Door Panels, Temperature Recorded and Other Observations' },
+      { key: 'ultrasoundDocHTML',  title: 'Ultrasonic PD Measurement on Outdoor Equipments'   },
+      { key: 'hotspotDocHTML',     title: 'Hotspot Detected by Thermal Imaging Camera'      },
+      { key: 'visualDocHTML',      title: 'Action to be Taken by Division Authority as per Visual Inspection Findings'         }
+    ];
 
 
+    for (let { key, title: secTitle } of sections) {
+      const html = localStorage.getItem(key);
+      if (html) {
+        const h2 = document.createElement('h2');
+        h2.textContent = secTitle;
+        container.appendChild(h2);
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = html;
+        container.appendChild(wrapper);
+      } else {
+        console.warn(`No data for ${secTitle} (key="${key}")`);
+      }
+    }
 
 
-    <div class="table-container">
-      <table id="tableTemp11">
-        <thead>
-          <tr>
-            <th>Sl. No.</th>
-            <th>11KV Panel Name</th>
-            <th>VCB State</th>
-            <th>Load (in A)</th>
-            <th>F1 (in <sup>°</sup>C)</th>
-            <th>B1 (in <sup>°</sup>C)</th>
-            <th>B2 (in <sup>°</sup>C)</th>
-            <th>S1/S2 (in <sup>°</sup>C)</th>
-            <th>PT (in <sup>°</sup>C)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- rows injected by JS -->
-        </tbody>
-      </table>
-    </div>
-    <div class="action-buttons" style="margin-top:1rem; display:flex; gap:1rem; justify-content:center;">
-      <button id="saveTemp11" class="section-btn">Save</button>
-    </div>
-  </div>
-  <div id="temp33" class="sub-section">
+// ── ADD ULTRASOUND LIVE TABLE WITH ROW GROUP COLOURING ──
+const usLiveHTML = localStorage.getItem('ultrasoundLiveTableHTML');
+if (usLiveHTML) {
+  const h2 = document.createElement('h2');
+  h2.textContent = 'Ultrasonic PD Measurement on Outdoor Equipments';
+  container.appendChild(h2);
 
-
-<!-- Ambient Temp for 33KV -->
-<div style="
-    margin-bottom:1rem;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:0.5rem;
-">
-  <label for="ambientTemp33"
-         style="font-size:0.9rem; color:#00f2ff; white-space:nowrap;">
-    Ambient Temp.
-  </label>
-  <input
-    id="ambientTemp33"
-    type="number"
-    placeholder="°C"
-    style="
-      width:90px;
-      background:#0a0f2c;
-      color:#fff;
-      border:2px solid #00f2ff;
-      border-radius:6px;
-      padding:4px 6px;
-      font-family:'Orbitron',sans-serif;
-      font-size:0.9rem;
-      box-shadow: inset 0 0 6px #00f2ff;
-    " />
-  <button id="addAmbientTemp33"
-          class="section-btn"
-          style="padding:6px 12px; font-size:0.8rem;">
-    Add
-  </button>
-</div>
-
-
-
-    <div class="table-container">
-      <table id="tableTemp33">
-        <thead>
-          <tr>
-            <th>Sl. No.</th>
-            <th>33KV Panel Name</th>
-            <th>VCB State</th>
-            <th>Load (in A)</th>
-            <th>F1 (in <sup>°</sup>C)</th>
-            <th>B1 (in <sup>°</sup>C)</th>
-            <th>B2 (in <sup>°</sup>C)</th>
-            <th>S1/S2 (in <sup>°</sup>C)</th>
-            <th>PT (in <sup>°</sup>C)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- rows injected by JS -->
-        </tbody>
-      </table>
-    </div>
-    <div class="action-buttons" style="margin-top:1rem; display:flex; gap:1rem; justify-content:center;">
-      <button id="saveTemp33" class="section-btn">Save</button>
-    </div>
-  </div>
-</div>
-
-    <div id="ultrasound" class="section">
-    <div class="sub-tab-container">
-      <button class="sub-tab-btn" data-sub="us11">11KV Panels</button>
-      <button class="sub-tab-btn" data-sub="us33">33KV Panels</button>
-    </div>
-    <div id="us11" class="sub-section">
-      <div class="table-container">
-        <table id="tableUltrasound11">
-          <thead>
-            <tr>
-              <th>Sl. No.</th>
-              <th>11KV Panel Name</th>
-              <th>VCB State</th>
-              <th>Load (in A)</th>
-              <th>F1 (in dB)</th>
-              <th>B1 (in dB)</th>
-              <th>B2 (in dB)</th>
-              <th>PT (in dB)</th>
-              <th>S1 (in dB)</th>
-              <th>S2 (in dB)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- rows injected by JS -->
-          </tbody>
-        </table>
-      </div>
-      <div class="action-buttons" style="margin-top:1rem; display:flex; gap:1rem; justify-content:center;">
-        <button id="saveUS11" class="section-btn">Save</button>
-      </div>
-    </div>
-    <div id="us33" class="sub-section">
-      <div class="table-container">
-        <table id="tableUltrasound33">
-          <thead>
-            <tr>
-              <th>Sl. No.</th>
-              <th>33KV Panel Name</th>
-              <th>VCB State</th>
-              <th>Load (in A)</th>
-              <th>F1 (in dB)</th>
-              <th>B1 (in dB)</th>
-              <th>B2 (in dB)</th>
-              <th>PT (in dB)</th>
-              <th>S1 (in dB)</th>
-              <th>S2 (in dB)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- rows injected by JS -->
-          </tbody>
-        </table>
-      </div>
-      <div class="action-buttons" style="margin-top:1rem; display:flex; gap:1rem; justify-content:center;">
-        <button id="saveUS33" class="section-btn">Save</button>
-      </div>
-    </div>
-  </div>
-
-<section id="battery" class="section">
-    
-  <!-- 1️. Sub-tab buttons -->
-  <div class="sub-tab-container">
-    <button class="sub-tab-btn" data-sub="bat11">
-      11KV Battery &amp; Battery Charger
-    </button>
-    <button class="sub-tab-btn" data-sub="bat33">
-      33KV Battery &amp; Battery Charger
-    </button>
-  </div>
-
-<div id="bat11" class="sub-section">
-  <!-- a) Panel Voltage table -->
-  <div class="table-container">
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = `
     <table>
-      <caption style="caption-side:top; text-align:center; font-weight:bold; margin-bottom:0.5rem;">
-        Panel Voltage (in V)
-      </caption>
       <thead>
         <tr>
-          <th>AC ON</th>
-          <th>AC OFF</th>
+          <th>Sl. No.</th>
+          <th>Equipment Details</th>
+          <th>Location</th>
+          <th>R Phase (in dB)</th>
+          <th>Y Phase (in dB)</th>
+          <th>B Phase (in dB)</th>
+          <th>Neutral (in dB)</th>
+          <th>Action to be taken</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>
-            <input id="bat11VoltageOn"
-                   type="number"
-                   placeholder="Voltage" />
-          </td>
-          <td>
-            <input id="bat11VoltageOff"
-                   type="number"
-                   placeholder="Voltage" />
-          </td>
-        </tr>
-
-<tr>
-  <td style="text-align:center; padding-top:0.5rem;">
-    <label style="display:inline-flex; align-items:center;font-family:'Orbitron',sans-serif; color:#fff;">
-      <input
-        type="checkbox"
-        id="bat11VoltageOnProblem"
-        name="bat11VoltageOnProblem"
-        style="margin-right:0.5rem;"
-      />
-      Problem
-    </label>
-  </td>
-  <td style="text-align:center; padding-top:0.5rem;">
-    <label style="display:inline-flex; align-items:center;font-family:'Orbitron',sans-serif; color:#fff;">
-      <input
-        type="checkbox"
-        id="bat11VoltageOffProblem"
-        name="bat11VoltageOffProblem"
-        style="margin-right:0.5rem;"
-      />
-      Problem
-    </label>
-  </td>
-</tr>
-
-
-
+        ${usLiveHTML}
       </tbody>
-    </table>
-  </div>
+    </table>`;
 
-  <!-- c) Battery Cell Voltage -->
-  <div style="margin-top:1.5rem; display:flex; justify-content:center; align-items:center; gap:0.5rem;">
-    <label for="bat11CellVoltage"
-           style="font-weight:bold; margin-right:0.5rem; color:#00f2ff;">
-      Battery Cell Voltage (in V)
-    </label>
-    <input id="bat11CellVoltage"
-           type="number"
-           placeholder="Voltage"
-           style="width:90px;
-                  background:#0a0f2c;
-                  color:#fff;
-                  border:2px solid #00f2ff;
-                  border-radius:6px;
-                  padding:6px 8px;
-                  font-family:'Orbitron',sans-serif;
-                  box-shadow: inset 0 0 8px #00f2ff;" />
-  </div>
+  const colors = [
+    '#f0f8ff','#fafad2','#e6e6fa','#fff0f5',
+    '#f0fff0','#f5f5f5','#fffaf0','#f5fffa',
+    '#f5f5dc','#f0ffff'
+  ];
+
+  let lastEq = null;
+  let currentEq = null;
+  let colorIndex = -1;
+
+  const rows = wrapper.querySelectorAll('tbody tr');
+
+  rows.forEach(tr => {
+    const eqCell = tr.querySelector('td[rowspan]');
+    if (eqCell) {
+      lastEq = eqCell.textContent;
+      currentEq = null; // Trigger new group colour
+    }
+    if (lastEq !== currentEq) {
+      currentEq = lastEq;
+      colorIndex = (colorIndex + 1) % colors.length;
+    }
+    tr.querySelectorAll('td').forEach(td => {
+      td.style.backgroundColor = colors[colorIndex];
+    });
+  });
+
+  container.appendChild(wrapper);
+}
 
 
 
 
+// ── ADD HOTSPOT LIVE TABLE WITH COLOR CODING ──
+const hsLiveHTML = localStorage.getItem('hotspotLiveTableBody');
+if (hsLiveHTML) {
+  const h2 = document.createElement('h2');
+  h2.textContent = 'Hotspot Detected by Thermal Imaging Camera';
+  container.appendChild(h2);
 
-  <!-- b) General Findings -->
-  <div style="margin-top:1.5rem;">
-    <p style="font-weight:bold; margin-bottom:0.5rem;">General Findings</p>
-    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:0.5rem;">
-      <label><input type="checkbox" name="bat11GenFindings" value="Cleaning" /> Cleaning</label>
-      <label><input type="checkbox" name="bat11GenFindings" value="Manual Mode" /> Manual Mode</label>
-      <label><input type="checkbox" name="bat11GenFindings" value="Water Top-up" /> Water Top-up</label>
-      <label><input type="checkbox" name="bat11GenFindings" value="Sulphur Deposition" /> Sulphur Deposition</label>
-      <label><input type="checkbox" name="bat11GenFindings" value="Sludge Formation" /> Sludge Formation</label>
-      <label><input type="checkbox" name="bat11GenFindings" value="Top Cover Open" /> Top Cover Open</label>
-      <label><input type="checkbox" name="bat11GenFindings" value="Top Cover Broken" /> Top Cover Broken</label>
-      <label><input type="checkbox" name="bat11GenFindings" value="Earth Fault" /> Earth Fault</label>
-      <label><input type="checkbox" name="bat11GenFindings" value="Rating Mismatch" /> Rating Mismatch</label>
-      <label><input type="checkbox" name="bat11GenFindings" value="Some Batteries Defective" /> Some Batteries Defective</label>
-      <label><input type="checkbox" name="bat11GenFindings" value="Exhaust Fan" /> Exhaust Fan</label>  
-      <label><input type="checkbox" name="bat11GenFindings" value="Charger Rating Mismatch" /> Charger Rating Mismatch</label>     
-    </div>
-    <div style="margin-top:0.75rem; display:flex; align-items:center; gap:0.5rem;">
-      <input id="bat11GenFindingsOther"
-             type="text"
-             placeholder="Other"
-             style="width:100%; box-sizing:border-box;
-                    background:#0a0f2c; color:#fff;
-                    border:2px solid #00f2ff; border-radius:6px;
-                    padding:6px 8px;" />
-    <button id="addBat11Other" class="section-btn">Add</button>
-    </div>
-  </div>
-
-  <!-- Save button -->
-  <div class="action-buttons"
-       style="margin-top:1.5rem; display:flex; justify-content:center; gap:1rem;">
-    <button id="saveBat11" class="section-btn">Save</button>
-  </div>
-</div>
-
-<div id="bat33" class="sub-section">
-  <!-- same structure, IDs/names switched to “bat33” -->
-  <div class="table-container">
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = `
     <table>
-      <caption style="caption-side:top; text-align:center; font-weight:bold; margin-bottom:0.5rem;">
-        Panel Voltage (in V)
-      </caption>
       <thead>
         <tr>
-          <th>AC ON</th>
-          <th>AC OFF</th>
+          <th>Sl. No.</th>
+          <th>Hotspot Location</th>
+          <th>Ambient Temp (°C)</th>
+          <th>R Phase (°C)</th>
+          <th>Y Phase (°C)</th>
+          <th>B Phase (°C)</th>
+          <th>Neutral (°C)</th>
+          <th>Image Code</th>
+          <th>Remarks</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>
-            <input id="bat33VoltageOn"
-                   type="number"
-                   placeholder="Voltage" />
-          </td>
-          <td>
-            <input id="bat33VoltageOff"
-                   type="number"
-                   placeholder="Voltage" />
-          </td>
-        </tr>
-
-<tr>
-  <td style="text-align:center; padding-top:0.5rem;">
-    <label style="display:inline-flex; align-items:center;font-family:'Orbitron',sans-serif; color:#fff;">
-      <input
-        type="checkbox"
-        id="bat33VoltageOnProblem"
-        name="bat33VoltageOnProblem"
-        style="margin-right:0.5rem;"
-      />
-      Problem
-    </label>
-  </td>
-  <td style="text-align:center; padding-top:0.5rem;">
-    <label style="display:inline-flex; align-items:center;font-family:'Orbitron',sans-serif; color:#fff;">
-      <input
-        type="checkbox"
-        id="bat33VoltageOffProblem"
-        name="bat33VoltageOffProblem"
-        style="margin-right:0.5rem;"
-      />
-      Problem
-    </label>
-  </td>
-</tr>
-
-
+        ${hsLiveHTML}
       </tbody>
-    </table>
-  </div>
+    </table>`;
+  
+  // Add color to all rows except header
+  const rows = wrapper.querySelectorAll('tbody tr');
+  rows.forEach(row => {
+    row.style.backgroundColor = '#dbe5f1';
+  });
 
-
-  <!-- c) Battery Cell Voltage -->
-  <div style="margin-top:1.5rem; display:flex; justify-content:center; align-items:center; gap:0.5rem;">
-    <label for="bat33CellVoltage"
-           style="font-weight:bold; margin-right:0.5rem; color:#00f2ff;">
-      Battery Cell Voltage (in V)
-    </label>
-    <input id="bat33CellVoltage"
-           type="number"
-           placeholder="Voltage"
-           style="width:90px;
-                  background:#0a0f2c;
-                  color:#fff;
-                  border:2px solid #00f2ff;
-                  border-radius:6px;
-                  padding:6px 8px;
-                  font-family:'Orbitron',sans-serif;
-                  box-shadow: inset 0 0 8px #00f2ff;" />
-  </div>
+  container.appendChild(wrapper);
+}
 
 
 
-  <div style="margin-top:1.5rem;">
-    <p style="font-weight:bold; margin-bottom:0.5rem;">General Findings</p>
-    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:0.5rem;">
-      <label><input type="checkbox" name="bat33GenFindings" value="Cleaning" /> Cleaning</label>
-      <label><input type="checkbox" name="bat33GenFindings" value="Manual Mode" /> Manual Mode</label>
-      <label><input type="checkbox" name="bat33GenFindings" value="Water Top-up" /> Water Top-up</label>
-      <label><input type="checkbox" name="bat33GenFindings" value="Sulphur Deposition" /> Sulphur Deposition</label>
-      <label><input type="checkbox" name="bat33GenFindings" value="Sludge Formation" /> Sludge Formation</label>
-      <label><input type="checkbox" name="bat33GenFindings" value="Top Cover Open" /> Top Cover Open</label>
-      <label><input type="checkbox" name="bat33GenFindings" value="Top Cover Broken" /> Top Cover Broken</label>
-      <label><input type="checkbox" name="bat33GenFindings" value="Earth Fault" /> Earth Fault</label>
-      <label><input type="checkbox" name="bat33GenFindings" value="Rating Mismatch" /> Rating Mismatch</label>
-      <label><input type="checkbox" name="bat33GenFindings" value="Some Batteries Defective" />Some Batteries Defective</label>
-      <label><input type="checkbox" name="bat33GenFindings" value="Exhaust Fan" />Exhaust Fan</label>
-      <label><input type="checkbox" name="bat33GenFindings" value="Charger Rating Mismatch" />Charger Rating Mismatch</label>
-        
-    </div>
-    <div style="margin-top:0.75rem; display:flex; align-items:center; gap:0.5rem;">
-      <input id="bat33GenFindingsOther"
-             type="text"
-             placeholder="Other"
-             style="width:100%; box-sizing:border-box;
-                    background:#0a0f2c; color:#fff;
-                    border:2px solid #00f2ff; border-radius:6px;
-                    padding:6px 8px;" />
-  <button id="addBat33Other" class="section-btn">Add</button>
-    </div>
-  </div>
+// ── ADD VISUAL FINDINGS LIVE TABLE WITH ROW GROUP COLOURING ──
+const vfLiveHTML = localStorage.getItem('visualLiveTableHTML');
+if (vfLiveHTML) {
+  const h2 = document.createElement('h2');
+  h2.textContent = 'Action to be Taken by Division Authority as per Visual Inspection Findings';
+  container.appendChild(h2);
 
-  <div class="action-buttons"
-       style="margin-top:1.5rem; display:flex; justify-content:center; gap:1rem;">
-    <button id="saveBat33" class="section-btn">Save</button>
-  </div>
-</div>
-
-</section>
-
-
-
-
-
-  <div id="other" class="section">
-  <div class="sub-tab-container">
-    <button class="sub-tab-btn" data-sub="oth11">11KV Panels</button>
-    <button class="sub-tab-btn" data-sub="oth33">33KV Panels</button>
-    <button class="sub-tab-btn" data-sub="othCRP">33KV CRP</button>
-    <button class="sub-tab-btn" data-sub="othRTCC">RTCC Panels</button>
-    <button class="sub-tab-btn" data-sub="othRoom">Panel Room</button>
-  </div>
-
-<div id="oth11" class="sub-section">
-  <div class="table-container">
-    <table id="tableOther11" style="width: 100%; table-layout: fixed;">
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = `
+    <table>
       <thead>
         <tr>
-          <th style="width: 8%;">Sl. No.</th>
-          <th style="width: 22%;">11KV Panel Name</th>
-          <th style="width: 70%;">Observations</th>
+          <th>Sl. No.</th>
+          <th>Equipment/Material</th>
+          <th>Action to be taken</th>
         </tr>
       </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-  <div class="action-buttons" style="margin-top:1rem; display:flex; justify-content:center; gap:1rem;">
-    <button id="saveOther11" class="section-btn">Save</button>
-  </div>
-</div>
+      <tbody>
+        ${vfLiveHTML}
+      </tbody>
+    </table>`;
 
+  // Row group colouring logic
+  const colors = [
+    '#f0f8ff', '#fafad2', '#e6e6fa', '#fff0f5', '#f0fff0',
+    '#f5f5f5', '#fffaf0', '#f5fffa', '#f5f5dc', '#f0ffff'
+  ];
 
-<div id="oth33" class="sub-section">
-  <div class="table-container">
-    <table id="tableOther33" style="width: 100%; table-layout: fixed;">
-      <thead>
-        <tr>
-          <th style="width: 8%;">Sl. No.</th>
-          <th style="width: 22%;">33KV Panel Name</th>
-          <th style="width: 70%;">Observations</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-  <div class="action-buttons" style="margin-top:1rem; display:flex; justify-content:center; gap:1rem;">
-    <button id="saveOther33" class="section-btn">Save</button>
-  </div>
-</div>
+  let colorIndex = -1;
+  let lastEquipment = null;
 
+  wrapper.querySelectorAll('tbody tr').forEach(tr => {
+    const equipCell = tr.querySelector('td[rowspan]');
+    if (equipCell) {
+      lastEquipment = equipCell.textContent.trim();
+      colorIndex = (colorIndex + 1) % colors.length;
+    }
 
+    tr.querySelectorAll('td').forEach(td => {
+      td.style.backgroundColor = colors[colorIndex];
+    });
+  });
 
-  <div id="othCRP" class="sub-section">
-    <!-- CRP Observation Form -->
-    <div style="display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center;justify-content:center;">
-      <select id="crpPTRSelect">
-        <option value="" disabled selected hidden></option>
-        <option>PTR-1</option>
-        <option>PTR-2</option>
-        <option>PTR-3</option>
-        <option>PTR-4</option>
-        <option>PTR-5</option>
-        <option>PTR-6</option>
-        <option>PTR-7</option>
-        <option>Other</option>
-      </select>
-      <input type="text"
-             id="crpPTROther"
-             placeholder="Other PTR"
-             style="display:none;"
-      />
-      <select id="crpDeviceTypeSelect">
-        <option value="" disabled selected hidden></option>
-        <option>Phase Ammeter</option>
-        <option>Voltmeter</option>
-        <option>Relay</option>
-        <option>Annunciator</option>
-        <option>Panel</option>
-      </select>
-      <select id="crpIssueSelect">
-        <option value="" disabled selected hidden></option>
-      </select>
-      <button id="addCRPBtn" class="section-btn" style="margin-left:0.5rem;">
-        Add
-      </button>
-    </div>
-<div style="
-    margin-top:0.5rem;
-    display: flex;
-    justify-content: center;    /* <-- center the row */
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    max-width: 600px;           /* optional: constrain width */
-    margin-left: auto;          /* center container */
-    margin-right: auto;
-  ">
-  <input
-    type="text"
-    id="crpManualInput"
-    placeholder="Other Observation"
-    style="flex: 1;"          /* <-- let it grow to fill space */
-  />
-  <button id="addCRPManualBtn" class="section-btn">Add</button>
-</div>
-
-  </div>
-
-
-
-  <!-- RTCC Panels Sub-tab -->
-  <div id="othRTCC" class="sub-section" style="padding:0.5rem;">
-  <div id="rtccForm" style="display:flex; justify-content:center; flex-wrap:wrap; gap:0.5rem; align-items:flex-start;">
-      <!-- 1st dropdown -->
-      <select id="rtccSelect" style="flex:1;">
-        <option value="" disabled selected hidden></option>
-        <option>RTCC-1</option>
-        <option>RTCC-2</option>
-        <option>RTCC-3</option>
-        <option>RTCC-4</option>
-        <option>RTCC-5</option>
-        <option>RTCC-6</option>
-        <option>RTCC-7</option>
-        <option>Other</option>
-      </select>
-      <!-- dynamic “Other” text -->
-      <input type="text" id="rtccOtherInput" placeholder="Specify RTCC" style="display:none; flex:1;" />
-      <!-- 2nd dropdown -->
-      <select id="rtccIssueSelect" style="flex:1;">
-        <option value="" disabled selected hidden></option>
-        <option>Tap Changing Indicator Defective</option>
-        <option>ROTI Open</option>
-        <option>RWTI Open</option>
-        <option>ROTI Display Defective</option>
-        <option>RWTI Display Defective</option>
-        <option>RTCC Disconnected</option>
-      </select>
-      <!-- Add button -->
-      <button id="addRTCCBtn" class="section-btn">Add</button>
-    </div>
-   
-    <!-- Manual‐entry row below -->
-       <div style="
-       margin-top:0.5rem;
-       display:flex;
-       justify-content:center;
-       align-items:center;
-       gap:0.5rem;
-       flex-wrap:wrap;
-       width:100%;
-       ">
-      <input type="text"
-       id="rtccManualInput"
-       placeholder="Other Observation"
-       style="flex:1;"
-      />
-      <button id="addRTCCManualBtn" class="section-btn">Add</button>
-    </div>
-  </div>
-
-<!-- Panel Room Sub-tab -->
-<div id="othRoom" class="sub-section" style="padding:0.5rem;">
-  <div style="
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.5rem 1rem;
-      max-width: 600px;
-      margin: 0 auto;
-    ">
-    <label><input type="checkbox" name="panelRoomObs" value="11KV Panel Gap" /> 11KV Panel Gap</label>
-    <label><input type="checkbox" name="panelRoomObs" value="33KV Panel Gap" /> 33KV Panel Gap</label>
-    <label><input type="checkbox" name="panelRoomObs" value="11KV Panel Hole" /> 11KV Panel Hole</label>
-    <label><input type="checkbox" name="panelRoomObs" value="33KV Panel Hole" /> 33KV Panel Hole</label>
-    <label><input type="checkbox" name="panelRoomObs" value="11KV Panels Dust & Spider" /> 11KV Panels Dust & Spider</label>
-    <label><input type="checkbox" name="panelRoomObs" value="33KV Panels Dust & Spider" /> 33KV Panels Dust & Spider</label>
-    <label><input type="checkbox" name="panelRoomObs" value="11KV Panels Huge Dust & Spider" /> 11KV Panels Huge Dust & Spider</label>
-    <label><input type="checkbox" name="panelRoomObs" value="11KV Panels Huge Dust & Spider" /> 33KV Panels Huge Dust & Spider</label>    
-    <label><input type="checkbox" name="panelRoomObs" value="Safety Mat near 11KV Panel Missing" /> Safety Mat near 11KV Panel Missing</label>
-    <label><input type="checkbox" name="panelRoomObs" value="Safety Mat near 33KV Panel Missing" /> Safety Mat near 33KV Panel Missing</label>
-    <label><input type="checkbox" name="panelRoomObs" value="Cable Trench Cover Missing" /> Cable Trench Cover Missing</label>
-  </div>
-
-  <div style="
-      margin-top: 0.5rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.5rem;
-      max-width: 600px;
-      margin: 0 auto;
-    ">
-    <input
-      type="text"
-      id="roomManualInput"
-      placeholder="Other Observation"
-      style="flex:1;"
-    />
-    <button id="addRoomManualBtn" class="section-btn">Add</button>
-  </div>
-</div>
-
-
-
-
-  <h2 class="compact-live-heading" style="font-weight:bold; text-align:center; color:#00f2ff;">
-    MEASUREMENT OF PARTIAL DISCHARGE, TEMPERATURE RECORDED &amp; OTHER FINDINGS OF THE INDOOR PANELS
-  </h2>
+  container.appendChild(wrapper);
+}
 
 
 
 
 
 
-</div>
+  // 3) inject your Control-Room export CSS so tables render identically
+  const docxStyle = `
+   <style type="text/css">
+   /* define a “Section1” page of Legal × Landscape */
+   @page Section1 {
+     size: 14in 8.5in;    /* width × height = Legal landscape */
+     margin: 1cm;
+   }
+   /* apply that section to our wrapper DIV */
+   div.Section1 {
+     page: Section1;
+   }
+
+      /* “No Spacing” for all table text */
+      body, p, th, td, div {
+        margin: 0;
+        padding: 0;
+        font-family: Cambria;
+        line-height: 1;
+        mso-style-name: "No Spacing";
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        border: 1px solid #000;
+        padding: 5px;
+      }
+      th {
+        background: #d9d9d9;
+        font-size: 11pt;
+      }
+      td {
+        font-size: 11pt;
+      }
+/* widen “Action to be Taken” and ensure font-size specifically for Control Room Table */
+table:nth-of-type(1) tbody td:last-child {
+  width: 200px !important;
+  font-family: Cambria !important;
+  font-size: 9pt !important;
+}
+
+      /* (keep your other row-background rules here) */
+
+/* Control Panel table rows font size */
+table tbody td {
+    font-size: 10pt !important;
+}
 
 
-<!-- ─────────── LIVE CONSOLIDATED TABLE ─────────── -->
-
-<!-- Back button (styled like other action buttons) -->
-<div class="action-buttons" style="margin-bottom:1rem;">
-  <button
-    id="backButton"
-    class="section-btn"
-    onclick="window.location.href='select_area.html'">
-    Back
-  </button>
-</div>
-
-<h2 class="compact-live-heading" style="font-weight:bold; text-align:center; color:#00f2ff;">
-  MEASUREMENT OF PARTIAL DISCHARGE, TEMPERATURE RECORDED &amp; OTHER FINDINGS OF THE INDOOR PANELS
-</h2>
-<div id="liveTableContainer" class="table-container">
-  <table id="liveTable">
-    <thead>
-      <tr>
-        <th rowspan="2">Sl. No.</th>
-        <th rowspan="2">Panel Name</th>
-        <th rowspan="2">VCB State</th>
-        <th rowspan="2">Load (A)</th>
-        <th colspan="6">Transient Earth Voltage (in dB)</th>
-        <th colspan="5">Temperature (in °C)</th>
-        <th colspan="6">Ultrasound (in dB)</th>
-        <th rowspan="2">Action to be Taken</th>
-      </tr>
-      <tr>
-        <th>TF1</th><th>Tb1</th><th>Tb2</th><th>TPT</th><th>TS1</th><th>TS2</th>
-        <th>F1</th><th>b1</th><th>b2</th><th>S1/S2</th><th>PT</th>
-        <th>UF1</th><th>Ub1</th><th>Ub2</th><th>UPT</th><th>Us1</th><th>Us2</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- rows will be injected here by your JS -->
-    </tbody>
-  </table>
-</div>
 
 
-  <!-- Download buttons for Live Table -->
-  <div class="action-buttons" style="margin-bottom:2rem; display:flex; justify-content:center; gap:1rem;">
-    <button id="downloadDocBtn"   class="section-btn">Download Doc</button>
-    <button id="downloadPdfBtn"   class="section-btn">Download PDF</button>
-    <button id="downloadExcelBtn" class="section-btn">Download Excel</button>
-  </div>
-
-<!-- include FileSaver and html-docx for Word export -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.4.1/html-docx.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
 
 
-  <!-- link to external JS -->
-  <script src="control_room.js"></script>
+     /* 11KV & 33KV panels data rows */
+     tr.kv-11 td,
+     tr.kv-33 td {
+       background-color: #dbe5f1 !important;
+     }
+     /* Group‐header rows for 11KV/33KV Panels */
+     tr.kv-header td {
+       background-color: #dbe5f1 !important;
+     }
+     /* Observations header row */
+     tr.obs-header td {
+       background-color: #d9d9d9 !important;
+     }
+
+
+  h2 {
+    font-family: Cambria;
+    font-size: 14pt;
+    text-align: center;
+  }
+
+
+    </style>
+  `;
+
+
+
+  // 4) wrap it all up
+  const fullHtml = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8"/>
+        ${docxStyle}
+      </head>
+      <body>
+      <div class="Section1">
+        ${container.innerHTML}
+      </div>
+    </body>
+   </html>
+  `;
+  try {
+    const blob = htmlDocx.asBlob(fullHtml);
+    saveAs(blob, `${subName}-Full-Report.docx`);
+  } catch (e) {
+    console.error(e);
+    alert('Failed to generate DOCX:\n' + e.message);
+  }
+  }
+
+async function downloadPDF() {
+  const subName = localStorage.getItem("selectedSubstation") || "[Substation Not Set]";
+
+  // Create container similar to downloadDoc
+  const container = document.createElement('div');
+
+  // Add Title
+  const title = document.createElement('h1');
+  title.textContent = `Condition Monitoring Report for ${subName}`;
+  title.style.fontFamily = 'Cambria';
+  title.style.fontSize = '16pt';
+  title.style.fontWeight = 'bold';
+  title.style.textDecoration = 'underline';
+  title.style.textAlign = 'center';
+  title.style.color = 'black';
+
+  container.appendChild(title);
+
+  // Sections from storage (Control Room, Ultrasound, Hotspot, Visual Findings)
+  const sections = [
+    { key: 'controlRoomDocHTML', title: 'Measurement Of Partial Discharge At In-Door Panels, Temperature Recorded and Other Observations' },
+    { key: 'ultrasoundDocHTML',  title: 'Ultrasonic PD Measurement on Outdoor Equipments'   },
+    { key: 'hotspotDocHTML',     title: 'Hotspot Detected by Thermal Imaging Camera'      },
+    { key: 'visualDocHTML',      title: 'Action to be Taken by Division Authority as per Visual Inspection Findings' }
+  ];
+
+  for (let { key, title: secTitle } of sections) {
+    const html = localStorage.getItem(key);
+    if (html) {
+      const h2 = document.createElement('h2');
+      h2.textContent = secTitle;
+      container.appendChild(h2);
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = html;
+      container.appendChild(wrapper);
+    }
+  }
+
+// Include Live tables with proper header rows
+const liveTables = [
+  { key: 'controlRoomLiveTableHTML', title: 'Control Room Live Data' },
+  { key: 'ultrasoundLiveTableHTML', title: 'Ultrasonic PD Measurement on Outdoor Equipments' },
+  { key: 'hotspotLiveTableBody', title: 'Hotspot Detected by Thermal Imaging Camera' },
+  { key: 'visualLiveTableHTML', title: 'Action to be Taken by Division Authority as per Visual Inspection Findings' }
+];
+
+liveTables.forEach(({ key, title }) => {
+  const tableHTML = localStorage.getItem(key);
+  if (tableHTML) {
+    const h2 = document.createElement('h2');
+    h2.textContent = title;
+    container.appendChild(h2);
+
+    const wrapper = document.createElement('div');
+    let tableHeader = '';
+
+    if (key === 'ultrasoundLiveTableHTML') {
+      tableHeader = `
+        <thead>
+          <tr>
+            <th>Sl. No.</th>
+            <th>Equipment Details</th>
+            <th>Location</th>
+            <th>R Phase (in dB)</th>
+            <th>Y Phase (in dB)</th>
+            <th>B Phase (in dB)</th>
+            <th>Neutral (in dB)</th>
+            <th>Action to be taken</th>
+          </tr>
+        </thead>`;
+    } else if (key === 'hotspotLiveTableBody') {
+      tableHeader = `
+        <thead>
+          <tr>
+            <th>Sl. No.</th>
+            <th>Hotspot Location</th>
+            <th>Ambient Temp (°C)</th>
+            <th>R Phase (°C)</th>
+            <th>Y Phase (°C)</th>
+            <th>B Phase (°C)</th>
+            <th>Neutral (°C)</th>
+            <th>Image Code</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>`;
+    } else if (key === 'visualLiveTableHTML') {
+      tableHeader = `
+        <thead>
+          <tr>
+            <th>Sl. No.</th>
+            <th>Equipment/Material</th>
+            <th>Action to be taken</th>
+          </tr>
+        </thead>`;
+    }
+
+wrapper.innerHTML = `<table>${tableHeader}<tbody>${tableHTML}</tbody></table>`;
+
+// Apply row color for Control Room table
+if (key === 'controlRoomLiveTableHTML') {
+  const rows = wrapper.querySelectorAll('tbody tr');
+  rows.forEach(row => {
+    row.style.backgroundColor = '#dbe5f1';
+  });
+}
+
+container.appendChild(wrapper);
+
+  }
+});
+
+
+  // Apply identical CSS styles from DOCX to PDF
+  container.style.backgroundColor = "#ffffff";
+  container.style.color = "#000000";
+  container.style.padding = "10px";
+  container.style.fontFamily = "Cambria";
+  container.style.width = "1200px";  // ensures good resolution
+
+  const docxStyle = `
+    <style>
+      body, p, th, td, div { margin:0; padding:0; font-family:Cambria; line-height:1; }
+      table { width:100%; border-collapse:collapse; }
+      th, td { border:1px solid #000; padding:5px; font-size:11pt; }
+      th { background:#d9d9d9; }
+      h1, h2 { text-align:center; }
+    </style>
+  `;
+  container.innerHTML = docxStyle + container.innerHTML;
+
+  document.body.appendChild(container);
+
+  const { jsPDF } = window.jspdf;
+
+  // PDF generation logic
+  html2canvas(container, { scale: 2 }).then(canvas => {
+    const pdf = new jsPDF('p', 'mm', 'legal'); // Portrait & Legal size
+    const imgData = canvas.toDataURL('image/png');
+
+    const imgWidth = 216; // Legal width in mm
+    const pageHeight = 356; // Legal height in mm
+    const imgHeight = canvas.height * imgWidth / canvas.width;
+    let heightLeft = imgHeight;
+    let position = 10;
+
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save(`${subName}-Full-Report.pdf`);
+    document.body.removeChild(container);
+  }).catch(e => {
+    alert('Failed to generate PDF:\n' + e.message);
+    document.body.removeChild(container);
+  });
+}
+
+
+  window.downloadDoc = downloadDoc;
+  window.downloadPDF = downloadPDF;
+</script>
+
+
+
+
+
 </body>
 </html>
+
 
