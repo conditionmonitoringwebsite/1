@@ -773,6 +773,35 @@
   word-wrap: break-word;    /* wrap long headers */
 }
 
+
+/* Reduce font-size for Temp columns: F1, b1, b2, S1/S2 & PT */
+#liveTable td:nth-child(11),
+#liveTable td:nth-child(12),
+#liveTable td:nth-child(13),
+#liveTable td:nth-child(14),
+#liveTable td:nth-child(15) {
+  font-size: 0.60rem !important;
+}
+
+
+
+
+
+
+
+/* Reduce font-size for specific ultrasound columns: UF1, Ub1, Ub2, UPT, US1, US2 */
+#liveTable td:nth-child(16),
+#liveTable td:nth-child(17),
+#liveTable td:nth-child(18),
+#liveTable td:nth-child(19),
+#liveTable td:nth-child(20),
+#liveTable td:nth-child(21) {
+  font-size: 0.55rem !important;
+}
+
+
+
+
 #liveTable th {
   background-color: #111836;
   white-space: normal;      /* allow multi-line headings */
@@ -796,14 +825,14 @@ h2.compact-live-heading {
 
 #liveTable th:nth-child(2),
 #liveTable td:nth-child(2) {
-  width: 150px;
-  max-width: 150px;
+  width: 80px;
+  max-width: 80px;
 }
 
 #liveTable th:nth-child(3),
 #liveTable td:nth-child(3) {
-  width: 100px;
-  max-width: 100px;
+  width: 50px;
+  max-width: 50px;
 }
 
 #liveTable th:nth-child(4),
@@ -849,6 +878,29 @@ h2.compact-live-heading {
   width: 30px;
   max-width: 30px;
 }
+
+
+/* Narrow UF1, Ub1, Ub2, UPT, Us1, Us2 (columns 14 to 19) to fixed 30px width */
+#liveTable thead tr:nth-child(2) th:nth-child(14),
+#liveTable tbody td:nth-child(14),
+#liveTable thead tr:nth-child(2) th:nth-child(15),
+#liveTable tbody td:nth-child(15),
+#liveTable thead tr:nth-child(2) th:nth-child(16),
+#liveTable tbody td:nth-child(16),
+#liveTable thead tr:nth-child(2) th:nth-child(17),
+#liveTable tbody td:nth-child(17),
+#liveTable thead tr:nth-child(2) th:nth-child(18),
+#liveTable tbody td:nth-child(18),
+#liveTable thead tr:nth-child(2) th:nth-child(19),
+#liveTable tbody td:nth-child(19) {
+  width: 50px;
+  max-width: 50px;
+}
+
+
+
+
+
 
 /* Style "Other" tab dropdowns, inputs, and buttons to match theme */
 #tableOther11 select,
@@ -2068,7 +2120,36 @@ h2.compact-live-heading {
   </button>
 </div>
 
-<h2 class="compact-live-heading" style="font-weight:bold; text-align:center; color:#00f2ff;">
+
+  <div id="infoTableContainer" style="width:100%; max-width:90vw; margin-bottom:1rem; overflow-x:auto;">
+
+  <table
+    style="
+      width:100%;
+      border-collapse:collapse;
+      color:#fff;
+      text-align:center;
+      font-family:'Orbitron',sans-serif;
+      font-size:0.85rem;
+      border:none;
+    ">
+
+      <tr>
+        <td><strong>Substation Name:</strong></td>
+        <td id="infoSubstation"></td>
+        <td><strong>Division Name:</strong></td>
+        <td id="infoDivision"></td>
+        <td><strong>Region Name:</strong></td>
+        <td id="infoRegion"></td>
+        <td><strong>Zone Name:</strong></td>
+        <td id="infoZone"></td>
+      </tr>
+    </table>
+  </div>
+  <!-- ← end insertion point -->
+
+
+<h2 id="docHeading" class="compact-live-heading" style="font-weight:bold; text-align:center; color:#00f2ff;">
   MEASUREMENT OF PARTIAL DISCHARGE, TEMPERATURE RECORDED &amp; OTHER FINDINGS OF THE INDOOR PANELS
 </h2>
 <div id="liveTableContainer" class="table-container">
