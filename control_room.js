@@ -2576,7 +2576,16 @@ populateLiveTable();
 
   // ── Download Live Table as .docx ──
 document.getElementById('downloadDocBtn').addEventListener('click', () => {
-  const content = document.getElementById('liveTableContainer').innerHTML;
+
+
+    // include the Substation-info table + heading + live-table in the Word export
+  const infoTableHTML = document.getElementById('infoTableContainer').outerHTML;
+  const headingHTML   = document.getElementById('docHeading').outerHTML;
+  const liveHTML      = document.getElementById('liveTableContainer').innerHTML;
+  const content       = infoTableHTML + headingHTML + liveHTML;
+
+
+
   localStorage.setItem('controlRoomDocHTML', content);
 
   const fullHtml = `
@@ -2585,6 +2594,24 @@ document.getElementById('downloadDocBtn').addEventListener('click', () => {
       <head>
         <meta charset="UTF-8">
        <style>
+
+  /* ── Override for the info table in the Word export ── */
+  #infoTableContainer table {
+    color: #000 !important;
+    border: none !important;
+  }
+  #infoTableContainer th,
+  #infoTableContainer td {
+    text-align: center !important;
+    border: none !important;
+  }
+
+  /* ── Force the heading to print black ── */
+  #docHeading {
+    color: #000 !important;
+  }
+
+
        /* Legal Landscape, 1 cm margins */
        @page { size: legal landscape; margin: 1cm; }
       /* “No Spacing” style for all table text (including divs) */
@@ -2751,6 +2778,15 @@ document.getElementById('downloadPdfBtn').addEventListener('click', () => {
     window.location.reload();
   });
 
-
+  const infoMap = {
+    infoSubstation: localStorage.getItem('selectedSubstation') || '',
+    infoDivision:   localStorage.getItem('selectedDivision')   || '',
+    infoRegion:     localStorage.getItem('selectedRegion')     || '',
+    infoZone:       localStorage.getItem('selectedZone')       || ''
+  };
+  Object.entries(infoMap).forEach(([id, value]) => {
+    const td = document.getElementById(id);
+    if (td) td.textContent = value;
+  });
 
 });
