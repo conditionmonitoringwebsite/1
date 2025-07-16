@@ -981,34 +981,8 @@ batterySection.querySelectorAll('.sub-tab-btn').forEach(btn => {
     localStorage.setItem('bat11Data', JSON.stringify(bat11Data));
     alert('11KV Battery & Battery Charger data saved');
 
-  // ── Generate Battery & Battery Charger actions ──
-  const batActions = otherActionsStore['Battery & Battery Charger'];
-  const { acOn, acOff, problemOn, problemOff } = bat11Data.voltage;
-
-  // (i) Only AC‐OFF problem
-  if (problemOff && !problemOn) {
-    batActions.push(
-      `11KV Panel voltage drops to ${acOff}V when charger AC input is OFF. Problem found in battery charger. The charger is unable to send the battery voltage to 11 KV Panel when AC input is OFF. So, Charger output voltage to be increased to such a value that sufficient voltage can reach to the panels. Cross section of the cables (From charger to panels) is also to be checked and increased if necessary.`
-    );
-  }
-  // (ii) Both AC‐ON & AC‐OFF
-  if (problemOn && problemOff) {
-    batActions.push(
-      `11KV panel voltage drops to ${acOn}V when charger AC input is ON and ${acOff}V when charger AC input is OFF. Problem found in battery charger. The charger is unable to send the battery voltage to 11 KV panel when AC input is OFF. So, Charger output voltage to be increased to such a value that sufficient voltage can reach to the panels. Cross section of the cables (From charger to panels) is also to be checked and increased if necessary.`
-    );
-  }
-  // (iii) Defective batteries
-  if (bat11Data.generalFindings.includes('Some Batteries Defective')) {
-    batActions.push(
-      `Battery Cell voltage corresponding to 11KV Panels found to be ${bat11Data.cellVoltage}V. Hence, individual cell voltages are to be measured to identify the defective voltage and necessary action is to be taken towards replacement of the defective battery cells with the healthy one of the same rating.`
-    );
-  }
-  // (iv–xiv) map remaining checkboxes
-  bat11Data.generalFindings.forEach(f => {
-    if (FINDING_MAP_11[f]) batActions.push(FINDING_MAP_11[f]);
-  });
-
-  // finally, refresh the Live Table
+  // Recalculate & redraw all Battery actions (this clears previous entries)
+  recalcBatActions();
   populateLiveTable();
 
   });
@@ -1035,6 +1009,10 @@ batterySection.querySelectorAll('.sub-tab-btn').forEach(btn => {
     localStorage.setItem('bat33Data', JSON.stringify(bat33Data));
     alert('33KV Battery & Battery Charger data saved');
 
+  // Recalculate & redraw Battery actions after saving 33KV
+  recalcBatActions();
+  populateLiveTable();
+
    });
 
 
@@ -1049,6 +1027,16 @@ function recalcBatActions() {
   const acOff11  = document.getElementById('bat11VoltageOff').value;
   const pOn11    = document.getElementById('bat11VoltageOnProblem').checked;
   const pOff11   = document.getElementById('bat11VoltageOffProblem').checked;
+
+
+if (pOn11 && !pOff11) {
+  bat.push(
+    `11KV Panel voltage drops to ${acOn11}V when charger AC input is ON. Problem found in battery charger. The charger is unable to send the battery voltage to 11KV Panel when AC input is ON. So, Charger output voltage to be increased to such a value that sufficient voltage can reach to the panels. Cross section of the cables (From charger to panels) is also to be checked and increased if necessary.`
+  );
+}
+
+
+
   const cellV11  = document.getElementById('bat11CellVoltage').value;
   const find11   = Array.from(
     document.querySelectorAll('#bat11 input[name="bat11GenFindings"]:checked')
@@ -1078,6 +1066,17 @@ function recalcBatActions() {
   const acOff33  = document.getElementById('bat33VoltageOff').value;
   const pOn33    = document.getElementById('bat33VoltageOnProblem').checked;
   const pOff33   = document.getElementById('bat33VoltageOffProblem').checked;
+
+
+// ONLY AC-ON problem (new)
+if (pOn33 && !pOff33) {
+  bat.push(
+    `33KV Panel voltage drops to ${acOn33}V when charger AC input is ON. Problem found in battery charger. The charger is unable to send the battery voltage to 33KV Panel when AC input is ON. So, Charger output voltage to be increased to such a value that sufficient voltage can reach to the panels. Cross section of the cables (From charger to panels) is also to be checked and increased if necessary.`
+  );
+}
+
+
+
   const cellV33  = document.getElementById('bat33CellVoltage').value;
   const find33   = Array.from(
     document.querySelectorAll('#bat33 input[name="bat33GenFindings"]:checked')
@@ -1147,16 +1146,20 @@ document.getElementById('addBat33Other').addEventListener('click', () => {
 
 
 
-  // Ambient-Temp storage & “Add” button for Temp11
-  const ambient11List = JSON.parse(localStorage.getItem('ambientTemp11Data') || '[]');
-  document.getElementById('addAmbientTemp11').addEventListener('click', () => {
-    const v = document.getElementById('ambientTemp11').value;
-    if (v === '') return alert('Enter Ambient Temp.');
-    ambient11List.push(v);
-    localStorage.setItem('ambientTemp11Data', JSON.stringify(ambient11List));
-    alert('11KV Ambient Temp added');
-    document.getElementById('ambientTemp11').value = '';
-  });
+// Ambient-Temp storage & “Add” button for Temp11
+const ambient11List = JSON.parse(localStorage.getItem('ambientTemp11Data') || '[]');
+document.getElementById('addAmbientTemp11').addEventListener('click', () => {
+  const v = document.getElementById('ambientTemp11').value;
+  if (v === '') return alert('Enter Ambient Temp.');
+  ambient11List.push(v);
+  localStorage.setItem('ambientTemp11Data', JSON.stringify(ambient11List));
+  // → update the info row immediately
+  const ambTd = document.getElementById('infoAmbientTemp');
+  if (ambTd) ambTd.textContent = `${v}℃`;
+  alert('11KV Ambient Temp added');
+  document.getElementById('ambientTemp11').value = '';
+});
+
 
   // Ambient-Temp storage & “Add” button for Temp33
   const ambient33List = JSON.parse(localStorage.getItem('ambientTemp33Data') || '[]');
@@ -2392,8 +2395,28 @@ document.getElementById('addRoomManualBtn').addEventListener('click', () => {
    const rtccObs  = otherActionsStore['RTCC'] || [];
    const panelObs = otherActionsStore['Panel Room'] || [];
 
-   // only proceed if *any* list has entries
-   if (batObs.length || crpObs.length || rtccObs.length || panelObs.length) {
+
+ // ── Always read current battery voltages & cell voltages from inputs ──
+const bat11VoltageOn    = document.getElementById('bat11VoltageOn')?.value    || '---';
+const bat11VoltageOff   = document.getElementById('bat11VoltageOff')?.value   || '---';
+const bat11CellVoltage  = document.getElementById('bat11CellVoltage')?.value  || '---';
+const bat33VoltageOn    = document.getElementById('bat33VoltageOn')?.value    || '---';
+const bat33VoltageOff   = document.getElementById('bat33VoltageOff')?.value   || '---';
+const bat33CellVoltage  = document.getElementById('bat33CellVoltage')?.value  || '---';
+
+const summaryArr = [
+  `<strong>11KV Panel Voltage (AC ON):</strong> ${bat11VoltageOn}` +
+    `&nbsp;&nbsp;<strong>11KV Panel Voltage (AC OFF):</strong> ${bat11VoltageOff}`,
+  `<strong>33KV Panel Voltage (AC ON):</strong> ${bat33VoltageOn}` +
+    `&nbsp;&nbsp;<strong>33KV Panel Voltage (AC OFF):</strong> ${bat33VoltageOff}`,
+  `<strong>Battery Cell Voltage (11KV Panels):</strong> ${bat11CellVoltage}` +
+    `&nbsp;&nbsp;<strong>Battery Cell Voltage (33KV Panels):</strong> ${bat33CellVoltage}`
+];
+
+  // combine the “always-through” summary rows with any manual battery actions
+  const combinedBat = [...summaryArr, ...batObs];
+  // only proceed if there is *either* a battery summary OR any of the other Observations lists
+  if (combinedBat.length || crpObs.length || rtccObs.length || panelObs.length) {
     // Observations header row
     const hdr = document.createElement('tr');
     hdr.classList.add('obs-header');
@@ -2407,6 +2430,27 @@ document.getElementById('addRoomManualBtn').addEventListener('click', () => {
 
      let counter = 1;
 
+
+// ── Battery & Battery Charger SUMMARY ROWS ──
+// ── Always read current battery voltages & cell voltages from inputs ──
+const bat11VoltageOn    = document.getElementById('bat11VoltageOn')?.value    || '---';
+const bat11VoltageOff   = document.getElementById('bat11VoltageOff')?.value   || '---';
+const bat11CellVoltage  = document.getElementById('bat11CellVoltage')?.value  || '---';
+const bat33VoltageOn    = document.getElementById('bat33VoltageOn')?.value    || '---';
+const bat33VoltageOff   = document.getElementById('bat33VoltageOff')?.value   || '---';
+const bat33CellVoltage  = document.getElementById('bat33CellVoltage')?.value  || '---';
+
+const summaryArr = [
+  `<strong>11KV Panel Voltage (AC ON):</strong> ${bat11VoltageOn}V` +
+    `&nbsp;&nbsp;<strong>11KV Panel Voltage (AC OFF):</strong> ${bat11VoltageOff}V`,
+  `<strong>33KV Panel Voltage (AC ON):</strong> ${bat33VoltageOn}V` +
+    `&nbsp;&nbsp;<strong>33KV Panel Voltage (AC OFF):</strong> ${bat33VoltageOff}V`,
+  `<strong>Battery Cell Voltage (11KV Panels):</strong> ${bat11CellVoltage}V` +
+    `&nbsp;&nbsp;<strong>Battery Cell Voltage (33KV Panels):</strong> ${bat33CellVoltage}V`
+];
+
+
+// now render these three as one merged‐location block
 
       // helper to render a block with merged location column
       function renderBlock(arr, locText, sectionKey) {
@@ -2440,7 +2484,8 @@ document.getElementById('addRoomManualBtn').addEventListener('click', () => {
       }
 
      // render in desired order
-      renderBlock(batObs,   'Battery & Battery Charger', 'bat');
+      const combinedBat = [...summaryArr, ...batObs];
+      renderBlock(combinedBat, 'Battery & Battery Charger', 'bat');
       renderBlock(crpObs,   '33KV CRP',                'crp');
       renderBlock(rtccObs,  'RTCC Panels',             'rtcc');
       renderBlock(panelObs, 'Panels & Panel Room',     'proom');
@@ -2788,5 +2833,32 @@ document.getElementById('downloadPdfBtn').addEventListener('click', () => {
     const td = document.getElementById(id);
     if (td) td.textContent = value;
   });
+
+
+// ── Populate Inspection Date in DD-MM-YYYY format ──
+const insp = localStorage.getItem('inspectionDate') || '';
+const inspTd = document.getElementById('infoInspectionDate');
+if (inspTd) {
+  if (insp) {
+    // parse the stored string into a Date, then format
+    const d = new Date(insp);
+    const dd   = String(d.getDate()).padStart(2, '0');
+    const mm   = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    inspTd.textContent = `${dd}-${mm}-${yyyy}`;
+  } else {
+    inspTd.textContent = '';
+  }
+}
+
+
+  // ── Populate latest 11KV Ambient Temp (in °C) ──
+  const ambArr = JSON.parse(localStorage.getItem('ambientTemp11Data') || '[]');
+  const latestAmb = ambArr.length ? ambArr[ambArr.length - 1] : '';
+  const ambTd = document.getElementById('infoAmbientTemp');
+  if (ambTd && latestAmb !== '') {
+    ambTd.textContent = latestAmb + '℃';
+  }
+
 
 });
