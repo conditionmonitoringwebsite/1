@@ -113,8 +113,18 @@
 
   <script>
     function saveAndGo() {
+      const zone      = document.getElementById("zone").value;
+      const region    = document.getElementById("region").value;
+      const division  = document.getElementById("division").value;
       const substation = document.getElementById("substation").value;
+      const entryDate  = document.getElementById("entryDate").value;
+
+
+      localStorage.setItem("selectedZone",     zone);
+      localStorage.setItem("selectedRegion",   region);
+      localStorage.setItem("selectedDivision", division);
       localStorage.setItem("selectedSubstation", substation);
+      localStorage.setItem("inspectionDate", entryDate);
       window.location.href = "select_area.html";
     }
 
