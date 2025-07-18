@@ -2757,20 +2757,60 @@ document.getElementById('downloadDocBtn').addEventListener('click', () => {
   // then the live table itself
   const liveHTML        = document.getElementById('liveTableContainer').innerHTML;
 
+
+
+  // ── NEW: company + zone headings ──
+  const zoneName       = localStorage.getItem('selectedZone') || '';
+  const companyHeading = `<h1 style="
+                             font-family: Cambria;
+                             font-size: 20pt;
+                             font-weight: bold;
+                             text-align: center;
+                             margin: 0;
+                           ">
+                             West Bengal State Electricity Distribution Company Limited
+                           </h1>`;
+// Grab only the first word of the zone name
+const fullZone = localStorage.getItem('selectedZone') || '';
+const firstZone = fullZone.split(/\s+/)[0] || '';
+const zoneHeading = `<h2 style="
+    font-family: Cambria;
+    font-size: 12pt;
+    font-weight: bold;
+    text-align: center;
+    margin: 0;
+  ">
+    ${firstZone} Zonal Testing
+  </h2>`;
+
+
+
+
   // build export in the order you want:
   //  1) Substation info
   //  2) Main heading
   //  3) TEV Refs for 11KV
   //  4) TEV Refs for 33KV
   //  5) Live consolidated table
-  const content         = infoTableHTML
-                        + tevRefs11HTML
-                        + tevRefs33HTML
-                        // insert heading here, styled Cambria 18pt
-                        + `<h2 id="docHeading" style="font-family:Cambria; font-size:18pt; font-weight:bold; text-align:center; margin:1em 0;">
-                             Measurement of Partial Discharge, Temperature Recorded &amp; Other Findings of the Indoor Panels
-                           </h2>`
-                        + liveHTML;
+  // NEW: stitch everything—company, zone, info table, TEV refs, main heading, live table
+  const mainHeading = `<h2 id="docHeading" style="
+                          font-family: Cambria;
+                          font-size: 18pt;
+                          font-weight: bold;
+                          text-align: center;
+                          margin: 1em 0;
+                        ">
+                          Measurement of Partial Discharge, Temperature Recorded &amp; Other Findings of the Indoor Panels
+                        </h2>`;
+
+  const content = companyHeading
+                + zoneHeading
+                + infoTableHTML
+                + tevRefs11HTML
+                + tevRefs33HTML
+                + mainHeading
+                + liveHTML;
+
 
 
 
