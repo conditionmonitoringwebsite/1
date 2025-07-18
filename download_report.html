@@ -115,19 +115,21 @@ container.appendChild(title);
     ];
 
 
-    for (let { key, title: secTitle } of sections) {
-      const html = localStorage.getItem(key);
-      if (html) {
-        const h2 = document.createElement('h2');
-        h2.textContent = secTitle;
-        container.appendChild(h2);
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = html;
-        container.appendChild(wrapper);
-      } else {
-        console.warn(`No data for ${secTitle} (key="${key}")`);
-      }
+for (let { key, title: secTitle } of sections) {
+  if (key !== 'ultrasoundDocHTML') {  // Skip duplicate ultrasound section here
+    const html = localStorage.getItem(key);
+    if (html) {
+      const h2 = document.createElement('h2');
+      h2.textContent = secTitle;
+      container.appendChild(h2);
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = html;
+      container.appendChild(wrapper);
+    } else {
+      console.warn(`No data for ${secTitle} (key="${key}")`);
     }
+  }
+}
 
 
 // ── ADD ULTRASOUND LIVE TABLE WITH ROW GROUP COLOURING ──
@@ -604,4 +606,5 @@ container.style.background = '#fff';
 
 </body>
 </html>
+
 
