@@ -445,20 +445,22 @@ async function downloadPDF() {
     { key: 'visualDocHTML',      title: 'Action to be Taken by Division Authority as per Visual Inspection Findings' }
   ];
 
-  for (let { key, title: secTitle } of sections) {
+for (let { key, title: secTitle } of sections) {
+  if (key !== 'ultrasoundDocHTML') {  // Skip duplicate ultrasound section
     const html = localStorage.getItem(key);
     if (html) {
       const h2 = document.createElement('h2');
       h2.textContent = secTitle;
       container.appendChild(h2);
       const temp = document.createElement('div');
-temp.innerHTML = html;
-Array.from(temp.children).forEach(child => {
-  container.appendChild(child.cloneNode(true));
-});
-
+      temp.innerHTML = html;
+      Array.from(temp.children).forEach(child => {
+        container.appendChild(child.cloneNode(true));
+      });
     }
   }
+}
+
 
 // Include Live tables with proper header rows
 const liveTables = [
@@ -606,5 +608,6 @@ container.style.background = '#fff';
 
 </body>
 </html>
+
 
 
