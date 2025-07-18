@@ -1994,6 +1994,105 @@ populateUS11();
 populateUS33();
 
 
+// ─── TEV-REFERENCES UPDATE FUNCTIONS ───
+
+// Helper: show/hide + populate the 11KV TEV-refs section
+function updateTEVRefs11() {
+  // grab the “extra” TEV inputs
+  const airRow   = document.querySelector('#tableTEV11Extra tbody tr:nth-child(1)');
+  const metalRow = document.querySelector('#tableTEV11Extra tbody tr:nth-child(2)');
+
+  const vals = {
+    'air-pfsl':  airRow.querySelector('td:nth-child(2) input').value,
+    'air-pfsr':  airRow.querySelector('td:nth-child(3) input').value,
+    'air-pbsl':  airRow.querySelector('td:nth-child(4) input').value,
+    'air-pbsr':  airRow.querySelector('td:nth-child(5) input').value,
+    'metal-pfsl': metalRow.querySelector('td:nth-child(2) input').value,
+    'metal-pfsr': metalRow.querySelector('td:nth-child(3) input').value,
+    'metal-pbsl': metalRow.querySelector('td:nth-child(4) input').value,
+    'metal-pbsr': metalRow.querySelector('td:nth-child(5) input').value
+  };
+
+  // check if any value is non-empty
+  const any = Object.values(vals).some(v => v !== '');
+
+  const section = document.getElementById('tevRefs11Section');
+  if (!any) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = 'block';
+
+  // fill each cell (add “ dB” if there's a number)
+  Object.entries(vals).forEach(([key, v]) => {
+    const el = document.getElementById(`tev11-${key}`);
+    el.textContent = v ? `${v} dB` : '---';
+  });
+}
+
+// ...and exactly the same for 33KV:
+function updateTEVRefs33() {
+  const airRow   = document.querySelector('#tableTEV33Extra tbody tr:nth-child(1)');
+  const metalRow = document.querySelector('#tableTEV33Extra tbody tr:nth-child(2)');
+
+  const vals = {
+    'air-pfsl':  airRow.querySelector('td:nth-child(2) input').value,
+    'air-pfsr':  airRow.querySelector('td:nth-child(3) input').value,
+    'air-pbsl':  airRow.querySelector('td:nth-child(4) input').value,
+    'air-pbsr':  airRow.querySelector('td:nth-child(5) input').value,
+    'metal-pfsl': metalRow.querySelector('td:nth-child(2) input').value,
+    'metal-pfsr': metalRow.querySelector('td:nth-child(3) input').value,
+    'metal-pbsl': metalRow.querySelector('td:nth-child(4) input').value,
+    'metal-pbsr': metalRow.querySelector('td:nth-child(5) input').value
+  };
+
+  const any = Object.values(vals).some(v => v !== '');
+  const section = document.getElementById('tevRefs33Section');
+  if (!any) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = 'block';
+
+  Object.entries(vals).forEach(([key, v]) => {
+    const el = document.getElementById(`tev33-${key}`);
+    el.textContent = v ? `${v} dB` : '---';
+  });
+}
+
+// Wire these up to fire any time the “extra” TEV inputs change
+['input','change'].forEach(evt => {
+  document.getElementById('tableTEV11Extra').addEventListener(evt, updateTEVRefs11);
+  document.getElementById('tableTEV33Extra').addEventListener(evt, updateTEVRefs33);
+});
+
+// And do an initial render on page-load
+updateTEVRefs11();
+updateTEVRefs33();
+
+// ── Persist extra‐TEV inputs to localStorage ──
+['input','change'].forEach(evt => {
+  document.getElementById('tableTEV11Extra').addEventListener(evt, () => {
+    const data11 = [...document.querySelectorAll('#tableTEV11Extra tbody tr')]
+      .map(row => [...row.querySelectorAll('input')].map(i => i.value));
+    localStorage.setItem('tev11ExtraData', JSON.stringify(data11));
+    updateTEVRefs11();
+  });
+  document.getElementById('tableTEV33Extra').addEventListener(evt, () => {
+    const data33 = [...document.querySelectorAll('#tableTEV33Extra tbody tr')]
+      .map(row => [...row.querySelectorAll('input')].map(i => i.value));
+    localStorage.setItem('tev33ExtraData', JSON.stringify(data33));
+    updateTEVRefs33();
+  });
+});
+
+
+
+
+
+
+
+
   // ── Load saved TEV data ──
   (function loadTEVData() {
     const rows11 = document.querySelectorAll('#tableTEV11 tbody tr');
@@ -2023,6 +2122,30 @@ populateUS33();
       });
   })();
 
+// ── Load persisted extra‐TEV inputs and re-render references ──
+(function loadExtraTEVData() {
+  const saved11 = JSON.parse(localStorage.getItem('tev11ExtraData') || 'null');
+  if (saved11) {
+    document.querySelectorAll('#tableTEV11Extra tbody tr').forEach((row, i) => {
+      saved11[i]?.forEach((val, j) => {
+        const inp = row.cells[j+1].querySelector('input');
+        if (inp) inp.value = val;
+      });
+    });
+  }
+  const saved33 = JSON.parse(localStorage.getItem('tev33ExtraData') || 'null');
+  if (saved33) {
+    document.querySelectorAll('#tableTEV33Extra tbody tr').forEach((row, i) => {
+      saved33[i]?.forEach((val, j) => {
+        const inp = row.cells[j+1].querySelector('input');
+        if (inp) inp.value = val;
+      });
+    });
+  }
+  // now update the visible TEV‐Refs sections
+  updateTEVRefs11();
+  updateTEVRefs33();
+})();
 
 
   // ── Load saved Temperature data ──
@@ -2623,11 +2746,31 @@ populateLiveTable();
 document.getElementById('downloadDocBtn').addEventListener('click', () => {
 
 
-    // include the Substation-info table + heading + live-table in the Word export
-  const infoTableHTML = document.getElementById('infoTableContainer').outerHTML;
-  const headingHTML   = document.getElementById('docHeading').outerHTML;
-  const liveHTML      = document.getElementById('liveTableContainer').innerHTML;
-  const content       = infoTableHTML + headingHTML + liveHTML;
+  // grab the substation info & main heading (unchanged)
+  const infoTableHTML   = document.getElementById('infoTableContainer').outerHTML;
+  const headingHTML     = document.getElementById('docHeading').outerHTML;
+
+  // NEW: grab your two TEV-References sections
+  const tevRefs11HTML   = document.getElementById('tevRefs11Section').outerHTML;
+  const tevRefs33HTML   = document.getElementById('tevRefs33Section').outerHTML;
+
+  // then the live table itself
+  const liveHTML        = document.getElementById('liveTableContainer').innerHTML;
+
+  // build export in the order you want:
+  //  1) Substation info
+  //  2) Main heading
+  //  3) TEV Refs for 11KV
+  //  4) TEV Refs for 33KV
+  //  5) Live consolidated table
+  const content         = infoTableHTML
+                        + tevRefs11HTML
+                        + tevRefs33HTML
+                        // insert heading here, styled Cambria 18pt
+                        + `<h2 id="docHeading" style="font-family:Cambria; font-size:18pt; font-weight:bold; text-align:center; margin:1em 0;">
+                             Measurement of Partial Discharge, Temperature Recorded &amp; Other Findings of the Indoor Panels
+                           </h2>`
+                        + liveHTML;
 
 
 
@@ -2653,6 +2796,11 @@ document.getElementById('downloadDocBtn').addEventListener('click', () => {
 
   /* ── Force the heading to print black ── */
   #docHeading {
+    color: #000 !important;
+  }
+
+  #tevRefs11Section h2,
+  #tevRefs33Section h2 {
     color: #000 !important;
   }
 
