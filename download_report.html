@@ -449,9 +449,12 @@ async function downloadPDF() {
       const h2 = document.createElement('h2');
       h2.textContent = secTitle;
       container.appendChild(h2);
-      const wrapper = document.createElement('div');
-      wrapper.innerHTML = html;
-      container.appendChild(wrapper);
+      const temp = document.createElement('div');
+temp.innerHTML = html;
+Array.from(temp.children).forEach(child => {
+  container.appendChild(child.cloneNode(true));
+});
+
     }
   }
 
@@ -549,6 +552,16 @@ container.appendChild(wrapper);
 
   document.body.appendChild(container);
 
+
+// Ensure the container is in the DOM and styled properly
+document.body.appendChild(container);
+container.style.position = 'fixed';
+container.style.top = '0';
+container.style.left = '0';
+container.style.zIndex = '9999';
+container.style.background = '#fff';
+
+
   const { jsPDF } = window.jspdf;
 
   // PDF generation logic
@@ -591,3 +604,4 @@ container.appendChild(wrapper);
 
 </body>
 </html>
+
