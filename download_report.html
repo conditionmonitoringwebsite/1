@@ -377,14 +377,45 @@ table tbody td {
     </body>
    </html>
   `;
-  try {
-    const blob = htmlDocx.asBlob(fullHtml);
-    saveAs(blob, `${subName}-Full-Report.docx`);
-  } catch (e) {
-    console.error(e);
-    alert('Failed to generate DOCX:\n' + e.message);
+  // detect mobile UA
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+  if (isMobile) {
+    // wrap as Word-HTML for maximum mobile compatibility
+    const wordHtml = `
+      <!DOCTYPE html>
+      <html xmlns:o="urn:schemas-microsoft-com:office:office"
+            xmlns:w="urn:schemas-microsoft-com:office:word"
+            xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta charset="utf-8"/>
+        <meta name="ProgId" content="Word.Document"/>
+        <title>Condition Monitoring Report</title>
+        <style>
+          body, p, th, td, div { margin:0; padding:0; font-family:Cambria; line-height:1; }
+          table { width:100%; border-collapse:collapse; }
+          th, td { border:1px solid #000; padding:5px; font-size:11pt; }
+          th { background:#d9d9d9; }
+          h1, h2 { text-align:center; font-family:Cambria; }
+        </style>
+      </head>
+      <body>
+        ${container.innerHTML}
+      </body>
+      </html>`;
+
+    const blob = new Blob([wordHtml], { type: 'application/msword' });
+    saveAs(blob, `${subName}-Full-Report.doc`);
+  } else {
+    // desktop: keep using true .docx for best fidelity
+    try {
+      const blob = htmlDocx.asBlob(fullHtml);
+      saveAs(blob, `${subName}-Full-Report.docx`);
+    } catch (e) {
+      console.error(e);
+      alert('Failed to generate DOCX:\n' + e.message);
+    }
   }
-  }
+}
 
 async function downloadPDF() {
   const subName = localStorage.getItem("selectedSubstation") || "[Substation Not Set]";
@@ -560,5 +591,3 @@ container.appendChild(wrapper);
 
 </body>
 </html>
-
-
