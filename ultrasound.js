@@ -9,7 +9,7 @@ const locationOptions = [
   'Bus PT','PT-1','PT-2','PT-3','Station Service Transformer','Other'
 ];
 const sideOptions = [
-  'PTR Side','Bus Side','CT Side','VCB Side','LA Side','Line Side',
+  'Both Sides', 'PTR Side','Bus Side','CT Side','VCB Side','LA Side','Line Side',
   'Incoming Side','Cable Side','Station Transformer Side','Other'
 ];
 const classifications = [
@@ -30,7 +30,7 @@ const prompt2Maps = {
   preciseMap: {
     'Bushing':            ['HV Bushing','LV Bushing','HV Bushing Connector','LV Bushing Connector','Other'],
     'Cable':              ['33KV Cable Head','33KV Cable Lead','11KV Cable Head','11KV Cable Lead','33KV Cable Socket Nut-Bolt','11KV Cable Socket Nut-Bolt','Other'],
-    '33KV Pin Insulator': ['1st Isolator 33KV Pin','1st DP 33KV Pin','Isolator before CT 33KV Pin','Isolator after VCB 33KV Pin','Isolator before VCB 33KV Pin','Isolator 33KV Pin','Other'],
+    '33KV Pin Insulator': ['1st Isolator 33KV Pin','2nd Isolator 33KV Pin','1st DP 33KV Pin','Isolator before CT 33KV Pin','Isolator after VCB 33KV Pin','Isolator before VCB 33KV Pin','Isolator 33KV Pin','Other'],
     '11KV Pin Insulator': ['11KV Pin','11KV Feeder Isolator 11KV Pin','Other'],
     'Conductor':          ['HV Conductor','LV Conductor','LV Bushing to Cable Conductor','Other'],
     'Lightning Arrestor':  ['HV LA','LV LA','Other']
