@@ -43,8 +43,8 @@ const location1Opts = ['PTR-1','PTR-2','PTR-3','PTR-4','PTR-5','PTR-6','PTR-7','
 const location2Opts = [
   'HV Bushing Connector','LV Bushing Connector','HV Bushing Stud','LV Bushing Stud','CT Connector',
   'VCB Upper Pad Connector','VCB Lower Pad Connector','VCB Upper & Lower Pad Connector','VCB Upper Pad','VCB Lower Pad',
-  '1st Isolator','1st DP','Isolator before CT','Isolator after VCB','Isolator before VCB',
-  'HV LA Internal Hotspot','LV LA Internal Hotspot','11KV Feeder Isolator','Cable Socket Nut-Bolt','Other'
+  '1st Isolator','1st DP','2nd Isolator','Isolator before CT','Isolator after VCB','Isolator before VCB',
+  'HV LA Internal Hotspot','LV LA Internal Hotspot','11KV Feeder Isolator','11KV Cable Socket Nut-Bolt','33KV Cable Socket Nut-Bolt','Other'
 ];
 const condMap = {
   isolator: ['Pad Connector','Female Contact','Pad Connector & Female Contact','Other'],
@@ -220,7 +220,7 @@ function resetPhaseCells(row) {
 
     // 2) choose new third control
     const v = sel2.value;
-    if (['1st Isolator','1st DP','Isolator before CT','Isolator after VCB','Isolator before VCB'].includes(v)) {
+    if (['1st Isolator','1st DP', '2nd Isolator','Isolator before CT','Isolator after VCB','Isolator before VCB'].includes(v)) {
       sel3 = createSelect(condMap.isolator);
     } 
 
