@@ -12,7 +12,7 @@ const oilLeakCols = [
 ];
 const otherCols = [
   ['Air-Oil Mix','M.Tank Silica Gel','OLTC Silica Gel','M. Tank Oil Low','OLTC Oil Low','PTR Oil Check','Low Oil on M. Tank Breather Oil Pot','Low Oil on OLTC Breather Oil Pot','M. Tank Breather Oil Pot Empty','OLTC Breather Oil Pot Empty','Broken M. Tank Breather Oil Pot','Broken OLTC Breather Oil Pot','M. Tank Breather Oil Pot Missing','OLTC Breather Oil Pot Missing'],
-  ['OTI >WTI','OTI=WTI','OTI Def.','WTI Def.','MOG Def.','MOG Conn. Open','POG not Visible','MK Box Glass Cover Missing','MK Box Glass Cover Broken'],
+  ['OTI >WTI','OTI=WTI','OTI Def.','WTI Def.','MOG Def.','MOG Conn. Open','POG not Visible','MK Box Glass Cover Missing','MK Box Glass Cover Broken', 'MK Box Glass Cover Hazzy'],
   ['MK Box Flat Earthing','OLTC Flat Earthing','Neutral Double Flat Earthing','PTR Body Rusted','PTR Radiator Rusted','PTR Con. Tank Rusted'],
   ['OLTC Count']
 ];
@@ -1232,7 +1232,7 @@ else if (equip === 'Other') {
   secRust.innerHTML = '<h3>Rusted Structure</h3>';
   const gridRust = document.createElement('div');
   gridRust.className = 'grid';
-  ['Iron Structures','Isolator Handles','CT Body','PT Body','CT JB','PT JB','Earth Riser']
+  ['Iron Structures','Isolator Handles','CT Body','PT Body','CT JB','PT JB', 'VCB','Earth Riser']
     .forEach(val => {
       const lbl = document.createElement('label');
       const cb  = document.createElement('input');
@@ -1455,6 +1455,7 @@ function otherDesc(val){
     'POG not Visible':'POG was found to be hazy and not properly visible. The same is to be checked.',
     'MK Box Glass Cover Missing':'Glass Cover of the Marshalling Kiosk was found missing. Appropriate action must be taken.',
     'MK Box Glass Cover Broken':'MK Box Glass Cover was found broken. Appropriate action to be taken to rectify the problem.',
+    'MK Box Glass Cover Hazzy':'MK Box Glass Cover was found to be hazzy. Appropriate action to be taken to rectify the problem.',
     'MK Box Flat Earthing':'MK box is to be earthed though flat and is to be connected with PTR Body earthing.',
     'OLTC Flat Earthing':'OLTC Chamber is to be earthed though flat and is to be connected with PTR Body earthing.',
     'Neutral Double Flat Earthing':'PTR Neutral is to be earth though Double Flat and is to be connected with the PTR body earthing.',
