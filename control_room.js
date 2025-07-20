@@ -1911,6 +1911,37 @@ tr.appendChild(actionTd);
       liveTbody.appendChild(buildPanelRow(r, false));
     });
   }
+
+
+
+const infoTable = document.querySelector('#infoTable');
+if (infoTable) {
+  // Get values from localStorage
+  const zone = localStorage.getItem("selectedZone") || '';
+  const region = localStorage.getItem("selectedRegion") || '';
+  const division = localStorage.getItem("selectedDivision") || '';
+  const substation = localStorage.getItem("selectedSubstation") || '';
+  const date = localStorage.getItem("inspectionDate") || '';
+  const ambient = localStorage.getItem("ambientTemp") || '';
+
+  // Fill the cells using IDs
+  const setText = (id, text) => {
+    const el = document.getElementById(id);
+    if (el) el.innerText = text;
+  };
+  setText("infoZone", zone);
+  setText("infoRegion", region);
+  setText("infoDivision", division);
+  setText("infoSubstation", substation);
+  setText("infoInspectionDate", date);
+  setText("infoAmbientTemp", ambient);
+
+  // Save updated table to localStorage
+  localStorage.setItem('infoTableHTML', infoTable.outerHTML);
+}
+
+
+
 }
 
 
@@ -2604,6 +2635,23 @@ const summaryArr = [
           tr.appendChild(tdA);
           liveTbody.appendChild(tr);
         });
+
+
+
+// ── SAVE HEADERS & TEV REFERENCES to localStorage for report export ──
+const headingEl = document.getElementById('companyHeading');
+const infoTableEl = document.getElementById('infoTable');
+const tev11El = document.getElementById('tevRefs11Section');
+const tev33El = document.getElementById('tevRefs33Section');
+
+localStorage.setItem('companyHeading', headingEl?.outerHTML || '');
+localStorage.setItem('infoTableHTML', infoTableEl?.outerHTML || '');
+localStorage.setItem('tevRefs11HTML', tev11El?.outerHTML || '');
+localStorage.setItem('tevRefs33HTML', tev33El?.outerHTML || '');
+
+
+
+
       }
 
      // render in desired order
@@ -2751,8 +2799,22 @@ document.getElementById('downloadDocBtn').addEventListener('click', () => {
   const headingHTML     = document.getElementById('docHeading').outerHTML;
 
   // NEW: grab your two TEV-References sections
-  const tevRefs11HTML   = document.getElementById('tevRefs11Section').outerHTML;
-  const tevRefs33HTML   = document.getElementById('tevRefs33Section').outerHTML;
+let tevRefs11HTML = '';
+let tevRefs33HTML = '';
+
+const tev11Section = document.getElementById('tevRefs11Section');
+const tev33Section = document.getElementById('tevRefs33Section');
+
+// Include 11KV TEV section only if it's visible
+if (tev11Section && tev11Section.style.display !== 'none') {
+  tevRefs11HTML = tev11Section.outerHTML;
+}
+
+// Include 33KV TEV section only if it's visible
+if (tev33Section && tev33Section.style.display !== 'none') {
+  tevRefs33HTML = tev33Section.outerHTML;
+}
+
 
   // then the live table itself
   const liveHTML        = document.getElementById('liveTableContainer').innerHTML;
@@ -2805,6 +2867,7 @@ const zoneHeading = `<h2 style="
 
   const content = companyHeading
                 + zoneHeading
++ `<table style="width:100%; border-collapse:collapse;"><tr><td style="height:20px; border:none;"></td></tr></table>`
                 + infoTableHTML
                 + tevRefs11HTML
                 + tevRefs33HTML
@@ -3003,6 +3066,7 @@ document.getElementById('downloadPdfBtn').addEventListener('click', () => {
       'pan11Data','pan33Data',
       'tev11Data','tev33Data',
       'temp11Data','temp33Data',
+      'tev11ExtraData', 'tev33ExtraData',
       'us11Data','us33Data',
       'ambientTemp11Data','ambientTemp33Data',
       'bat11Data','bat33Data', 'otherActionsStore'
