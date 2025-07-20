@@ -2123,16 +2123,7 @@ h2.compact-live-heading {
 
   <div id="infoTableContainer" style="width:100%; max-width:90vw; margin-bottom:1rem; overflow-x:auto;">
 
-  <table
-    style="
-      width:100%;
-      border-collapse:collapse;
-      color:#fff;
-      text-align:center;
-      font-family:'Orbitron',sans-serif;
-      font-size:0.85rem;
-      border:none;
-    ">
+  <table id="infoTable" style="width:100%; border-collapse:collapse; color:#fff; text-align:center; font-family:'Orbitron',sans-serif; font-size:0.85rem; border:none; ">
 
       <tr>
         <td><strong>Substation Name:</strong></td>
@@ -2155,17 +2146,16 @@ h2.compact-live-heading {
   </div>
   <!-- ← end insertion point -->
 
+
+
   <!-- ────────── TEV REFERENCES FOR 11KV PANELS ────────── -->
   <div id="tevRefs11Section" style="display:none; width:100%; max-width:90vw; margin-bottom:1rem; overflow-x:auto;">
-  <h2 class="compact-live-heading"
-      style="font-weight:bold; text-align:center; color:#00f2ff;">
-      TEV References for 11KV Panels
-    </h2>
+
     <div class="table-container">
       <table id="11TEVTableContainer">
         <thead>
           <tr>
-            <th colspan="8"><strong>11KV TEV References</strong></th>
+            <th colspan="8"><strong>TEV References for 11KV Panels</strong></th>
           </tr>
           <tr>
             <th><strong>Location-1</strong></th>
@@ -2204,18 +2194,16 @@ h2.compact-live-heading {
     </div>
   </div>
 
+
   <!-- ────────── TEV REFERENCES FOR 33KV PANELS ────────── -->
 
   <div id="tevRefs33Section" style="display:none; width:100%; max-width:90vw; margin-bottom:1rem; overflow-x:auto;">
-   <h2 class="compact-live-heading"
-       style="font-weight:bold; text-align:center; color:#00f2ff;">
-      TEV References for 33KV Panels
-    </h2>
+
     <div class="table-container">
       <table id="33TEVTableContainer">
         <thead>
           <tr>
-            <th colspan="8"><strong>33KV TEV References</strong></th>
+            <th colspan="8"><strong>TEV References for 33KV Panels</strong></th>
           </tr>
           <tr>
             <th><strong>Location-1</strong></th>
@@ -2307,5 +2295,69 @@ h2.compact-live-heading {
 
   <!-- link to external JS -->
   <script src="control_room.js"></script>
+
+
+<div id="companyHeading" style="display:none;">WBSEDCL<br>33/11KV Substation Inspection Report</div>
+
+<table id="infoTable" style="display:none; width:100%; margin-top:1rem;">
+  <tr>
+    <td><strong>Zone:</strong> Kolkata</td>
+    <td><strong>Division:</strong> [Insert Here]</td>
+  </tr>
+  <tr>
+    <td><strong>Region:</strong> [Insert Here]</td>
+    <td><strong>Date:</strong> [Insert Date]</td>
+  </tr>
+</table>
+
+<div id="tevRefs11Section" style="display:none;">
+  <h3>TEV References - 11KV Panels</h3>
+  <table>
+    <tr><th>Location</th><th>Panel Front Side Left</th><th>Panel Front Side Right</th><th>Panel Back Side Left</th><th>Panel Back Side Right</th></tr>
+    <tr>
+      <td>Air</td>
+      <td id="tev11-air-pfsl">---</td>
+      <td id="tev11-air-pfsr">---</td>
+      <td id="tev11-air-pbsl">---</td>
+      <td id="tev11-air-pbsr">---</td>
+    </tr>
+    <tr>
+      <td>Metal</td>
+      <td id="tev11-metal-pfsl">---</td>
+      <td id="tev11-metal-pfsr">---</td>
+      <td id="tev11-metal-pbsl">---</td>
+      <td id="tev11-metal-pbsr">---</td>
+    </tr>
+  </table>
+</div>
+
+<div id="tevRefs33Section" style="display:none;">
+  <h3>TEV References - 33KV Panels</h3>
+  <table>
+    <tr><th>Location</th><th>Panel Front Side Left</th><th>Panel Front Side Right</th><th>Panel Back Side Left</th><th>Panel Back Side Right</th></tr>
+    <tr>
+      <td>Air</td>
+      <td id="tev33-air-pfsl">---</td>
+      <td id="tev33-air-pfsr">---</td>
+      <td id="tev33-air-pbsl">---</td>
+      <td id="tev33-air-pbsr">---</td>
+    </tr>
+    <tr>
+      <td>Metal</td>
+      <td id="tev33-metal-pfsl">---</td>
+      <td id="tev33-metal-pfsr">---</td>
+      <td id="tev33-metal-pbsl">---</td>
+      <td id="tev33-metal-pbsr">---</td>
+    </tr>
+  </table>
+</div>
+
+
+
+
+
+
+
+
 </body>
 </html>
