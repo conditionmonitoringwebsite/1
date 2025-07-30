@@ -95,10 +95,30 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('exportDoc').onclick = exportDoc;
   document.getElementById('exportPdf').onclick = exportPdf;
 
-  document.getElementById('saveBtn').onclick = () => {
-    localStorage.setItem('visualFindings', JSON.stringify(liveData));
-    alert('Visual findings saved');
+document.getElementById('saveBtn').onclick = () => {
+  // Save current form data before saving to storage
+  savePTR(currentEquipment);  // ensures the latest is captured
+
+  localStorage.setItem('visualFindings', JSON.stringify(liveData));
+
+  // Safely store PTR Make/Capacity/Date if they exist
+  const makeVal = document.getElementById('ptrMakeSelect')?.value || '';
+  const manualMakeVal = document.getElementById('ptrMakeManualInput')?.value || '';
+  const capVal = document.getElementById('ptrCapacityInput')?.value || '';
+  const dateVal = document.getElementById('ptrMfgDateInput')?.value || '';
+
+  const ptrDetails = {
+    make: makeVal,
+    manualMake: manualMakeVal,
+    capacity: capVal,
+    mfgDate: dateVal
   };
+
+  localStorage.setItem(`ptrDetails-${currentEquipment}`, JSON.stringify(ptrDetails));
+
+  alert('Visual findings saved');
+};
+
 
   document.getElementById('backBtn').onclick = () => {
     window.location.href = 'switchyard.html';
@@ -116,7 +136,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   btn.addEventListener('click', () => {
     if (confirm("Are you sure you want to start a NEW inspection? All current data will be cleared.")) {
+      // Clear the main findings
       localStorage.removeItem('visualFindings');
+
+      // 🔁 Clear PTR Make, Capacity, Mfg Date for each PTR tab
+      ptrList.forEach(name => {
+        localStorage.removeItem(`ptrDetails-${name}`);
+      });
+
+      // Reload the page
       location.reload();
     }
   });
@@ -154,6 +182,7 @@ function switchSection(sec) {
 
 // PTR Handling
 function selectPTR(name) {
+savePTR(currentEquipment); 
   currentEquipment = name;
   // Highlight only the clicked PTR button
   document.querySelectorAll('#ptrButtons button').forEach(btn => {
@@ -168,11 +197,119 @@ function selectPTR(name) {
 function buildPTRForm(equip) {
   const c = document.getElementById('ptrFormContainer'); c.innerHTML='';
   const div = document.createElement('div'); div.className='form-container';
+const savedDetails = JSON.parse(localStorage.getItem(`ptrDetails-${equip}`) || '{}');
+
   // Oil Leakages
   // Oil Leakages Accordion
   const osec = document.createElement('div');
   osec.className = 'form-section';
-  osec.innerHTML = `<h2>${equip} Observations</h2><h3>Oil Leakages</h3>`;
+  osec.innerHTML = `
+  <h2>${equip} Observations</h2>
+  <button class="accordion-btn">PTR Make, Capacity & Mfg Date</button>
+  <div class="grid" style="display: none;">
+    <label>PTR Make:
+      <select id="ptrMakeSelect" class="custom-select">
+        <option value="" disabled selected>Select Make</option>
+        <option value="Toshiba T&D Systems India Pvt. Ltd.">Toshiba T&D Systems India Pvt. Ltd.</option>
+        <option value="MEI Power Pvt. Ltd.">MEI Power Pvt. Ltd.</option>
+        <option value="Marsons Limited, Kolkata">Marsons Limited, Kolkata</option>
+        <option value="Shirdi Sai Electricals Ltd.">Shirdi Sai Electricals Ltd.</option>
+        <option value="Vijai Electricals Ltd. ">Vijai Electricals Ltd. </option>
+        <option value="RTS">RTS</option>
+        <option value="Nucon">Nucon</option>
+        <option value="Schneider">Schneider</option>	
+        <option value="Hackbridge-Hewiltic & Easun Ltd.">Hackbridge-Hewiltic & Easun Ltd.</option>
+        <option value="Other">Other</option>
+      </select>
+    </label>
+
+
+<div id="manualPtrMake" style="display: none; margin-top: 5px;">
+  <input type="text" id="ptrMakeManualInput" placeholder="Enter PTR Make manually" style="width: 100%; padding: 6px; background: #0a0f2c; border: 1px solid #00f2ff; color: #fff; border-radius: 4px;" />
+</div>
+
+
+
+    <label>PTR Capacity (MVA):
+      <input type="text" id="ptrCapacityInput" placeholder="Enter Capacity" />
+    </label>
+    <label>Mfg Date:
+      <input type="text" id="ptrMfgDateInput" placeholder="Enter Manufacturing Date" />
+    </label>
+  </div>
+  <h3>Oil Leakages</h3>
+`;
+
+
+
+
+const accBtn = osec.querySelector('.accordion-btn');
+
+const ptrMakeSelect = osec.querySelector('#ptrMakeSelect');
+const manualMakeDiv = osec.querySelector('#manualPtrMake');
+
+
+ptrMakeSelect.addEventListener('change', () => {
+  if (ptrMakeSelect.value === 'Other') {
+    manualMakeDiv.style.display = 'block';
+  } else {
+    manualMakeDiv.style.display = 'none';
+    document.getElementById('ptrMakeManualInput').value = '';
+  }
+  savePTR(equip);  // Immediate update
+});
+
+const manualMakeInput = osec.querySelector('#ptrMakeManualInput');
+manualMakeInput.addEventListener('input', () => savePTR(equip));
+
+const ptrCapacityInput = osec.querySelector('#ptrCapacityInput');
+ptrCapacityInput.addEventListener('input', () => savePTR(equip));
+
+const ptrMfgDateInput = osec.querySelector('#ptrMfgDateInput');
+ptrMfgDateInput.addEventListener('input', () => savePTR(equip));
+
+
+// Restore saved values
+if (savedDetails.make) {
+  ptrMakeSelect.value = savedDetails.make;
+  if (savedDetails.make === 'Other') {
+    manualMakeDiv.style.display = 'block';
+  }
+}
+if (savedDetails.manualMake) {
+  manualMakeInput.value = savedDetails.manualMake;
+}
+if (savedDetails.capacity) {
+  ptrCapacityInput.value = savedDetails.capacity;
+}
+if (savedDetails.mfgDate) {
+  ptrMfgDateInput.value = savedDetails.mfgDate;
+}
+
+
+						
+ptrMakeSelect.addEventListener('change', () => {
+  if (ptrMakeSelect.value === 'Other') {
+    manualMakeDiv.style.display = 'block';
+  } else {
+    manualMakeDiv.style.display = 'none';
+    document.getElementById('ptrMakeManualInput').value = '';
+  }
+});
+
+
+
+
+const accGrid = accBtn.nextElementSibling;
+['click','touchstart'].forEach(evt => {
+  accBtn.addEventListener(evt, e => {
+    e.preventDefault();
+    accBtn.classList.toggle('active');
+    accGrid.style.display = accGrid.style.display === 'grid' ? 'none' : 'grid';
+  });
+});
+
+
   // define groups
   const groups = {
     'Bushing O/L': [
@@ -583,6 +720,33 @@ function buildOtherForm(equip) {
     liveData.push({ equipment: 'SSTR', action: text, manual: false });
   }
 
+
+// Save PTR Make/Capacity/Mfg Date
+const makeVal = document.getElementById('ptrMakeSelect')?.value === 'Other'
+  ? document.getElementById('ptrMakeManualInput')?.value
+  : document.getElementById('ptrMakeSelect')?.value;
+
+const capVal  = document.getElementById('ptrCapacityInput')?.value;
+const dateVal = document.getElementById('ptrMfgDateInput')?.value;
+
+if (makeVal || capVal || dateVal) {
+  const details = [
+    makeVal ? `Make - ${makeVal}` : '',
+    capVal ? `Capacity - ${capVal} MVA` : '',
+    dateVal ? `Mfg Date - ${dateVal}` : ''
+  ].filter(Boolean).join(', ');
+
+  liveData.unshift({
+    equipment: equip,
+    action: `(${details})`,
+    manual: false
+  });
+}
+
+
+
+
+
   renderLive();
   localStorage.setItem('visualFindings', JSON.stringify(liveData));
 };
@@ -737,11 +901,30 @@ else if (equip === '33KV CT') {
     dd2.style.display = 'flex';
     dd2.style.gap = '8px';
 
-    const selLoc = document.createElement('select');
-    selLoc.className = 'custom-select';
-    selLoc.add(new Option('-- Select Location --', '', true, true));
-    ['PTR-1','PTR-2','PTR-3','PTR-4','PTR-5','PTR-6','PTR-7','Other']
-      .forEach(o => selLoc.add(new Option(o, o)));
+const selLoc = document.createElement('select');
+selLoc.className = 'custom-select';
+selLoc.add(new Option('-- Select Location --', '', true, true));
+['PTR-1','PTR-2','PTR-3','PTR-4','PTR-5','PTR-6','PTR-7','Other']
+  .forEach(o => selLoc.add(new Option(o, o)));
+
+// 🔽 Manual input for 'Other' location
+const manualInput = document.createElement('input');
+manualInput.type = 'text';
+manualInput.placeholder = 'Enter location manually';
+manualInput.style.display = 'none';
+manualInput.style.width = '150px';
+manualInput.style.padding = '4px';
+manualInput.style.background = '#0a0f2c';
+manualInput.style.border = '1px solid #00f2ff';
+manualInput.style.color = '#fff';
+manualInput.style.borderRadius = '4px';
+
+// Handle dynamic show/hide
+selLoc.onchange = () => {
+  manualInput.style.display = selLoc.value === 'Other' ? 'block' : 'none';
+  if (selLoc.value !== 'Other') manualInput.value = '';
+};
+
 
     const selPhase = document.createElement('select');
     selPhase.className = 'custom-select';
@@ -752,9 +935,17 @@ else if (equip === '33KV CT') {
     addBtn.textContent = 'Add';
 
     addBtn.onclick = () => {
-      const loc = selLoc.value, phase = selPhase.value;
-      if (!loc || !phase) return;
-      const entry = `${loc} ${phase} CT`;
+let loc = selLoc.value;
+const phase = selPhase.value;
+if (!loc || !phase) return;
+
+if (loc === 'Other') {
+  const manual = manualInput.value.trim();
+  if (!manual) return;  // Prevent empty entry
+  loc = manual;
+}
+const entry = `${loc} ${phase} CT`;
+
       config.entries.add(entry);
 
       // Replace only same-tag row for 33KV CT
@@ -775,6 +966,7 @@ else if (equip === '33KV CT') {
     };
 
     dd2.appendChild(labelEl('Location', selLoc));
+    dd2.appendChild(manualInput);
     dd2.appendChild(labelEl('Phase', selPhase));
     dd2.appendChild(addBtn);
     sec.appendChild(dd2);
@@ -1080,14 +1272,32 @@ else if (equip === 'LA') {
     const selLoc = document.createElement('select');
     selLoc.className = 'custom-select';
     selLoc.add(new Option('-- Select Location --','',true,true));
-    ['PTR-1','PTR-2','PTR-3','PTR-4','PTR-5','PTR-6','PTR-7','Other']
-      .forEach(o => selLoc.add(new Option(o,o)));
+['PTR-1','PTR-2','PTR-3','PTR-4','PTR-5','PTR-6','PTR-7','Other']
+  .forEach(o => selLoc.add(new Option(o, o)));
+
+const manualInput = document.createElement('input');
+manualInput.type = 'text';
+manualInput.placeholder = 'Enter location manually';
+manualInput.style.display = 'none';
+manualInput.style.width = '150px';
+manualInput.style.padding = '4px';
+manualInput.style.background = '#0a0f2c';
+manualInput.style.border = '1px solid #00f2ff';
+manualInput.style.color = '#fff';
+manualInput.style.borderRadius = '4px';
+dd.appendChild(manualInput);
+
+selLoc.onchange = () => {
+  manualInput.style.display = (selLoc.value === 'Other') ? 'block' : 'none';
+  if (selLoc.value !== 'Other') manualInput.value = '';
+};
+
 
     // Phase dropdown
     const selPhase = document.createElement('select');
     selPhase.className = 'custom-select';
     selPhase.add(new Option('-- Select Phase --','',true,true));
-    ['R-Phase','Y-Phase','B-Phase'].forEach(o => selPhase.add(new Option(o,o)));
+    ['R-Phase','Y-Phase','B-Phase','all Phase'].forEach(o => selPhase.add(new Option(o,o)));
 
     // HV/LV dropdown
     const selHVLV = document.createElement('select');
@@ -1103,7 +1313,15 @@ else if (equip === 'LA') {
     const addBtn = document.createElement('button');
     addBtn.textContent = 'Add';
     addBtn.onclick = () => {
-      const loc  = selLoc.value, phase = selPhase.value, hvlv   = selHVLV.value;
+      let loc = selLoc.value;
+if (loc === 'Other') {
+  const manual = manualInput.value.trim();
+  if (!manual) return;  // Don't proceed if manual field is empty
+  loc = manual;
+}
+const phase = selPhase.value;
+const hvlv  = selHVLV.value;
+
       if (!loc || !phase || !hvlv) return;
       const entry = `${loc} ${phase} ${hvlv}`;
       cfg.entries.add(entry);
@@ -1385,44 +1603,79 @@ function createManualEntry(placeholder = 'Other…') {
 
 
 function savePTR(equip) {
-  // clear existing for this equip
-  // Remove only the auto-generated rows, but keep manual ones
-liveData = liveData.filter(r => !(r.equipment === equip && !r.manual));
-  // Oil
-  // Oil (only from the first form-section)
+  equip = equip || currentEquipment;
+  // Clear auto-generated rows for this PTR
+  liveData = liveData.filter(r => !(r.equipment === equip && !r.manual));
+
+  // Capture PTR Make/Capacity/Mfg Date and add it as the first row
+  const makeVal = document.getElementById('ptrMakeSelect')?.value === 'Other'
+    ? document.getElementById('ptrMakeManualInput')?.value
+    : document.getElementById('ptrMakeSelect')?.value;
+
+  const capVal  = document.getElementById('ptrCapacityInput')?.value;
+  const dateVal = document.getElementById('ptrMfgDateInput')?.value;
+
+  if (makeVal || capVal || dateVal) {
+    const details = [
+      makeVal ? `Make: ${makeVal}` : '',
+      capVal ? `Capacity:${capVal}` : '',
+      dateVal ? `Mfg date: ${dateVal}` : ''
+    ].filter(Boolean).join(', ');
+
+    liveData.unshift({
+      equipment: equip,
+      action: details,
+      manual: false
+    });
+  }
+
+  // Oil Leakages
   const oil = Array.from(
     document.querySelectorAll(
       '#ptrFormContainer .form-section:nth-of-type(1) input[type="checkbox"]:checked'
     )
   ).map(cb => cb.value);
 
+  if (oil.length) {
+    let listText;
+    if (oil.length > 1) {
+      const allButLast = oil.slice(0, -1).join(', ');
+      const lastItem   = oil[oil.length - 1];
+      listText = `${allButLast} & ${lastItem}`;
+    } else {
+      listText = oil[0];
+    }
 
-if (oil.length) {
-  // build a comma-separated list with " & " before the last item
-  let listText;
-  if (oil.length > 1) {
-    const allButLast = oil.slice(0, -1).join(', ');
-    const lastItem   = oil[oil.length - 1];
-    listText = `${allButLast} & ${lastItem}`;
-  } else {
-    listText = oil[0];
+    const txt = oil.length > 1
+      ? `Oil leakages were found from ${listText} --- These oil leakages must be arrested.`
+      : `Oil leakage was found from ${listText} --- This oil leakage must be arrested.`;
+
+    liveData.push({ equipment: equip, action: txt, tags: oil });
   }
 
-  const txt = oil.length > 1
-    ? `Oil leakages were found from ${listText} --- These oil leakages must be arrested.`
-    : `Oil leakage was found from ${listText} --- This oil leakage must be arrested.`;
-
-  liveData.push({ equipment: equip, action: txt, tags: oil });
-}
-
-  // Other
-  document.querySelectorAll('#ptrFormContainer .form-section:nth-child(2) input').forEach(inp=>{
-    if(inp.type==='checkbox'&&inp.checked){
-      liveData.push({equipment:equip,action:otherDesc(inp.value), tags: [inp.value]});
-    } else if(inp.tagName==='INPUT'&&inp.type==='number'&&inp.value){
-      liveData.push({equipment:equip,action:`OLTC counter was been found ${inp.value}. BDV of the oil of OLTC chamber to be checked. If BDV found low appropriate action to be taken.`});
+  // Other Findings + OLTC Count
+  document.querySelectorAll('#ptrFormContainer .form-section:nth-child(2) input').forEach(inp => {
+    if (inp.type === 'checkbox' && inp.checked) {
+      liveData.push({ equipment: equip, action: otherDesc(inp.value), tags: [inp.value] });
+    } else if (inp.tagName === 'INPUT' && inp.type === 'number' && inp.value) {
+      liveData.push({
+        equipment: equip,
+        action: `OLTC counter was been found ${inp.value}. BDV of the oil of OLTC chamber to be checked. If BDV found low appropriate action to be taken.`
+      });
     }
   });
+
+
+// Persist PTR Make/Capacity/Mfg Date separately
+const ptrDetails = {
+  make: document.getElementById('ptrMakeSelect')?.value || '',
+  manualMake: document.getElementById('ptrMakeManualInput')?.value || '',
+  capacity: document.getElementById('ptrCapacityInput')?.value || '',
+  mfgDate: document.getElementById('ptrMfgDateInput')?.value || ''
+};
+localStorage.setItem(`ptrDetails-${equip}`, JSON.stringify(ptrDetails));
+
+
   renderLive();
   localStorage.setItem('visualFindings', JSON.stringify(liveData));
 }
@@ -1837,24 +2090,31 @@ doc.save(`Visualfindings_${subName}_${dateStr}.pdf`
 function addCustomOil() {
   const v = document.getElementById('customOilInput').value.trim();
   if (!v) return;
+
+  const equip = currentEquipment; // lock-in the correct context
   const activeGrid = document.querySelector(
     '#ptrFormContainer .form-section:nth-of-type(1) .grid[style*="display: grid"]'
   );
   const lbl = document.createElement('label');
   const cb  = document.createElement('input');
-  cb.type = 'checkbox'; cb.value = v; cb.onchange = () => savePTR(currentEquipment);
+  cb.type = 'checkbox'; cb.value = v;
+  cb.checked = true;
+  cb.onchange = () => savePTR(equip);
   lbl.appendChild(cb); lbl.append(v);
   activeGrid.appendChild(lbl);
+
   document.getElementById('customOilInput').value = '';
-  savePTR(currentEquipment);
+  savePTR(equip); // save with the correct context
 }
 
 function addCustomOther() {
   const v = document.getElementById('customOtherInput').value.trim();
   if (!v) return;
-  liveData.push({ equipment: currentEquipment, action: v, manual: true });
+  const equip = currentEquipment; // ensure scoped value
+  liveData.push({ equipment: equip, action: v, manual: true });
   renderLive();
   localStorage.setItem('visualFindings', JSON.stringify(liveData));
   document.getElementById('customOtherInput').value = '';
 }
+
 
