@@ -96,28 +96,27 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('exportPdf').onclick = exportPdf;
 
 document.getElementById('saveBtn').onclick = () => {
-  // Save current form data before saving to storage
-  savePTR(currentEquipment);  // ensures the latest is captured
+  if (!currentEquipment) {
+    alert("No equipment selected.");
+    return;
+  }
 
-  localStorage.setItem('visualFindings', JSON.stringify(liveData));
+  // Decide based on whether currentEquipment is in ptrList
+  if (ptrList.includes(currentEquipment)) {
+    savePTR(currentEquipment);
+  } else {
+    // No action needed for others since their changes already reflect live
+    alert("Visual findings saved for Other Observations.");
+    return;
+  }
 
-  // Safely store PTR Make/Capacity/Date if they exist
-  const makeVal = document.getElementById('ptrMakeSelect')?.value || '';
-  const manualMakeVal = document.getElementById('ptrMakeManualInput')?.value || '';
-  const capVal = document.getElementById('ptrCapacityInput')?.value || '';
-  const dateVal = document.getElementById('ptrMfgDateInput')?.value || '';
-
-  const ptrDetails = {
-    make: makeVal,
-    manualMake: manualMakeVal,
-    capacity: capVal,
-    mfgDate: dateVal
-  };
-
-  localStorage.setItem(`ptrDetails-${currentEquipment}`, JSON.stringify(ptrDetails));
-
-  alert('Visual findings saved');
+  alert("Visual findings saved.");
 };
+
+
+
+
+
 
 
   document.getElementById('backBtn').onclick = () => {
