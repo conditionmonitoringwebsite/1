@@ -9,7 +9,7 @@ const locationOptions = [
   'Bus PT','PT-1','PT-2','PT-3','Station Service Transformer','Other'
 ];
 const sideOptions = [
-  'Both Sides', 'PTR Side','Bus Side','CT Side','VCB Side','LA Side','Line Side',
+  'Both Sides','PTR Side','Bus Side','CT Side','VCB Side','LA Side','Line Side',
   'Incoming Side','Cable Side','Station Transformer Side','Other'
 ];
 const classifications = [
@@ -30,16 +30,11 @@ const prompt2Maps = {
   preciseMap: {
     'Bushing':            ['HV Bushing','LV Bushing','HV Bushing Connector','LV Bushing Connector','Other'],
     'Cable':              ['33KV Cable Head','33KV Cable Lead','11KV Cable Head','11KV Cable Lead','33KV Cable Socket Nut-Bolt','11KV Cable Socket Nut-Bolt','Other'],
-    '33KV Pin Insulator': ['1st Isolator 33KV Pin','2nd Isolator 33KV Pin','1st DP 33KV Pin','Isolator before CT 33KV Pin','Isolator after VCB 33KV Pin','Isolator before VCB 33KV Pin','Isolator 33KV Pin','Other'],
+    '33KV Pin Insulator': ['1st Isolator 33KV Pin','1st DP 33KV Pin','Isolator before CT 33KV Pin','Isolator after VCB 33KV Pin','Isolator before VCB 33KV Pin','Isolator 33KV Pin','Other'],
     '11KV Pin Insulator': ['11KV Pin','11KV Feeder Isolator 11KV Pin','Other'],
     'Conductor':          ['HV Conductor','LV Conductor','LV Bushing to Cable Conductor','Other'],
     'Lightning Arrestor':  ['HV LA','LV LA','Other']
   },
-
-
-
-
-
   actionTemplates: {
     '33KV CT': {
       'Corona':                      'Necessary action to be taken care of towards cleaning, maintenance and oil checking of the said CT.',
@@ -53,8 +48,6 @@ const prompt2Maps = {
       'Corona with Severe Tracking': 'Necessary cleaning, maintenance and oil checking of the said CT. Insulation resistance in between CT primary to earth and Primary to secondary by 5KV megger and CT secondary to earth by 500Volt megger are to be measured and if found low then the CT is to be replaced.',
       'Arcing':                      'Necessary action to be taken care of towards replacement of the CT with a healthy one.'
     },
-
-
     '33KV PT': {
       /* same as CT but “PT” */
       'Corona':                      'Necessary action to be taken care of towards cleaning, maintenance and oil checking of the said PT.',
@@ -98,23 +91,6 @@ const prompt2Maps = {
   }
 };
 
-// — persist custom live-table actions —
-let manualActions = JSON.parse(localStorage.getItem('ultrasoundActions') || '{}');
-
-// — persist entire live-table HTML —
-function saveLiveTableHTML() {
-  const html = document.querySelector('#liveTable tbody').innerHTML;
-  localStorage.setItem('ultrasoundLiveTableHTML', html);
-}
-
-function loadLiveTableHTML() {
-  const html = localStorage.getItem('ultrasoundLiveTableHTML');
-  if (html) {
-    document.querySelector('#liveTable tbody').innerHTML = html;
-  }
-}
-
-
 // === Helpers ===
 function createDropdown(opts, onChange) {
   const sel = document.createElement('select');
@@ -128,14 +104,21 @@ function createPhaseField() {
   const num  = Object.assign(document.createElement('input'), { type:'number', placeholder:'dB' });
   const cls  = createDropdown(classifications, null);
   const cbw  = document.createElement('div'); cbw.className='checkbox-container';
-  ['Rep','IR','Audible','X-Cbl','C-Dep','Trck Mrk'].forEach(l=>{
-    const lab = document.createElement('label');
-    const cb  = document.createElement('input'); cb.type='checkbox'; cb.value=l;
-    lab.append(cb, document.createTextNode(' '+l));
-    cbw.append(lab);
-  });
+['Rep','IR','Audible','X-Cbl','C-Dep','Trck Mrk'].forEach(l=>{
+  const lab = document.createElement('label');
+  const cb  = document.createElement('input'); cb.type='checkbox'; cb.value=l;
+
+  // Add a special class to Cable-specific checkboxes
+  if (['X-Cbl','C-Dep','Trck Mrk'].includes(l)) {
+    cb.classList.add('cable-only');
+    lab.style.display = 'none';  // initially hidden
+  }
+
+  lab.append(cb, document.createTextNode(' ' + l));
+  cbw.append(lab);
+});
+
   const rec = Object.assign(document.createElement('input'), { type:'number', placeholder:'Recording No.' });
-  rec.className = 'recNo';   
   wrap.append(num, cls, cbw, rec);
   return wrap;
 }
@@ -148,56 +131,56 @@ function addRow() {
 
   // Equipment
   const tdEq = document.createElement('td');
-  const selEq = createDropdown(equipmentOptions, function(){
-    // if CT/PT/VCB: auto-precise
-    if (['33KV CT','33KV PT','33KV VCB','Post Insulator'].includes(this.value)) {
-      tdPrec.innerHTML = '';
-      const inp = document.createElement('input');
-      inp.type='text'; inp.value=this.value; inp.readOnly=true;
-      tdPrec.append(inp);
-    } else {
-      updatePrecise(this, tdPrec);
-    }
-    // if “Other”: manual
-if (this.value==='Other') {
-  const inp = document.createElement('input');
-  inp.type        = 'text';
-  inp.placeholder = 'Enter Equipment Details';
-  // immediately re-run Precise-location logic whenever you finish typing
-  inp.addEventListener('change', () => updatePrecise(inp, tdPrec));
-  // immediately refresh the live table as you type
-  inp.addEventListener('input', renderLive);
-  this.replaceWith(inp);
-}
 
+const selEq = createDropdown(equipmentOptions, function(){
+  const value = this.value;
 
-  // — new: disable Side dropdown when appropriate —
-  const disableFor = ['33KV CT','33KV PT','33KV VCB','Bushing','Lightning Arrestor'];
-  if (disableFor.includes(this.value)) {
-    selSide.disabled = true;
-    selSide.value = '';
+  // Auto-fill or editable precise location
+  if (['33KV CT','33KV PT','33KV VCB','Post Insulator'].includes(value)) {
+    tdPrec.innerHTML = '';
+    const inp = document.createElement('input');
+    inp.type='text'; inp.value=value; inp.readOnly=true;
+    tdPrec.append(inp);
   } else {
-    selSide.disabled = false;
+    updatePrecise(this, tdPrec);
   }
 
+  // Disable side dropdown for specific Equipment
+  const disableSideFor = ['33KV CT','33KV PT','33KV VCB','Bushing','Lightning Arrestor'];
+  const sideInput = tdSide.querySelector('select,input');
+  if (sideInput && sideInput.tagName === 'SELECT') {
+    sideInput.disabled = disableSideFor.includes(value);
+  }
 
-
-    renderLive();
+  // Show/Hide Cable-specific checkboxes
+  const row = this.closest('tr');
+  row.querySelectorAll('.checkbox-container label').forEach(lab => {
+    const cb = lab.querySelector('input[type="checkbox"]');
+    if (cb && cb.classList.contains('cable-only')) {
+      lab.style.display = (value === 'Cable') ? 'inline-flex' : 'none';
+    }
   });
-  tdEq.append(selEq); tr.append(tdEq);
+
+  // “Other” option
+  if (value==='Other') {
+    const inp = document.createElement('input');
+    inp.type='text'; inp.placeholder='Enter Equipment Details';
+    this.replaceWith(inp);
+  }
+
+  renderLive();
+});
+tdEq.append(selEq); tr.append(tdEq);
+
 
   // Location
   const tdLoc = document.createElement('td');
   const selLoc = createDropdown(locationOptions, function(){
-if (this.value==='Other') {
-  const inp = document.createElement('input');
-  inp.type        = 'text';
-  inp.placeholder = 'Enter location';
-  // refresh live table on every keystroke
-  inp.addEventListener('input', renderLive);
-  this.replaceWith(inp);
-}
-
+    if (this.value==='Other'){
+      const inp=document.createElement('input');
+      inp.type='text'; inp.placeholder='Enter location';
+      this.replaceWith(inp);
+    }
     renderLive();
   });
   tdLoc.append(selLoc); tr.append(tdLoc);
@@ -209,33 +192,14 @@ if (this.value==='Other') {
   // Side
   const tdSide = document.createElement('td');
   const selSide = createDropdown(sideOptions, function(){
-if (this.value==='Other') {
-  const inp = document.createElement('input');
-  inp.type        = 'text';
-  inp.placeholder = 'Enter side';
-  // keep live table in sync
-  inp.addEventListener('input', renderLive);
-  this.replaceWith(inp);
-}
-
+    if (this.value==='Other'){
+      const inp=document.createElement('input');
+      inp.type='text'; inp.placeholder='Enter side';
+      this.replaceWith(inp);
+    }
     renderLive();
   });
   tdSide.append(selSide); tr.append(tdSide);
-
-
-// ── disable Side dropdown for certain equipment ──
-selEq.addEventListener('change', function() {
-  const disableFor = ['33KV CT','33KV PT','33KV VCB','Bushing','Lightning Arrestor'];
-  if (disableFor.includes(this.value)) {
-    selSide.disabled = true;
-    selSide.value = '';        // clear any previous choice
-  } else {
-    selSide.disabled = false;
-  }
-});
-
-
-
 
   // R/Y/B/Neutral
   for(let i=0; i<4; i++){
@@ -261,7 +225,6 @@ selEq.addEventListener('change', function() {
 
   tbody.append(tr);
   renderLive();
-
 }
 
 function updatePrecise(sel, cell) {
@@ -269,15 +232,11 @@ function updatePrecise(sel, cell) {
   const opts = prompt2Maps.preciseMap[sel.value]||[];
   if (opts.length) {
     const dd = createDropdown(opts, function(){
-if (this.value==='Other') {
-  const inp = document.createElement('input');
-  inp.type        = 'text';
-  inp.placeholder = 'Enter precise';
-  // ← here’s the missing piece:
-  inp.addEventListener('input', renderLive);
-  this.replaceWith(inp);
-}
-
+      if (this.value==='Other'){
+        const inp=document.createElement('input');
+        inp.type='text'; inp.placeholder='Enter precise';
+        this.replaceWith(inp);
+      }
       renderLive();
     });
     cell.append(dd);
@@ -336,58 +295,41 @@ function renderLive(){
       tr.append(td2);
 
       // Phases
-['R Phase','Y Phase','B Phase','Neutral'].forEach((ph,j) => {
-  const f = r.cells[4+j].firstChild;
-  // core inputs
-  const inputs = Array.from(f.querySelectorAll('input[type=number]'));
-  const v     = inputs[0].value;           // the dB value
-  const recNo = inputs[1].value;           // the Recording No.
-  const cls   = f.querySelector('select').value;
-  const cbs   = {};
-  f.querySelectorAll('input[type=checkbox]')
-   .forEach(cb => cbs[cb.value] = cb.checked);
-
-  const td = document.createElement('td');
-
-  // build output if either measurement or recording exists
-  if ((v && cls) || recNo) {
-    let out = '';
-    if (v && cls) {
-      out = `${v} dB (${cls})`;
-      if (cbs['Audible']) out += '<br/><strong>Audible</strong>';
-    }
-    if (recNo) {
-      // place below Audible (if any)
-      out += (out ? '<br/>' : '') + `<strong>Recording No- ${recNo}</strong>`;
-    }
-    td.innerHTML = out;
-  } else {
-    td.textContent = '---';
-  }
-  tr.append(td);
-});
-
-      // Action (editable)
-if (isBus || isPin) {
-  if (i === 0) {
-    const tdA = document.createElement('td');
-    // use your saved text if it exists, otherwise fall back to the template
-    if (manualActions[eq]) {
-      tdA.innerHTML = manualActions[eq];
-    } else {
-      tdA.textContent = isBus
-        ? prompt2Maps.actionTemplates['Bushing'].default
-        : prompt2Maps.actionTemplates['33KV Pin Insulator'].default;
-    }
-    tdA.rowSpan = grp.length;
-    tdA.contentEditable = true;
-    tr.append(tdA);
-  }
+      ['R Phase','Y Phase','B Phase','Neutral'].forEach((ph,j)=>{
+        const f=r.cells[4+j].firstChild;
+        const v=f.querySelector('input[type=number]').value;
+        const cls=f.querySelector('select').value;
+        const cbs={};
+        f.querySelectorAll('input[type=checkbox]').forEach(cb=>cbs[cb.value]=cb.checked);
+        const td=document.createElement('td');
+const rec = f.querySelector('input[placeholder="Recording No."]').value;
+if(v && cls){
+  let out = `${v} dB (${cls})`;
+  if(cbs['Audible']) out += '<br/><strong>Audible</strong>';
+  if(rec) out += `<br/><strong>Recording No- ${rec}</strong>`;
+  td.innerHTML = out;
+} else if (rec) {
+  td.innerHTML = `<strong>Recording No- ${rec}</strong>`;
+} else {
+  td.textContent = '---';
 }
 
 
+        tr.append(td);
+      });
 
-        else {
+      // Action (editable)
+      if(isBus||isPin){
+        if(i===0){
+          const tdA=document.createElement('td');
+          tdA.textContent = isBus
+            ? prompt2Maps.actionTemplates['Bushing'].default
+            : prompt2Maps.actionTemplates['33KV Pin Insulator'].default;
+          tdA.rowSpan=grp.length;
+          tdA.contentEditable = true;
+          tr.append(tdA);
+        }
+      } else {
         const tdA=document.createElement('td');
         tdA.contentEditable = true;
         const acts=[];
@@ -416,7 +358,8 @@ if (isBus || isPin) {
             acts.push(`<u><strong>${ph}:</strong></u><br/>${arr.join('<br/>')}`);
           }
         });
-        tdA.innerHTML = acts.join('<hr style="border-top:1px dashed #888;margin:4px 0;"/>');
+        tdA.innerHTML = acts.join('<br/>');
+
         tr.append(tdA);
       }
 
@@ -437,252 +380,50 @@ function saveFormData(){
     };
     ['R','Y','B','N'].forEach((k,i)=>{
       const f=r.cells[4+i].firstChild;
-      e[k]={
-        value:f.querySelector('input[type=number]').value,
-        class:f.querySelector('select').value,
-        rep:  f.querySelector('input[value="Rep"]').checked,
-        ir:   f.querySelector('input[value="IR"]').checked,
-        aud:  f.querySelector('input[value="Audible"]').checked,
-        xcb:   f.querySelector('input[value="X-Cbl"]').checked,
-       cdep:  f.querySelector('input[value="C-Dep"]').checked,
-       trck:  f.querySelector('input[value="Trck Mrk"]').checked,
-        rec:   f.querySelector('.recNo').value 
-      };
+e[k]={
+  value: f.querySelector('input[placeholder="dB"]').value,
+  class: f.querySelector('select').value,
+  rep:   f.querySelector('input[value="Rep"]').checked,
+  ir:    f.querySelector('input[value="IR"]').checked,
+  aud:   f.querySelector('input[value="Audible"]').checked,
+  rec:   f.querySelector('input[placeholder="Recording No."]').value
+};
     });
     data.push(e);
   });
   localStorage.setItem('ultrasoundData',JSON.stringify(data));
-
-// — save any custom live-table edits —
-const actionsToSave = {};
-document.querySelectorAll('#liveTable tbody tr').forEach(row => {
-  const eqCell = row.querySelector('td[rowspan]');
-  if (!eqCell) return;                    // skip non-group rows
-  const actionCell = row.querySelector('td[contenteditable]');
-  if (actionCell) {
-    actionsToSave[ eqCell.textContent ] = actionCell.innerHTML;
-  }
-});
-localStorage.setItem('ultrasoundActions', JSON.stringify(actionsToSave));
-
-saveLiveTableHTML(); 
-
-
   alert('Data saved.');
 }
-
-// auto-save both form data and live-table HTML on page unload
-window.addEventListener('beforeunload', () => {
-  // 1) persist the form data exactly as Save button would
-  saveFormData();
-  // 2) persist the live-table HTML
-  saveLiveTableHTML();
-});
-
-
-
-
 
 function loadFormData(){
   const s=localStorage.getItem('ultrasoundData');
   if(!s) return;
-
-  // load any previously saved live-table edits
-  manualActions = JSON.parse(localStorage.getItem('ultrasoundActions') || '{}');
-
-
-
   JSON.parse(s).forEach(e=>{
     addRow();
     const r=document.querySelector('#ultrasoundTable tbody tr:last-child');
-        // ── Equipment Details: rebuild select vs. manual input ──
-    const eqCell = r.cells[0];
-    eqCell.innerHTML = '';  // clear whatever default <select> is there
+    r.cells[0].querySelector('select,input').value = e.equipment;
+    r.cells[1].querySelector('select,input').value = e.location;
+    updatePrecise(r.cells[0].querySelector('select,input'),r.cells[2]);
+    r.cells[2].querySelector('select,input').value = e.precise;
+    r.cells[3].querySelector('select,input').value = e.side;
 
-    // If it’s one of your predefined options, rebuild the <select>
-    if (equipmentOptions.includes(e.equipment)) {
-      const selEq = createDropdown(equipmentOptions, function(){
-        // your exact onChange from addRow():
-        if (['33KV CT','33KV PT','33KV VCB','Post Insulator'].includes(this.value)) {
-          // auto‐precise for CT/PT/VCB
-          r.cells[2].innerHTML = '';
-          const inp = document.createElement('input');
-          inp.type = 'text'; inp.value = this.value; inp.readOnly = true;
-          r.cells[2].append(inp);
-        } else {
-          updatePrecise(this, r.cells[2]);
-        }
-        // “Other” → switch to manual <input>
-        if (this.value === 'Other') {
-          const inp = document.createElement('input');
-          inp.type = 'text'; inp.placeholder = 'Enter Equipment Details';
-          this.replaceWith(inp);
-        }
-        renderLive();
-      });
-      selEq.value = e.equipment;       // restore saved dropdown choice
-      eqCell.appendChild(selEq);
-
-
-
-// — re-attach Side-disable logic for this loaded row —
-const selSide = r.cells[3].querySelector('select');  // the “Side” dropdown in this row
-selEq.addEventListener('change', function() {
-  const disableFor = ['33KV CT','33KV PT','33KV VCB','Bushing','Lightning Arrestor'];
-  if (disableFor.includes(this.value)) {
-    selSide.disabled = true;
-    selSide.value = '';
-  } else {
-    selSide.disabled = false;
-  }
-});
-// fire once on load so existing rows start in the correct state
-selEq.dispatchEvent(new Event('change'));
-
-
-    } else {
-      // It was a user‐typed “Other” value: create an <input>
-      const inpEq = document.createElement('input');
-      inpEq.type        = 'text';
-      inpEq.placeholder = 'Enter Equipment Details';
-      inpEq.value       = e.equipment; // restore custom text
-      // re‐wire precise-location lookup on change
-      inpEq.addEventListener('change', () => updatePrecise(inpEq, r.cells[2]));
-      inpEq.addEventListener('input', renderLive);
-      eqCell.appendChild(inpEq);
-    }
-
-    // Finally, trigger the Precise logic on whichever element we built:
-    const eqEl = eqCell.querySelector('select,input');
-    updatePrecise(eqEl, r.cells[2]);
-    // ── end Equipment Details rebuild ──
-
-        // ── Location: rebuild select vs. manual input ──
-    {
-      const locCell = r.cells[1];
-      locCell.innerHTML = '';
-      if (locationOptions.includes(e.location)) {
-        // a predefined choice
-        const selLoc = createDropdown(locationOptions, function(){
-          if (this.value === 'Other') {
-            const inp = document.createElement('input');
-            inp.type = 'text'; inp.placeholder = 'Enter location';
-            this.replaceWith(inp);
-          }
-          renderLive();
-        });
-        selLoc.value = e.location;
-        locCell.appendChild(selLoc);
-      } else {
-        // a user-typed “Other”
-        const inpLoc = document.createElement('input');
-        inpLoc.type = 'text';
-        inpLoc.placeholder = 'Enter location';
-        inpLoc.value = e.location;
-        inpLoc.addEventListener('input', renderLive);
-        locCell.appendChild(inpLoc);
-      }
-    }
-
-    // ── Precise Location: rebuild select vs. manual input ──
-    {
-      const eqVal    = r.cells[0].querySelector('select,input').value;
-      const opts     = prompt2Maps.preciseMap[eqVal] || [];
-      const precCell = r.cells[2];
-      precCell.innerHTML = '';
-
-      if (opts.length && opts.includes(e.precise)) {
-        // predefined precise choice
-        const selPrec = createDropdown(opts, function(){
-if (this.value==='Other') {
-  const inp = document.createElement('input');
-  inp.type        = 'text';
-  inp.placeholder = 'Enter precise';
-  // refresh live table as you type new precise text
-  inp.addEventListener('input', renderLive);
-  this.replaceWith(inp);
+const disableSideFor = ['33KV CT','33KV PT','33KV VCB','Bushing','Lightning Arrestor'];
+const eq = e.equipment;
+const sideInput = r.cells[3].querySelector('select,input');
+if (sideInput && sideInput.tagName === 'SELECT') {
+  sideInput.disabled = disableSideFor.includes(eq);
 }
 
-          renderLive();
-        });
-        selPrec.value = e.precise;
-        precCell.appendChild(selPrec);
 
-      } else if (opts.length) {
-        // the user originally picked “Other” → show manual input
-        const inpPrec = document.createElement('input');
-        inpPrec.type = 'text';
-        inpPrec.placeholder = 'Enter precise';
-        inpPrec.value = e.precise;
-        inpPrec.addEventListener('input', renderLive);
-        precCell.appendChild(inpPrec);
-
-      } else {
-        // no predefined opts for this equipment → always text input
-        const inpPrec = document.createElement('input');
-        inpPrec.type = 'text';
-        inpPrec.placeholder = 'Enter precise location';
-        inpPrec.value = e.precise;
-        inpPrec.addEventListener('input', renderLive);
-        precCell.appendChild(inpPrec);
-      }
-    }
-
-      // ── Side: rebuild select vs. manual input ──
-  {
-    const sideCell = r.cells[3];
-    sideCell.innerHTML = '';
-
-    if (sideOptions.includes(e.side)) {
-      // predefined option → recreate dropdown
-      const selSide = createDropdown(sideOptions, function(){
-        if (this.value === 'Other') {
-          const inp = document.createElement('input');
-          inp.type = 'text';
-          inp.placeholder = 'Enter side';
-          this.replaceWith(inp);
-        }
-        renderLive();
-      });
-      selSide.value = e.side;
-      sideCell.appendChild(selSide);
-
-      // re-attach Equipment→Side disable logic
-      const selEq = r.cells[0].querySelector('select,input');
-      const disableFor = ['33KV CT','33KV PT','33KV VCB','Bushing','Lightning Arrestor'];
-      selEq.addEventListener('change', function(){
-        if (disableFor.includes(this.value)) {
-          selSide.disabled = true;
-          selSide.value = '';
-        } else {
-          selSide.disabled = false;
-        }
-      });
-      // enforce its initial state
-      selEq.dispatchEvent(new Event('change'));
-
-    } else {
-      // custom “Other” → plain text input
-      const inpSide = document.createElement('input');
-      inpSide.type        = 'text';
-      inpSide.placeholder = 'Enter side';
-      inpSide.value       = e.side;
-      inpSide.addEventListener('input', renderLive);
-      sideCell.appendChild(inpSide);
-    }
-  }
 
     ['R','Y','B','N'].forEach((k,i)=>{
       const f=r.cells[4+i].firstChild;
-      f.querySelector('input[type=number]').value       = e[k].value;
+      f.querySelector('input[placeholder="dB"]').value             = e[k].value;
+      f.querySelector('input[placeholder="Recording No."]').value  = e[k].rec || '';
       f.querySelector('select').value                   = e[k].class;
       f.querySelector('input[value="Rep"]').checked     = e[k].rep;
       f.querySelector('input[value="IR"]').checked      = e[k].ir;
       f.querySelector('input[value="Audible"]').checked = e[k].aud;
-      f.querySelector('input[value="X-Cbl"]').checked    = e[k].xcb;
-      f.querySelector('input[value="C-Dep"]').checked    = e[k].cdep;
-      f.querySelector('input[value="Trck Mrk"]').checked = e[k].trck;
-      f.querySelector('.recNo').value = e[k].rec || '';
     });
     r.cells[8].querySelector('input').value = e.remarks;
   });
@@ -695,8 +436,6 @@ if (this.value==='Other') {
 document.getElementById('downloadExcelBtn').addEventListener('click', downloadExcel);
 document.getElementById('downloadDocBtn').addEventListener('click', downloadDoc);
 document.getElementById('downloadPdfBtn').addEventListener('click', downloadPdf);
-
-
 
 function downloadExcel() {
   // 1) grab your live table HTML
@@ -833,110 +572,181 @@ const date  = `${day}-${month}-${year}`;
 }
 
 
+
 function downloadPdf() {
-  // 1) Clone the live table
-  const original = document.getElementById('liveTable');
-  const clone    = original.cloneNode(true);
+renderLive(); // ensure live table is up-to-date
 
-  // 2) Strip off its id (and any classes) so no page CSS bleeds in
-  clone.removeAttribute('id');
-  clone.querySelectorAll('*').forEach(el => el.removeAttribute('class'));
+  const substation = localStorage.getItem('selectedSubstation') || 'Unknown';
+  const now = new Date();
+  const dd = String(now.getDate()).padStart(2, '0');
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const yyyy = now.getFullYear();
+  const formattedDate = `${dd}.${mm}.${yyyy}`;
 
-  // 3) Table-level styling (no spacing, collapse all borders)
-  clone.style.borderCollapse = 'collapse';
-  clone.style.borderSpacing  = '0';
-  clone.style.margin         = '0';
-  clone.style.padding        = '0';
+  // Create a deep clone of the full live table content
+  const liveTable = document.getElementById('liveTable');
+  const tableClone = liveTable.cloneNode(true);
+  const heading = document.createElement('h2');
+  heading.textContent = `Ultrasound Findings at ${substation}`;
+  heading.style.textAlign = 'center';
+  heading.style.fontFamily = 'Cambria';
+  heading.style.fontSize = '16pt';
+  heading.style.margin = '10px 0';
+  heading.style.color = 'black';
 
-  // 4) Cell-level styling (exactly 1px solid black, no padding/margin, black text)
-  clone.querySelectorAll('th, td').forEach(cell => {
-    cell.style.border  = '1px solid black';
-    cell.style.margin  = '0';
-    cell.style.padding = '0';
-    cell.style.color   = 'black';
+  // Apply styling
+  tableClone.style.borderCollapse = 'collapse';
+  tableClone.style.width = '100%';
+tableClone.style.maxWidth = '100%';
+tableClone.style.overflowX = 'auto';
+tableClone.style.wordBreak = 'break-word';
+
+
+// Get the exact text of the Action column header
+const actionHeader = "Action to be taken";
+let actionColIndex = -1;
+const ths = tableClone.querySelectorAll("thead tr th");
+ths.forEach((th, idx) => {
+  if (th.textContent.trim().toLowerCase() === actionHeader.toLowerCase()) {
+    actionColIndex = idx;
+  }
+});
+
+tableClone.querySelectorAll("tr").forEach((row, rowIndex) => {
+  const cells = Array.from(row.children);
+
+  // Avoid splitting table rows across pages
+  row.style.breakInside = "avoid";
+  row.style.pageBreakInside = "avoid";
+  row.style.pageBreakAfter = "auto";
+
+  cells.forEach((cell, cellIndex) => {
+    cell.style.border = "1px solid black";
+    cell.style.padding = "4px";
+    cell.style.color = "black";
+    cell.style.fontFamily = "Cambria";
+
+    const isHeader = cell.tagName.toLowerCase() === "th";
+    const isActionCol = cellIndex === actionColIndex;
+
+    if (isHeader) {
+      cell.style.fontSize = "11pt";
+      cell.style.backgroundColor = "#d3d3d3";
+      cell.style.textAlign = "center";
+      cell.style.whiteSpace = "normal";
+      cell.style.wordBreak = "break-word";
+      cell.style.minWidth = "80px";
+    } else {
+      cell.style.fontSize = isActionCol ? "9pt" : "10pt";
+      cell.style.textAlign = isActionCol ? "left" : "center";
+    }
   });
-
-  // 5) Header-row override (must exactly match your DOC export)
-
-const headerRow = clone.querySelector('thead tr');
-headerRow.querySelectorAll('th').forEach(th => {
-  th.style.backgroundColor = '#a7abb7';    // ← this hex code
-  th.style.color          = 'black';
-  th.style.border         = '1px solid black';
-  th.style.fontFamily     = 'Cambria';
-  th.style.fontSize       = '11pt';
 });
 
 
-  // 6) Row-group colouring & font sizing (same as downloadDoc)
-  const rows   = Array.from(clone.querySelectorAll('tbody tr'));
-  const colors = [
-    '#f0f8ff','#fafad2','#e6e6fa','#fff0f5',
-    '#f0fff0','#f5f5f5','#fffaf0','#f5fffa',
-    '#f5f5dc','#f0ffff'
-  ];
-  let lastEq     = null;
-  let currentEq  = null;
-  let colorIndex = -1;
 
+
+
+
+  // Add background coloring group-wise like DOC
+  const groupColors = [
+    '#f0f8ff', '#fafad2', '#e6e6fa', '#fff0f5',
+    '#f0fff0', '#f5f5f5', '#fffaf0', '#f5fffa',
+    '#f5f5dc', '#f0ffff'
+  ];
+  let currentEq = null;
+  let colorIndex = -1;
+  const rows = tableClone.querySelectorAll('tbody tr');
   rows.forEach(tr => {
     const eqCell = tr.querySelector('td[rowspan]');
     if (eqCell) {
-      lastEq    = eqCell.textContent;
-      currentEq = null;      // new group ⇒ advance colour
+      currentEq = eqCell.textContent.trim();
+      colorIndex = (colorIndex + 1) % groupColors.length;
     }
-    if (lastEq !== currentEq) {
-      currentEq  = lastEq;
-      colorIndex = (colorIndex + 1) % colors.length;
-    }
-    Array.from(tr.cells).forEach((td, colIdx, all) => {
-      td.style.backgroundColor = colors[colorIndex];
-      td.style.fontFamily      = 'Cambria';
-      td.style.fontSize        = (colIdx === all.length - 1) ? '9pt' : '11pt';
+    tr.querySelectorAll('td').forEach(td => {
+      td.style.backgroundColor = groupColors[colorIndex];
     });
   });
 
-  // 7) Build filename
-  const sub   = localStorage.getItem('selectedSubstation') || 'Unknown';
-  const now   = new Date();
-  const dd    = String(now.getDate()).padStart(2, '0');
-  const mm    = String(now.getMonth() + 1).padStart(2, '0');
-  const yyyy  = now.getFullYear();
-  const filename = `Ultrasound_${sub}_${dd}-${mm}-${yyyy}.pdf`;
+  const wrapper = document.createElement('div');
+  wrapper.style.backgroundColor = 'white';
+  wrapper.style.padding = '20px';
+  wrapper.appendChild(heading);
+  wrapper.appendChild(tableClone);
 
-  // 8) Finally, hand off to html2pdf
-  html2pdf()
-    .set({
-      margin:       [10,10,10,10],
-      filename:     filename,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2 },
-      jsPDF:        { unit: 'pt', format: 'a4', orientation: 'landscape' }
-    })
-    .from(clone)
-    .save();
+  const options = {
+    margin:       0.5,
+    filename:     `Ultrasound_${substation}_${formattedDate}.pdf`,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, backgroundColor: '#ffffff', scrollY: 0, scrollX: 0 },
+
+    jsPDF:        { unit: 'in', format: 'legal', orientation: 'landscape' }
+  };
+
+  // Trigger download
+document.body.appendChild(wrapper); // force render
+
+// Add Note below the table
+const note = document.createElement('div');
+note.innerHTML = `<p style="
+  font-family: Cambria;
+  font-size: 11pt;
+  margin-top: 20px;
+  text-align: left;
+  color: black;">
+  <strong>Note:</strong> This is a draft copy of the ultrasound findings which has been given to the concerned person instantly after the Condition Monitoring. However, the final report shall be sent through e-mail.
+</p>`;
+wrapper.appendChild(note);
+
+
+// Add Watermark - full screen diagonal overlay
+const watermark = document.createElement('div');
+watermark.textContent = 'Draft Copy';
+Object.assign(watermark.style, {
+  position: 'absolute',
+  top: '35%',
+  left: '50%',
+  transform: 'translate(-50%, -50%) rotate(-15deg)',
+  fontSize: '120px',
+  color: 'rgba(0, 0, 0, 0.2)',
+  fontFamily: 'Cambria',
+  zIndex: 0,
+  whiteSpace: 'nowrap',
+  pointerEvents: 'none',
+  width: '100%',
+  textAlign: 'center',
+});
+wrapper.style.position = 'relative'; // <-- ensure wrapper can anchor absolute elements
+wrapper.appendChild(watermark);
+
+
+
+
+document.body.appendChild(wrapper); // force render
+
+html2pdf().set(options).from(wrapper).save().then(() => {
+  document.body.removeChild(wrapper);    // cleanup
+  document.body.removeChild(watermark);  // cleanup watermark after download
+});
+
+
 }
 
 
-// whenever any cell in the live table is edited, save its HTML
-document
-  .querySelector('#liveTable tbody')
-  .addEventListener('input', saveLiveTableHTML);
 
 
-
-
-
-// ── RESET HANDLER ──
+// ———————— RESET HANDLER ————————
 document.getElementById('resetBtn').addEventListener('click', () => {
   if (!confirm('Clear all ultrasound entries and live data?')) return;
 
-  // 1) Clear saved form data
+  // 1. Clear local storage
   localStorage.removeItem('ultrasoundData');
 
-  // 2) Empty both tables
+  // 2. Clear form and live table
   document.querySelector('#ultrasoundTable tbody').innerHTML = '';
-  document.querySelector('#liveTable tbody').innerHTML       = '';
-});
+  document.querySelector('#liveTable tbody').innerHTML = '';
 
+  // 3. Add one blank row
+  addRow();
+});
 
