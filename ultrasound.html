@@ -78,7 +78,7 @@
 
   <div class="live-table-container">
     <h2>Ultrasonic PD Measurements</h2>
-    <table id="liveTable" contenteditable="true">
+    <table id="liveTable">
       <thead>
         <tr>
           <th>Sl. No.</th><th>Equipment Details</th><th>Location</th>
@@ -91,31 +91,28 @@
     <button id="downloadExcelBtn">Download Excel</button>
     <button id="downloadDocBtn">Download Doc</button>
     <button id="downloadPdfBtn">Download PDF</button>
-
   </div>
 
   <!-- JavaScript -->
-  <script src="ultrasound.js"></script>
-  <script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="ultrasound.js"></script>
+<script>
   document.getElementById('addRowBtn').onclick = addRow;
   document.getElementById('saveBtn').onclick   = saveFormData;
+
   window.onload = () => {
     document.getElementById('substationHeader').innerText =
       "Entering data for '" + (localStorage.getItem('selectedSubstation')||'') + "'";
-    loadFormData();
-    // only add a new empty row if we found no saved data
-    if (!localStorage.getItem('ultrasoundData')) {
-      addRow();
+
+    const existingData = localStorage.getItem('ultrasoundData');
+    if (existingData) {
+      loadFormData();
+    } else {
+      addRow();  // only add blank row if no existing data
     }
-
-    loadLiveTableHTML();
-
   };
 </script>
 
-<!-- html2pdf: HTML→Canvas→PDF helper -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
-
-
 </body>
 </html>
+
