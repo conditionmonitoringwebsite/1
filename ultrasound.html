@@ -110,9 +110,21 @@
     } else {
       addRow();  // only add blank row if no existing data
     }
+
+
+  // Load & apply any saved live-table edits
+  const savedLive = localStorage.getItem('ultrasoundLiveTable');
+  if (savedLive) {
+    document.querySelector('#liveTable tbody').innerHTML = savedLive;
+  }
+  // re-enable editing and persistence
+  makeLiveTableEditable();
+
+
   };
 </script>
 
 </body>
 </html>
+
 
