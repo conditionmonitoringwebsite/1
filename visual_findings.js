@@ -58,7 +58,9 @@ const sstrOtherMap = {
 
 // Store entries
 let liveData = JSON.parse(localStorage.getItem('visualFindings') || '[]');
-let currentEquipment = '';
+let currentPTR = '';
+let currentOther = '';
+
 
 // Accumulate all SSTR Oil Leakage selections across clicks
 let sstrOilLeaks = new Set();
@@ -96,27 +98,28 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('exportPdf').onclick = exportPdf;
 
 document.getElementById('saveBtn').onclick = () => {
-  if (!currentEquipment) {
-    alert("No equipment selected.");
-    return;
-  }
+  // Save current form data before saving to storage
+  savePTR(currentPTR);  // ensures the latest is captured
 
-  // Decide based on whether currentEquipment is in ptrList
-  if (ptrList.includes(currentEquipment)) {
-    savePTR(currentEquipment);
-  } else {
-    // No action needed for others since their changes already reflect live
-    alert("Visual findings saved for Other Observations.");
-    return;
-  }
+  localStorage.setItem('visualFindings', JSON.stringify(liveData));
 
-  alert("Visual findings saved.");
+  // Safely store PTR Make/Capacity/Date if they exist
+  const makeVal = document.getElementById('ptrMakeSelect')?.value || '';
+  const manualMakeVal = document.getElementById('ptrMakeManualInput')?.value || '';
+  const capVal = document.getElementById('ptrCapacityInput')?.value || '';
+  const dateVal = document.getElementById('ptrMfgDateInput')?.value || '';
+
+  const ptrDetails = {
+    make: makeVal,
+    manualMake: manualMakeVal,
+    capacity: capVal,
+    mfgDate: dateVal
+  };
+
+  localStorage.setItem(`ptrDetails-${currentPTR}`, JSON.stringify(ptrDetails));
+
+  alert('Visual findings saved');
 };
-
-
-
-
-
 
 
   document.getElementById('backBtn').onclick = () => {
@@ -181,8 +184,8 @@ function switchSection(sec) {
 
 // PTR Handling
 function selectPTR(name) {
-savePTR(currentEquipment); 
-  currentEquipment = name;
+savePTR(currentPTR);
+currentPTR = name;
   // Highlight only the clicked PTR button
   document.querySelectorAll('#ptrButtons button').forEach(btn => {
     btn.classList.toggle('active', btn.textContent === name);
@@ -190,6 +193,10 @@ savePTR(currentEquipment);
   buildPTRForm(name);
 }
 
+function checkbox(val) {
+  const checked = liveData.some(r => r.equipment === currentPTR && r.tags?.includes(val)) ? 'checked' : '';
+  return `<label><input type="checkbox" value="${val}" ${checked} onchange="savePTR('${currentPTR}')"> ${val.replace(/^.*near /, '')}</label>`;
+}
 
 
 
@@ -206,6 +213,9 @@ const savedDetails = JSON.parse(localStorage.getItem(`ptrDetails-${equip}`) || '
   <h2>${equip} Observations</h2>
   <button class="accordion-btn">PTR Make, Capacity & Mfg Date</button>
   <div class="grid" style="display: none;">
+  <label>PTR Sl. No:
+    <input type="text" id="ptrSerialInput" placeholder="Enter PTR Serial Number" />
+  </label>
     <label>PTR Make:
       <select id="ptrMakeSelect" class="custom-select">
         <option value="" disabled selected>Select Make</option>
@@ -229,9 +239,22 @@ const savedDetails = JSON.parse(localStorage.getItem(`ptrDetails-${equip}`) || '
 
 
 
-    <label>PTR Capacity (MVA):
-      <input type="text" id="ptrCapacityInput" placeholder="Enter Capacity" />
-    </label>
+<label>PTR Capacity (MVA):
+  <select id="ptrCapacitySelect" class="custom-select">
+    <option value="" disabled selected>Select Capacity</option>
+    <option value="10 MVA">10 MVA</option>
+    <option value="6.3 MVA">6.3 MVA</option>
+    <option value="5 MVA">5 MVA</option>
+    <option value="3.15 MVA">3.15 MVA</option>
+    <option value="3 MVA">3 MVA</option>
+    <option value="Other">Other</option>
+  </select>
+</label>
+<div id="manualPtrCapacity" style="display: none; margin-top: 5px;">
+  <input type="text" id="ptrCapacityInput" placeholder="Enter Capacity manually" 
+    style="width: 100%; padding: 6px; background: #0a0f2c; border: 1px solid #00f2ff; color: #fff; border-radius: 4px;" />
+</div>
+
     <label>Mfg Date:
       <input type="text" id="ptrMfgDateInput" placeholder="Enter Manufacturing Date" />
     </label>
@@ -246,6 +269,25 @@ const accBtn = osec.querySelector('.accordion-btn');
 
 const ptrMakeSelect = osec.querySelector('#ptrMakeSelect');
 const manualMakeDiv = osec.querySelector('#manualPtrMake');
+
+
+const ptrCapacitySelect = osec.querySelector('#ptrCapacitySelect');  // the new dropdown
+const manualCapDiv = osec.querySelector('#manualPtrCapacity');      // container for manual input
+const manualCapInput = osec.querySelector('#ptrCapacityInput');     // actual input field
+
+// When dropdown changes
+ptrCapacitySelect.addEventListener('change', () => {
+  if (ptrCapacitySelect.value === 'Other') {
+    manualCapDiv.style.display = 'block';   // show manual input if "Other" is selected
+  } else {
+    manualCapDiv.style.display = 'none';    // hide it otherwise
+    manualCapInput.value = '';              // clear manual field
+  }
+  savePTR(equip);  // save updated info immediately
+});
+
+// When manual capacity value is typed
+manualCapInput.addEventListener('input', () => savePTR(equip));  // save as user types
 
 
 ptrMakeSelect.addEventListener('change', () => {
@@ -267,6 +309,9 @@ ptrCapacityInput.addEventListener('input', () => savePTR(equip));
 const ptrMfgDateInput = osec.querySelector('#ptrMfgDateInput');
 ptrMfgDateInput.addEventListener('input', () => savePTR(equip));
 
+const ptrSerialInput = osec.querySelector('#ptrSerialInput');
+ptrSerialInput.addEventListener('input', () => savePTR(equip));
+
 
 // Restore saved values
 if (savedDetails.make) {
@@ -279,10 +324,22 @@ if (savedDetails.manualMake) {
   manualMakeInput.value = savedDetails.manualMake;
 }
 if (savedDetails.capacity) {
-  ptrCapacityInput.value = savedDetails.capacity;
+  const validOptions = ['10 MVA', '6.3 MVA', '5 MVA', '3.15 MVA', '3 MVA'];
+  if (validOptions.includes(savedDetails.capacity)) {
+    ptrCapacitySelect.value = savedDetails.capacity;
+  } else {
+    ptrCapacitySelect.value = 'Other';
+    manualCapDiv.style.display = 'block';
+    manualCapInput.value = savedDetails.capacity;
+  }
 }
+
 if (savedDetails.mfgDate) {
   ptrMfgDateInput.value = savedDetails.mfgDate;
+}
+
+if (savedDetails.serial) {
+  ptrSerialInput.value = savedDetails.serial;
 }
 
 
@@ -618,10 +675,7 @@ if(val === 'OLTC Count') {
 }
 
 
-function checkbox(val) {
-  const checked = liveData.some(r => r.equipment === currentEquipment && r.tags?.includes(val)) ? 'checked' : '';
-  return `<label><input type="checkbox" value="${val}" ${checked} onchange="savePTR(currentEquipment)"> ${val.replace(/^.*near /, '')}</label>`;
-}
+
 
 
 
@@ -631,7 +685,7 @@ function checkbox(val) {
 
 // ─── Other Observations Handler ──────────────────────────────────────────────
 function selectOther(name) {
-  currentEquipment = name;
+  currentOther = name;
   document.querySelectorAll('#otherButtons button').forEach(btn => {
     btn.classList.toggle('active', btn.textContent === name);
   });
@@ -725,15 +779,22 @@ const makeVal = document.getElementById('ptrMakeSelect')?.value === 'Other'
   ? document.getElementById('ptrMakeManualInput')?.value
   : document.getElementById('ptrMakeSelect')?.value;
 
-const capVal  = document.getElementById('ptrCapacityInput')?.value;
+const capVal = document.getElementById('ptrCapacitySelect')?.value === 'Other'
+  ? document.getElementById('ptrCapacityInput')?.value
+  : document.getElementById('ptrCapacitySelect')?.value;
+
 const dateVal = document.getElementById('ptrMfgDateInput')?.value;
 
-if (makeVal || capVal || dateVal) {
+const serialVal = document.getElementById('ptrSerialInput')?.value;
+
+if (serialVal || makeVal || capVal || dateVal) {
   const details = [
-    makeVal ? `Make - ${makeVal}` : '',
-    capVal ? `Capacity - ${capVal} MVA` : '',
-    dateVal ? `Mfg Date - ${dateVal}` : ''
+    serialVal ? `Serial No: ${serialVal}` : '',
+    makeVal ? `Make: ${makeVal}` : '',
+    capVal ? `Capacity:${capVal}` : '',
+    dateVal ? `Mfg date: ${dateVal}` : ''
   ].filter(Boolean).join(', ');
+
 
   liveData.unshift({
     equipment: equip,
@@ -1602,7 +1663,8 @@ function createManualEntry(placeholder = 'Other…') {
 
 
 function savePTR(equip) {
-  equip = equip || currentEquipment;
+  if (!equip) return;  // stop if no PTR is selected
+
   // Clear auto-generated rows for this PTR
   liveData = liveData.filter(r => !(r.equipment === equip && !r.manual));
 
@@ -1613,9 +1675,11 @@ function savePTR(equip) {
 
   const capVal  = document.getElementById('ptrCapacityInput')?.value;
   const dateVal = document.getElementById('ptrMfgDateInput')?.value;
+const serialVal = document.getElementById('ptrSerialInput')?.value;
 
-  if (makeVal || capVal || dateVal) {
+  if (serialVal || makeVal || capVal || dateVal) {
     const details = [
+      serialVal ? `Serial No: ${serialVal}` : '',
       makeVal ? `Make: ${makeVal}` : '',
       capVal ? `Capacity:${capVal}` : '',
       dateVal ? `Mfg date: ${dateVal}` : ''
@@ -1665,12 +1729,16 @@ function savePTR(equip) {
   });
 
 
-// Persist PTR Make/Capacity/Mfg Date separately
+
+
+
+// Persist PTR Sl. No./PTR Make/Capacity/Mfg Date separately
 const ptrDetails = {
   make: document.getElementById('ptrMakeSelect')?.value || '',
   manualMake: document.getElementById('ptrMakeManualInput')?.value || '',
   capacity: document.getElementById('ptrCapacityInput')?.value || '',
-  mfgDate: document.getElementById('ptrMfgDateInput')?.value || ''
+  mfgDate: document.getElementById('ptrMfgDateInput')?.value || '',
+  serial: document.getElementById('ptrSerialInput')?.value || ''
 };
 localStorage.setItem(`ptrDetails-${equip}`, JSON.stringify(ptrDetails));
 
@@ -2089,31 +2157,36 @@ doc.save(`Visualfindings_${subName}_${dateStr}.pdf`
 function addCustomOil() {
   const v = document.getElementById('customOilInput').value.trim();
   if (!v) return;
-
-  const equip = currentEquipment; // lock-in the correct context
   const activeGrid = document.querySelector(
     '#ptrFormContainer .form-section:nth-of-type(1) .grid[style*="display: grid"]'
   );
   const lbl = document.createElement('label');
   const cb  = document.createElement('input');
-  cb.type = 'checkbox'; cb.value = v;
-  cb.checked = true;
-  cb.onchange = () => savePTR(equip);
+  cb.type = 'checkbox'; cb.value = v; cb.onchange = () => savePTR(currentPTR);
   lbl.appendChild(cb); lbl.append(v);
   activeGrid.appendChild(lbl);
-
   document.getElementById('customOilInput').value = '';
-  savePTR(equip); // save with the correct context
+  savePTR(currentPTR);
 }
 
 function addCustomOther() {
   const v = document.getElementById('customOtherInput').value.trim();
   if (!v) return;
-  const equip = currentEquipment; // ensure scoped value
+
+  const equip = currentPTR || currentOther;
   liveData.push({ equipment: equip, action: v, manual: true });
   renderLive();
   localStorage.setItem('visualFindings', JSON.stringify(liveData));
   document.getElementById('customOtherInput').value = '';
 }
+
+
+// Make key internal functions globally accessible (for innerHTML usage)
+window.selectPTR = selectPTR;
+window.buildPTRForm = buildPTRForm;
+window.savePTR = savePTR;
+window.addCustomOil = addCustomOil;
+window.addCustomOther = addCustomOther;
+window.checkbox = checkbox;
 
 
