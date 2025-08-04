@@ -162,11 +162,15 @@ const selEq = createDropdown(equipmentOptions, function(){
   });
 
   // “Other” option
-  if (value==='Other') {
-    const inp = document.createElement('input');
-    inp.type='text'; inp.placeholder='Enter Equipment Details';
-    this.replaceWith(inp);
-  }
+if (value === 'Other') {
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.placeholder = 'Enter Equipment Details';
+  // ← attach live-update
+  inp.addEventListener('input', renderLive);
+  this.replaceWith(inp);
+}
+
 
   renderLive();
 });
@@ -176,12 +180,16 @@ tdEq.append(selEq); tr.append(tdEq);
   // Location
   const tdLoc = document.createElement('td');
   const selLoc = createDropdown(locationOptions, function(){
-    if (this.value==='Other'){
-      const inp=document.createElement('input');
-      inp.type='text'; inp.placeholder='Enter location';
-      this.replaceWith(inp);
-    }
-    renderLive();
+if (this.value === 'Other') {
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.placeholder = 'Enter location';
+  // ← attach live-update
+  inp.addEventListener('input', renderLive);
+  this.replaceWith(inp);
+}
+renderLive();
+
   });
   tdLoc.append(selLoc); tr.append(tdLoc);
 
@@ -192,12 +200,16 @@ tdEq.append(selEq); tr.append(tdEq);
   // Side
   const tdSide = document.createElement('td');
   const selSide = createDropdown(sideOptions, function(){
-    if (this.value==='Other'){
-      const inp=document.createElement('input');
-      inp.type='text'; inp.placeholder='Enter side';
-      this.replaceWith(inp);
-    }
-    renderLive();
+if (this.value === 'Other') {
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.placeholder = 'Enter side';
+  // ← attach live-update
+  inp.addEventListener('input', renderLive);
+  this.replaceWith(inp);
+}
+renderLive();
+
   });
   tdSide.append(selSide); tr.append(tdSide);
 
@@ -232,12 +244,16 @@ function updatePrecise(sel, cell) {
   const opts = prompt2Maps.preciseMap[sel.value]||[];
   if (opts.length) {
     const dd = createDropdown(opts, function(){
-      if (this.value==='Other'){
-        const inp=document.createElement('input');
-        inp.type='text'; inp.placeholder='Enter precise';
-        this.replaceWith(inp);
-      }
-      renderLive();
+if (this.value === 'Other') {
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.placeholder = 'Enter precise';
+  // ← attach live-update
+  inp.addEventListener('input', renderLive);
+  this.replaceWith(inp);
+}
+renderLive();
+
     });
     cell.append(dd);
   } else {
@@ -366,6 +382,9 @@ if(v && cls){
       lb.append(tr);
     });
   });
+
+  // after rebuilding the live table, re-apply editability
+  makeLiveTableEditable();
 }
 
 function saveFormData(){
@@ -401,18 +420,75 @@ function loadFormData(){
   JSON.parse(s).forEach(e=>{
     addRow();
     const r=document.querySelector('#ultrasoundTable tbody tr:last-child');
-    r.cells[0].querySelector('select,input').value = e.equipment;
-    r.cells[1].querySelector('select,input').value = e.location;
-    updatePrecise(r.cells[0].querySelector('select,input'),r.cells[2]);
-    r.cells[2].querySelector('select,input').value = e.precise;
-    r.cells[3].querySelector('select,input').value = e.side;
-
-const disableSideFor = ['33KV CT','33KV PT','33KV VCB','Bushing','Lightning Arrestor'];
-const eq = e.equipment;
-const sideInput = r.cells[3].querySelector('select,input');
-if (sideInput && sideInput.tagName === 'SELECT') {
-  sideInput.disabled = disableSideFor.includes(eq);
+// 1) Equipment Details: use dropdown if known, else text input
+const eqCell = r.cells[0];
+const eqVal  = e.equipment;
+const eqSel  = eqCell.querySelector('select');
+if (equipmentOptions.includes(eqVal)) {
+  eqSel.value = eqVal;
+} else {
+  const inp = document.createElement('input');
+  inp.type  = 'text';
+  inp.value = eqVal;
+  inp.placeholder = 'Enter Equipment Details';
+  inp.addEventListener('input', renderLive);
+  eqSel.replaceWith(inp);
 }
+
+// 2) Location: same logic
+const locCell = r.cells[1];
+const locVal  = e.location;
+const locSel  = locCell.querySelector('select');
+if (locationOptions.includes(locVal)) {
+  locSel.value = locVal;
+} else {
+  const inp = document.createElement('input');
+  inp.type  = 'text';
+  inp.value = locVal;
+  inp.placeholder = 'Enter location';
+  inp.addEventListener('input', renderLive);
+  locSel.replaceWith(inp);
+}
+
+// 3) Precise Location: regenerate dropdown based on equipment, then apply custom
+updatePrecise(r.cells[0].querySelector('select,input'), r.cells[2]);
+const precCell = r.cells[2];
+const precVal  = e.precise;
+const precSel  = precCell.querySelector('select');
+if (precSel) {
+  const found = Array.from(precSel.options).some(o => o.value === precVal);
+  if (found) {
+    precSel.value = precVal;
+  } else if (precVal) {
+    const inp = document.createElement('input');
+    inp.type  = 'text';
+    inp.value = precVal;
+    inp.placeholder = 'Enter precise location';
+    inp.addEventListener('input', renderLive);
+    precSel.replaceWith(inp);
+  }
+} else {
+  const inp = precCell.querySelector('input');
+  if (inp) inp.value = precVal;
+}
+
+// 4) Side: dropdown when standard, else text input; also reapply disable logic
+const sideCell = r.cells[3];
+const sideVal  = e.side;
+const sideSel  = sideCell.querySelector('select');
+const disableSideFor = ['33KV CT','33KV PT','33KV VCB','Bushing','Lightning Arrestor'];
+if (sideSel && sideOptions.includes(sideVal)) {
+  sideSel.value = sideVal;
+  sideSel.disabled = disableSideFor.includes(e.equipment);
+} else if (sideSel && sideVal) {
+  const inp = document.createElement('input');
+  inp.type  = 'text';
+  inp.value = sideVal;
+  inp.placeholder = 'Enter side';
+  inp.addEventListener('input', renderLive);
+  sideSel.replaceWith(inp);
+}
+
 
 
 
@@ -733,6 +809,18 @@ html2pdf().set(options).from(wrapper).save().then(() => {
 }
 
 
+// ——— Enable editing & persistence for live-table cells ———
+function makeLiveTableEditable() {
+  document.querySelectorAll('#liveTable tbody td').forEach(cell => {
+    cell.contentEditable = true;
+    cell.addEventListener('input', () => {
+      localStorage.setItem(
+        'ultrasoundLiveTable',
+        document.querySelector('#liveTable tbody').innerHTML
+      );
+    });
+  });
+}
 
 
 // ———————— RESET HANDLER ————————
@@ -741,6 +829,8 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 
   // 1. Clear local storage
   localStorage.removeItem('ultrasoundData');
+  // also clear any saved live-table edits
+  localStorage.removeItem('ultrasoundLiveTable');
 
   // 2. Clear form and live table
   document.querySelector('#ultrasoundTable tbody').innerHTML = '';
