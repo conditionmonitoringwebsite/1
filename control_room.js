@@ -1834,6 +1834,10 @@ if (usRow) {
   else if (b1Val && !tempB2Val) {
     actions.push("Partial Discharge as noted, was found on the rear side of Bus Section/CT/Cable Chamber of the panel. Thus, thorough checking of bus chambers, bus spouts and bus support insulators of these panels should be done. Cleaning & maintenance of the said bus chambers also should be done. Also, thorough maintenance of the CT/Cable chamber should be done. Bus & CT spouts are to be checked. Electrical clearance of cable lead between phases and phase to earth to be checked.");
   }  
+
+  else if (b1Val && tempB2Val && !b2Val) {
+    actions.push("Partial Discharge as noted, was found on the rear side of Bus Section of the panel. Thus, thorough checking of bus chambers, bus spouts and bus support insulators of these panels should be done. Cleaning & maintenance of the said bus chambers also should be done.");
+  }  
   
   else if (!b1Val && b2Val) {
     actions.push("Partial Discharge as noted, was found on the rear side of CT/Cable Chamber of the panel. Thus, thorough maintenance of the CT/Cable chamber should be done. Bus & CT spouts are to be checked. Electrical clearance of cable lead between phases and phase to earth to be checked.");
@@ -3114,3 +3118,4 @@ if (inspTd) {
 
 
 });
+
