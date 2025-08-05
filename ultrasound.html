@@ -112,6 +112,30 @@
     }
 
 
+    // ── Disable “Side” dropdown for specific Equipment Details after rows are rendered ──
+    const disableSideFor = [
+      '33KV CT',
+      '33KV PT',
+      '33KV VCB',
+      'Bushing',
+      'Lightning Arrestor'
+    ];
+    document
+      .querySelectorAll('#ultrasoundTable tbody tr')
+      .forEach(row => {
+        // read the Equipment Details value (from either select or input)
+        const eqVal = row.cells[0]
+          .querySelector('select,input')
+          .value;
+        // pick out the <select> inside the “Side” cell
+        const sideSelect = row.cells[3].querySelector('select');
+        if (sideSelect) {
+          sideSelect.disabled = disableSideFor.includes(eqVal);
+        }
+      });
+
+
+
   // Load & apply any saved live-table edits
   const savedLive = localStorage.getItem('ultrasoundLiveTable');
   if (savedLive) {
@@ -126,5 +150,6 @@
 
 </body>
 </html>
+
 
 
