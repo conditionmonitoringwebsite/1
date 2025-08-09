@@ -103,17 +103,25 @@ document.getElementById('saveBtn').onclick = () => {
 
   localStorage.setItem('visualFindings', JSON.stringify(liveData));
 
-  // Safely store PTR Make/Capacity/Date if they exist
-  const makeVal = document.getElementById('ptrMakeSelect')?.value || '';
+  // Safely store PTR Make/Capacity/Date if they exist  (handles Select vs Other correctly)
+
+const makeSelectVal = document.getElementById('ptrMakeSelect')?.value || '';
   const manualMakeVal = document.getElementById('ptrMakeManualInput')?.value || '';
-  const capVal = document.getElementById('ptrCapacityInput')?.value || '';
+  const makeVal = (makeSelectVal === 'Other') ? manualMakeVal : makeSelectVal;
+
+  const capSelectVal = document.getElementById('ptrCapacitySelect')?.value || '';
+  const manualCapVal = document.getElementById('ptrCapacityInput')?.value || '';
+  const capVal = (capSelectVal === 'Other') ? manualCapVal : capSelectVal;
+
   const dateVal = document.getElementById('ptrMfgDateInput')?.value || '';
+  const serialVal = document.getElementById('ptrSerialInput')?.value || '';
 
   const ptrDetails = {
-    make: makeVal,
-    manualMake: manualMakeVal,
-    capacity: capVal,
-    mfgDate: dateVal
+    make: makeSelectVal,        // what was chosen in dropdown (could be 'Other')
+    manualMake: manualMakeVal,  // manual text if 'Other'
+    capacity: capVal,           // final capacity value (either preset or manual)
+    mfgDate: dateVal,
+    serial: serialVal
   };
 
   localStorage.setItem(`ptrDetails-${currentPTR}`, JSON.stringify(ptrDetails));
@@ -724,43 +732,33 @@ function buildOtherForm(equip) {
     const addBtn = document.createElement('button');
     addBtn.textContent = 'Add';
 
-    // when clicked, gather dropdown + checkboxes + manual, push one row
-   addBtn.onclick = () => {
-  // 1) Only preserve dropdown combos
+// when clicked, gather dropdown + checkboxes + manual, push one row (CLEAN — no PTR details injection)
+addBtn.onclick = () => {
+  // 1) Preserve dropdown combo (HV/LV + Phase + Location)
   const combo = `${selHVLV.value} ${selPhase.value} ${selLoc.value}`;
-  if (!sstrOilLeaks.has(combo)) {
-    sstrOilLeaks.add(combo);
-  }
+  if (!sstrOilLeaks.has(combo)) sstrOilLeaks.add(combo);
 
-  // 2) Get ALL currently checked checkboxes and manually entered value
+  // 2) Collect current checkbox selections + manual entry
   const checkboxVals = Array.from(
     grid.querySelectorAll('input[type="checkbox"]:checked')
   ).map(cb => cb.value);
 
   const manualInput = oilSec.querySelector('input[type="text"]');
-  const manualVal = manualInput.value.trim();
-  if (manualVal) {
-    checkboxVals.push(manualVal);
-    manualInput.value = '';
-  }
+  const manualVal = manualInput ? manualInput.value.trim() : '';
+  if (manualVal) { checkboxVals.push(manualVal); manualInput.value = ''; }
 
-  // 3) Remove all previous checkbox/manual entries from sstrOilLeaks
+  // 3) Replace old checkbox/manual picks in the set with the current ones
   const checkboxOptions = Array.from(
     grid.querySelectorAll('input[type="checkbox"]')
   ).map(cb => cb.value);
-
-  // Remove all existing checkbox-related entries
   checkboxOptions.forEach(val => sstrOilLeaks.delete(val));
-
-  // Add back only currently checked/manual entries
   checkboxVals.forEach(val => sstrOilLeaks.add(val));
 
-  // 4) Remove old Oil Leakage rows
+  // 4) Rebuild only the SSTR oil‑leakage sentence (no PTR details row)
   liveData = liveData.filter(r =>
-    !(r.equipment === 'SSTR' && r.action.startsWith('Oil Leakage'))
+    !(r.equipment === 'SSTR' && /^Oil Leakage(s)?\b/.test(r.action))
   );
 
-  // 5) Add new sentence if anything present
   if (sstrOilLeaks.size) {
     const arr = Array.from(sstrOilLeaks);
     const multi = arr.length > 1;
@@ -768,44 +766,10 @@ function buildOtherForm(equip) {
     const prefix = arr.join(', ') + (multi ? ' & ' : '');
     const listText = prefix + last;
     const text = multi
-      ? `Oil Leakages were found from ${listText}--- These oil leakages must be arrested.`
+      ? `Oil Leakages were found from ${listText} --- These oil leakages must be arrested.`
       : `Oil Leakage was found from ${listText} --- This oil leakage must be arrested.`;
     liveData.push({ equipment: 'SSTR', action: text, manual: false });
   }
-
-
-// Save PTR Make/Capacity/Mfg Date
-const makeVal = document.getElementById('ptrMakeSelect')?.value === 'Other'
-  ? document.getElementById('ptrMakeManualInput')?.value
-  : document.getElementById('ptrMakeSelect')?.value;
-
-const capVal = document.getElementById('ptrCapacitySelect')?.value === 'Other'
-  ? document.getElementById('ptrCapacityInput')?.value
-  : document.getElementById('ptrCapacitySelect')?.value;
-
-const dateVal = document.getElementById('ptrMfgDateInput')?.value;
-
-const serialVal = document.getElementById('ptrSerialInput')?.value;
-
-if (serialVal || makeVal || capVal || dateVal) {
-  const details = [
-    serialVal ? `Serial No: ${serialVal}` : '',
-    makeVal ? `Make: ${makeVal}` : '',
-    capVal ? `Capacity:${capVal}` : '',
-    dateVal ? `Mfg date: ${dateVal}` : ''
-  ].filter(Boolean).join(', ');
-
-
-  liveData.unshift({
-    equipment: equip,
-    action: `(${details})`,
-    manual: false
-  });
-}
-
-
-
-
 
   renderLive();
   localStorage.setItem('visualFindings', JSON.stringify(liveData));
@@ -1038,158 +1002,149 @@ const entry = `${loc} ${phase} CT`;
 
 
     else if (equip === '33KV PT') {
-      // ─── Configure the three PT sections ───────────────────────────────
-      const sectionData = {
-        'Oil Leakages': {
-          entries: ptOilLeakSet,
-          textSingle: v => `Oil Leakage has been observed from ${v} --- This oil leakage must be arrested.`,
-          textMulti:  vs => `Oil Leakages have been observed from ${vs.join(', ').replace(/, ([^,]*)$/, ' & $1')} --- These oil leakages must be arrested.`,
-          order: 1
-        },
-        'PT Missing': {
-          entries: ptMissingSet,
-          textSingle: v => `${v} was found to be missing. Necessary action is to be taken.`,
-          textMulti:  vs => `${vs.join(', ').replace(/, ([^,]*)$/, ' & $1')} were found to be missing. Necessary action is to be taken.`,
-          order: 2
-        },
-        'PT Out of Ckt.': {
-          entries: ptOutSet,
-          textSingle: v => `${v} was found to be out of circuit. Necessary action is to be taken.`,
-          textMulti:  vs => `${vs.join(', ').replace(/, ([^,]*)$/, ' & $1')} were found to be out of circuit. Necessary action is to be taken.`,
-          order: 3
-        }
-      };
-
-      // Clear & rebuild the form
-      const c = document.getElementById('otherFormContainer');
-      c.innerHTML = '';
-      const wrapper = document.createElement('div');
-      wrapper.className = 'form-container';
-
-      // 1. Build each dropdown-Add section
-      Object.entries(sectionData).forEach(([title, cfg]) => {
-        const sec = document.createElement('div');
-        sec.className = 'form-section';
-        sec.innerHTML = `<h3>${title}</h3>`;
-        const dd = document.createElement('div');
-        dd.style.display = 'flex';
-        dd.style.gap     = '8px';
-
-        // Location dropdown
-        const selLoc = document.createElement('select');
-        selLoc.className = 'custom-select';
-        selLoc.add(new Option('-- Select Location --','',true,true));
-        ['PT-1','PT-2','PT-3','Bus PT-1','Bus PT-2','Bus PT-3','Other']
-          .forEach(o => selLoc.add(new Option(o,o)));
-        selLoc.onchange = e => { if (e.target.value==='Other') dd.appendChild(createManualEntry()); };
-
-        // Phase dropdown
-        const selPhase = document.createElement('select');
-        selPhase.className = 'custom-select';
-        selPhase.add(new Option('-- Select Phase --','',true,true));
-        ['R-Phase','Y-Phase','B-Phase']
-          .forEach(o => selPhase.add(new Option(o,o)));
-
-        // Add button behavior
-        const addBtn = document.createElement('button');
-        addBtn.textContent = 'Add';
-        addBtn.onclick = () => {
-          const loc   = selLoc.value,
-                phase = selPhase.value;
-          if (!loc || !phase) return;
-          const entry = `${loc} ${phase}`;
-          cfg.entries.add(entry);
-
-          // Remove old rows for this title
-          liveData = liveData.filter(r =>
-            !(r.equipment==='33KV PT' && r.tag===title)
-          );
-
-          // Push new combined sentence
-          const arr  = Array.from(cfg.entries);
-          const text = arr.length>1
-            ? cfg.textMulti(arr)
-            : cfg.textSingle(arr[0]);
-          liveData.push({
-            equipment: '33KV PT',
-            action:     text,
-            manual:    false,
-            tag:        title,
-            order:      cfg.order
-          });
-
-          // Re-sort only the 33KV PT group by order
-          const ptGroup = liveData.filter(r => r.equipment==='33KV PT');
-          const rest    = liveData.filter(r => r.equipment!=='33KV PT');
-          ptGroup.sort((a,b)=> a.order - b.order);
-          liveData = [...rest, ...ptGroup];
-
-          renderLive();
-          localStorage.setItem('visualFindings', JSON.stringify(liveData));
-        };
-
-        dd.appendChild(labelEl('Location', selLoc));
-        dd.appendChild(labelEl('Phase',    selPhase));
-        dd.appendChild(addBtn);
-        sec.appendChild(dd);
-        wrapper.appendChild(sec);
-      });
-
-      // 2. “All cleaned” checkbox (4th row)
-      const secAll = document.createElement('div');
-      secAll.className = 'form-section';
-      secAll.innerHTML = '<h3>Other</h3>';
-      const gridAll = document.createElement('div');
-      gridAll.className = 'grid';
-      const lblAll  = document.createElement('label');
-      const cbAll   = document.createElement('input');
-      cbAll.type    = 'checkbox';
-      cbAll.onchange = e => {
-        // remove any previous “AllClean” row
-        liveData = liveData.filter(r =>
-          !(r.equipment==='33KV PT' && r.tag==='AllClean')
-        );
-        if (cbAll.checked) {
-          liveData.push({
-            equipment:'33KV PT',
-            action:   'All 33KV PTs are to be cleaned',
-            manual:   false,
-            tag:      'AllClean',
-            order:    4
-          });
-          // re-sort PT group
-          const ptG = liveData.filter(r=>r.equipment==='33KV PT');
-          const rt  = liveData.filter(r=>r.equipment!=='33KV PT');
-          ptG.sort((a,b)=>a.order-b.order);
-          liveData = [...rt, ...ptG];
-        }
-        renderLive();
-        localStorage.setItem('visualFindings', JSON.stringify(liveData));
-      };
-      lblAll.appendChild(cbAll);
-      lblAll.append('All 33KV PTs are to be cleaned');
-      gridAll.appendChild(lblAll);
-      secAll.appendChild(gridAll);
-
-      // 3️. Manual “Other detail…” entry (always appear last)
-      const manualDiv = createManualEntry('Other detail…');
-      manualDiv.querySelector('button').onclick = () => {
-        const val = manualDiv.querySelector('input').value.trim();
-        if (!val) return;
-        liveData.push({
-          equipment:'33KV PT',
-          action:    val,
-          manual:    true
-        });
-        renderLive();
-        localStorage.setItem('visualFindings', JSON.stringify(liveData));
-        manualDiv.querySelector('input').value = '';
-      };
-      secAll.appendChild(manualDiv);
-
-      wrapper.appendChild(secAll);
-      c.appendChild(wrapper);
+  const sectionData = {
+    'Oil Leakages': {
+      entries: ptOilLeakSet,
+      textSingle: v => `Oil Leakage has been observed from ${v} --- This oil leakage must be arrested.`,
+      textMulti:  vs => `Oil Leakages have been observed from ${vs.join(', ').replace(/, ([^,]*)$/, ' & $1')} --- These oil leakages must be arrested.`,
+      order: 1
+    },
+    'PT Missing': {
+      entries: ptMissingSet,
+      textSingle: v => `${v} was found to be missing. Necessary action is to be taken.`,
+      textMulti:  vs => `${vs.join(', ').replace(/, ([^,]*)$/, ' & $1')} were found to be missing. Necessary action is to be taken.`,
+      order: 2
+    },
+    'PT Out of Ckt.': {
+      entries: ptOutSet,
+      textSingle: v => `${v} was found to be out of circuit. Necessary action is to be taken.`,
+      textMulti:  vs => `${vs.join(', ').replace(/, ([^,]*)$/, ' & $1')} were found to be out of circuit. Necessary action is to be taken.`,
+      order: 3
     }
+  };
+
+  const c = document.getElementById('otherFormContainer');
+  c.innerHTML = '';
+  const wrapper = document.createElement('div');
+  wrapper.className = 'form-container';
+
+  Object.entries(sectionData).forEach(([title, cfg]) => {
+    const sec = document.createElement('div');
+    sec.className = 'form-section';
+    sec.innerHTML = `<h3>${title}</h3>`;
+    const dd = document.createElement('div');
+    dd.style.display = 'flex';
+    dd.style.gap     = '8px';
+
+    // Location dropdown + manual 'Other'
+    const selLoc = document.createElement('select');
+    selLoc.className = 'custom-select';
+    selLoc.add(new Option('-- Select Location --','',true,true));
+    ['PT-1','PT-2','PT-3','Bus PT-1','Bus PT-2','Bus PT-3','Other']
+      .forEach(o => selLoc.add(new Option(o,o)));
+
+    const manualLoc = document.createElement('input');
+    manualLoc.type = 'text';
+    manualLoc.placeholder = 'Enter location manually';
+    manualLoc.style.display = 'none';
+    manualLoc.style.width = '150px';
+    manualLoc.style.padding = '4px';
+    manualLoc.style.background = '#0a0f2c';
+    manualLoc.style.border = '1px solid #00f2ff';
+    manualLoc.style.color = '#fff';
+    manualLoc.style.borderRadius = '4px';
+
+    selLoc.onchange = () => {
+      manualLoc.style.display = (selLoc.value === 'Other') ? 'block' : 'none';
+      if (selLoc.value !== 'Other') manualLoc.value = '';
+    };
+
+    // Phase dropdown
+    const selPhase = document.createElement('select');
+    selPhase.className = 'custom-select';
+    selPhase.add(new Option('-- Select Phase --','',true,true));
+    ['R-Phase','Y-Phase','B-Phase'].forEach(o => selPhase.add(new Option(o,o)));
+
+    // Add handler (uses manualLoc when 'Other' is selected)
+    const addBtn = document.createElement('button');
+    addBtn.textContent = 'Add';
+    addBtn.onclick = () => {
+      let loc = selLoc.value;
+      if (!loc || !selPhase.value) return;
+
+      if (loc === 'Other') {
+        const mv = manualLoc.value.trim();
+        if (!mv) return;
+        loc = mv;
+      }
+
+      const entry = `${loc} ${selPhase.value}`;
+      cfg.entries.add(entry);
+
+      // Replace prior sentence of same tag
+      liveData = liveData.filter(r => !(r.equipment==='33KV PT' && r.tag===title));
+
+      const arr  = Array.from(cfg.entries);
+      const text = arr.length > 1 ? cfg.textMulti(arr) : cfg.textSingle(arr[0]);
+      liveData.push({ equipment: '33KV PT', action: text, manual: false, tag: title, order: cfg.order });
+
+      // Keep only 33KV PT rows ordered
+      const ptGroup = liveData.filter(r => r.equipment==='33KV PT').sort((a,b)=>a.order-b.order);
+      const rest    = liveData.filter(r => r.equipment!=='33KV PT');
+      liveData = [...rest, ...ptGroup];
+
+      renderLive();
+      localStorage.setItem('visualFindings', JSON.stringify(liveData));
+    };
+
+    dd.appendChild(labelEl('Location', selLoc));
+    dd.appendChild(manualLoc);
+    dd.appendChild(labelEl('Phase', selPhase));
+    dd.appendChild(addBtn);
+    sec.appendChild(dd);
+    wrapper.appendChild(sec);
+  });
+
+  // “Other” area (cleaning + free text)
+  const secAll = document.createElement('div');
+  secAll.className = 'form-section';
+  secAll.innerHTML = '<h3>Other</h3>';
+  const gridAll = document.createElement('div');
+  gridAll.className = 'grid';
+  const lblAll  = document.createElement('label');
+  const cbAll   = document.createElement('input');
+  cbAll.type    = 'checkbox';
+  cbAll.checked = liveData.some(r => r.equipment==='33KV PT' && r.tag==='AllClean');
+  cbAll.onchange = () => {
+    liveData = liveData.filter(r => !(r.equipment==='33KV PT' && r.tag==='AllClean'));
+    if (cbAll.checked) {
+      liveData.push({ equipment:'33KV PT', action:'All 33KV PTs are to be cleaned', manual:false, tag:'AllClean', order:4 });
+      const ptG = liveData.filter(r=>r.equipment==='33KV PT').sort((a,b)=>a.order-b.order);
+      const rt  = liveData.filter(r=>r.equipment!=='33KV PT');
+      liveData = [...rt, ...ptG];
+    }
+    renderLive(); localStorage.setItem('visualFindings', JSON.stringify(liveData));
+  };
+  lblAll.appendChild(cbAll);
+  lblAll.append('All 33KV PTs are to be cleaned');
+  gridAll.appendChild(lblAll);
+  secAll.appendChild(gridAll);
+
+  const manualDiv = createManualEntry('Other detail…');
+  manualDiv.querySelector('button').onclick = () => {
+    const val = manualDiv.querySelector('input').value.trim();
+    if (!val) return;
+    liveData.push({ equipment:'33KV PT', action:val, manual:true });
+    renderLive();
+    localStorage.setItem('visualFindings', JSON.stringify(liveData));
+    manualDiv.querySelector('input').value = '';
+  };
+  secAll.appendChild(manualDiv);
+
+  wrapper.appendChild(secAll);
+  c.appendChild(wrapper);
+}
+
 
     
 
@@ -1662,37 +1617,43 @@ function createManualEntry(placeholder = 'Other…') {
 
 
 
+// ⬇️ REPLACE the entire savePTR(equip) function with this version
 function savePTR(equip) {
-  if (!equip) return;  // stop if no PTR is selected
+  if (!equip) return;
 
-  // Clear auto-generated rows for this PTR
+  // Preserve any manually edited Equipment/Material display text for this PTR
+  const preservedDisplay =
+    (liveData.find(r => r.equipment === equip && r.displayEquip)?.displayEquip) || null;
+
+  // Remove only auto-generated rows for this PTR (keep manual rows intact)
   liveData = liveData.filter(r => !(r.equipment === equip && !r.manual));
 
-  // Capture PTR Make/Capacity/Mfg Date and add it as the first row
+  // ── PTR Make/Capacity/Mfg Date (row 1) ──
   const makeVal = document.getElementById('ptrMakeSelect')?.value === 'Other'
     ? document.getElementById('ptrMakeManualInput')?.value
     : document.getElementById('ptrMakeSelect')?.value;
 
-  const capVal  = document.getElementById('ptrCapacityInput')?.value;
-  const dateVal = document.getElementById('ptrMfgDateInput')?.value;
-const serialVal = document.getElementById('ptrSerialInput')?.value;
+  const capVal = (document.getElementById('ptrCapacitySelect')?.value === 'Other'
+    ? document.getElementById('ptrCapacityInput')?.value
+    : document.getElementById('ptrCapacitySelect')?.value) || '';
+
+  const dateVal   = document.getElementById('ptrMfgDateInput')?.value;
+  const serialVal = document.getElementById('ptrSerialInput')?.value;
 
   if (serialVal || makeVal || capVal || dateVal) {
     const details = [
       serialVal ? `Serial No: ${serialVal}` : '',
-      makeVal ? `Make: ${makeVal}` : '',
-      capVal ? `Capacity:${capVal}` : '',
-      dateVal ? `Mfg date: ${dateVal}` : ''
+      makeVal   ? `Make: ${makeVal}`       : '',
+      capVal    ? `Capacity:${capVal}`     : '',
+      dateVal   ? `Mfg date: ${dateVal}`   : ''
     ].filter(Boolean).join(', ');
 
-    liveData.unshift({
-      equipment: equip,
-      action: details,
-      manual: false
-    });
+    const baseRow = { equipment: equip, action: details, manual: false };
+    if (preservedDisplay) baseRow.displayEquip = preservedDisplay;
+    liveData.unshift(baseRow);
   }
 
-  // Oil Leakages
+  // ── Oil Leakages sentence ──
   const oil = Array.from(
     document.querySelectorAll(
       '#ptrFormContainer .form-section:nth-of-type(1) input[type="checkbox"]:checked'
@@ -1700,52 +1661,53 @@ const serialVal = document.getElementById('ptrSerialInput')?.value;
   ).map(cb => cb.value);
 
   if (oil.length) {
-    let listText;
-    if (oil.length > 1) {
-      const allButLast = oil.slice(0, -1).join(', ');
-      const lastItem   = oil[oil.length - 1];
-      listText = `${allButLast} & ${lastItem}`;
-    } else {
-      listText = oil[0];
-    }
+    const listText = oil.length > 1
+      ? `${oil.slice(0, -1).join(', ')} & ${oil[oil.length - 1]}`
+      : oil[0];
 
     const txt = oil.length > 1
       ? `Oil leakages were found from ${listText} --- These oil leakages must be arrested.`
       : `Oil leakage was found from ${listText} --- This oil leakage must be arrested.`;
 
-    liveData.push({ equipment: equip, action: txt, tags: oil });
+    const oilRow = { equipment: equip, action: txt, tags: oil, manual: false };
+    if (preservedDisplay) oilRow.displayEquip = preservedDisplay;
+    liveData.push(oilRow);
   }
 
-  // Other Findings + OLTC Count
+  // ── Other Findings + OLTC Count ──
   document.querySelectorAll('#ptrFormContainer .form-section:nth-child(2) input').forEach(inp => {
     if (inp.type === 'checkbox' && inp.checked) {
-      liveData.push({ equipment: equip, action: otherDesc(inp.value), tags: [inp.value] });
+      const row = { equipment: equip, action: otherDesc(inp.value), tags: [inp.value], manual: false };
+      if (preservedDisplay) row.displayEquip = preservedDisplay;
+      liveData.push(row);
+
     } else if (inp.tagName === 'INPUT' && inp.type === 'number' && inp.value) {
-      liveData.push({
+      const row = {
         equipment: equip,
-        action: `OLTC counter was been found ${inp.value}. BDV of the oil of OLTC chamber to be checked. If BDV found low appropriate action to be taken.`
-      });
+        action: `OLTC counter was been found ${inp.value}. BDV of the oil of OLTC chamber to be checked. If BDV found low appropriate action to be taken.`,
+        manual: false
+      };
+      if (preservedDisplay) row.displayEquip = preservedDisplay;
+      liveData.push(row);
     }
   });
 
-
-
-
-
-// Persist PTR Sl. No./PTR Make/Capacity/Mfg Date separately
-const ptrDetails = {
-  make: document.getElementById('ptrMakeSelect')?.value || '',
-  manualMake: document.getElementById('ptrMakeManualInput')?.value || '',
-  capacity: document.getElementById('ptrCapacityInput')?.value || '',
-  mfgDate: document.getElementById('ptrMfgDateInput')?.value || '',
-  serial: document.getElementById('ptrSerialInput')?.value || ''
-};
-localStorage.setItem(`ptrDetails-${equip}`, JSON.stringify(ptrDetails));
-
+  // Persist PTR details separately for form restoration
+  const ptrDetails = {
+    make: document.getElementById('ptrMakeSelect')?.value || '',
+    manualMake: document.getElementById('ptrMakeManualInput')?.value || '',
+    capacity: (document.getElementById('ptrCapacitySelect')?.value === 'Other'
+      ? document.getElementById('ptrCapacityInput')?.value
+      : document.getElementById('ptrCapacitySelect')?.value) || '',
+    mfgDate: document.getElementById('ptrMfgDateInput')?.value || '',
+    serial: document.getElementById('ptrSerialInput')?.value || ''
+  };
+  localStorage.setItem(`ptrDetails-${equip}`, JSON.stringify(ptrDetails));
 
   renderLive();
   localStorage.setItem('visualFindings', JSON.stringify(liveData));
 }
+
 
 function oilDesc(v){ return true; }
 function otherDesc(val){
@@ -1789,133 +1751,150 @@ function otherDesc(val){
 // Render live table
 function renderLive() {
   const tbody = document.querySelector('#liveTable tbody');
- const priorities = [
-   ...ptrList,
-   // all “otherList” except the generic ‘Other’
-   ...otherList.filter(e => e!=='Other'),
-   'Rusted Structures',
-   'Aerial Earth Spike',
-   'Other'
- ]; // ensure “Other” last
+
+  // Priority order for grouping (internal keys must stay stable)
+  const priorities = [
+    ...ptrList,
+    ...otherList.filter(e => e !== 'Other'),
+    'Rusted Structures',
+    'Aerial Earth Spike',
+    'Other'
+  ];
+
+  // Build rows in priority order, merging equipment cells
   let html = '';
   let sl = 1;
 
-  // Build rows in priority order, merging equipment cells
-  priorities.forEach(equip => {
-  
+  priorities.forEach(equipKey => {
+    // keep group rows (preserve any custom displayEquip from manual edits)
+    let group = liveData.filter(r => r.equipment === equipKey);
 
-
-
-// sort SSTR so that Oil Leakages come first, manuals last
-let group = liveData.filter(r => r.equipment === equip);
-if (equip === 'SSTR') {
-  group = group.sort((a, b) => {
-    const ma = a.manual ? 1 : 0, mb = b.manual ? 1 : 0;
-    if (ma !== mb) return ma - mb;
-    const oa = a.action.startsWith('Oil Leakage'), ob = b.action.startsWith('Oil Leakage');
-    if (oa !== ob) return oa ? -1 : 1;
-    return 0;
-  });
-} else {
-  group = group.sort((a, b) => (a.manual ? 1 : 0) - (b.manual ? 1 : 0));
-}
-
+    // sort: non‑manual first except SSTR where Oil Leakage sentences first
+    if (equipKey === 'SSTR') {
+      group = group.sort((a, b) => {
+        const ma = a.manual ? 1 : 0, mb = b.manual ? 1 : 0;
+        if (ma !== mb) return ma - mb;
+        const oa = a.action.startsWith('Oil Leakage'), ob = b.action.startsWith('Oil Leakage');
+        if (oa !== ob) return oa ? -1 : 1;
+        return 0;
+      });
+    } else {
+      group = group.sort((a, b) => (a.manual ? 1 : 0) - (b.manual ? 1 : 0));
+    }
 
     if (!group.length) return;
+
     group.forEach((row, idx) => {
-      if (idx === 0) {
-        html += `
-          <tr>
-            <td>${sl}</td>
-            <td rowspan="${group.length}">
-            ${equip === 'SSTR' ? 'Station Service Transformer' : equip}
-            </td>
-            <td>${row.action}</td>
-          </tr>`;
-      } else {
-        html += `
-          <tr>
-            <td>${sl}</td>
-            <td>${row.action}</td>
-          </tr>`;
-      }
+      // what to show in the Equipment/Material column (allow manual override)
+      const shownEquip =
+        row.displayEquip ??
+        (equipKey === 'SSTR' ? 'Station Service Transformer' : equipKey);
+
+const isAuto = !row.manual; // NEW: mark whether this row is auto-generated
+
+if (idx === 0) {
+  html += `
+    <tr data-equip="${equipKey}" data-auto="${isAuto ? '1' : '0'}">
+      <td>${sl}</td>
+      <td rowspan="${group.length}">${shownEquip}</td>
+      <td>${row.action}</td>
+    </tr>`;
+} else {
+  html += `
+    <tr data-equip="${equipKey}" data-auto="${isAuto ? '1' : '0'}">
+      <td>${sl}</td>
+      <td>${row.action}</td>
+    </tr>`;
+}
+
       sl++;
     });
   });
 
-  // Fallback
+  // Fallback when empty
   tbody.innerHTML = html || '<tr><td colspan="3">No data yet.</td></tr>';
 
-  // Store visual findings live-table rows for consolidated report
-  localStorage.setItem(
-    'visualLiveTableHTML',
-    tbody.innerHTML
-  );
+  // Store HTML for consolidated report
+  localStorage.setItem('visualLiveTableHTML', tbody.innerHTML);
+
+  // ── Make Equipment & Action cells editable and persist edits safely ──
+  const rows = document.querySelectorAll('#liveTable tbody tr');
+
+  rows.forEach(tr => {
+    const cells = tr.querySelectorAll('td');
+    cells.forEach((td, idx) => {
+      // Skip Sl. no. column (idx 0)
+      if (idx > 0) {
+        td.contentEditable = 'true';
+        td.addEventListener('blur', () => {
+          // Rebuild liveData from the edited table,
+          // preserving the original grouping key via data-equip
+          const updated = [];
+          let lastEquipKey = '';
+          let lastDisplayEquip = '';
+
+          document.querySelectorAll('#liveTable tbody tr').forEach(r => {
+            const tds = r.querySelectorAll('td');
+            const keyAttr   = r.getAttribute('data-equip') || lastEquipKey;
+            const isAutoRow = r.getAttribute('data-auto') === '1'; // NEW: preserve auto/manual
 
 
+            if (tds.length === 3) {
+              // first row of a merged group
+              lastEquipKey = keyAttr;
+              lastDisplayEquip = tds[1].textContent.trim();
 
-// ─── make Equipment & Action columns editable ───────────────────────────
-// ─── allow editing on every non-serial cell ───────────────────────────────
-const rows = document.querySelectorAll('#liveTable tbody tr');
-rows.forEach(tr => {
-  const cells = tr.querySelectorAll('td');
-  cells.forEach((td, idx) => {
-    // skip Sl. no. column (idx 0)
-    if (idx > 0) {
-      td.contentEditable = 'true';
-      td.addEventListener('blur', () => {
-        const updated = [];
-        document.querySelectorAll('#liveTable tbody tr').forEach(r => {
-          const tds = r.querySelectorAll('td');
-          if (tds.length === 3) {
-            // first row of a merged group
-            updated.push({
-              equipment: tds[1].textContent.trim(),
-              action:    tds[2].textContent.trim()
-            });
-          } else if (tds.length === 2) {
-            // continuation row — reuse last equipment
-            const lastEquip = updated.length
-              ? updated[updated.length - 1].equipment
-              : '';
-            updated.push({
-              equipment: lastEquip,
-              action:    tds[1].textContent.trim()
-            });
-          }
-        });
-        liveData = updated;
-        localStorage.setItem('visualFindings', JSON.stringify(liveData));
-      });
-    }
-  });
+updated.push({
+  equipment: lastEquipKey,               // stable internal key
+  displayEquip: lastDisplayEquip,        // user-facing edited text
+  action: tds[2].textContent.trim(),
+  manual: !isAutoRow                     // NEW: keep auto rows auto, manual rows manual
 });
 
+            } else if (tds.length === 2) {
+              // continuation row
+updated.push({
+  equipment: lastEquipKey,
+  displayEquip: lastDisplayEquip,
+  action: tds[1].textContent.trim(),
+  manual: !isAutoRow
+});
 
+            }
+          });
+
+          liveData = updated;
+          localStorage.setItem('visualFindings', JSON.stringify(liveData));
+        });
+      }
+    });
+  });
 }
 
 
 
 function updateSSTRLiveTable() {
+  // drop any existing SSTR oil‑leakage sentence (singular or plural)
   liveData = liveData.filter(r =>
-    !(r.equipment === 'SSTR' && r.action.startsWith('Oil Leakage'))
+    !(r.equipment === 'SSTR' && /^Oil Leakage(s)?\b/.test(r.action))
   );
 
   if (sstrOilLeaks.size) {
-    const arr = Array.from(sstrOilLeaks);
+    const arr   = Array.from(sstrOilLeaks);
     const multi = arr.length > 1;
-    const last = arr.pop();
-    const prefix = arr.join(', ') + (multi ? ' & ' : '');
-    const listText = prefix + last;
-    const text = multi
-      ? `Oil Leakages were found from ${listText}--- These oil leakages must be arrested.`
-      : `Oil Leakage was found from ${listText} --- This oil leakage must be arrested.`;
+    const last  = arr.pop();
+    const prefix= arr.join(', ') + (multi ? ' & ' : '');
+    const list  = prefix + last;
+    const text  = multi
+      ? `Oil Leakages were found from ${list} --- These oil leakages must be arrested.`
+      : `Oil Leakage was found from ${list} --- This oil leakage must be arrested.`;
     liveData.push({ equipment: 'SSTR', action: text, manual: false });
   }
 
   renderLive();
   localStorage.setItem('visualFindings', JSON.stringify(liveData));
 }
+
 
 
 /**
@@ -2067,6 +2046,37 @@ link.download = `Visualfindings_${subName}_${dateStr}.docx`;
   document.body.removeChild(link);
 }
 
+function addPdfWatermark(doc) {
+  // Create a single graphics state with explicit fill/stroke opacity.
+  // We’ll wrap each page draw in save/restore so nothing else inherits it.
+  const g = doc.GState({ opacity: 0.35, fillOpacity: 0.35, strokeOpacity: 0.35 });
+
+  const total = doc.getNumberOfPages();
+  for (let i = 1; i <= total; i++) {
+    doc.setPage(i);
+
+    // Ensure subsequent content doesn’t inherit alpha/color
+    doc.saveGraphicsState();
+    doc.setGState(g);
+
+    const { width, height } = doc.internal.pageSize;
+
+    // Set consistent font + size + grey on every page
+    doc.setFont('times', 'bold');
+    doc.setFontSize(90);
+    doc.setTextColor(128, 128, 128);
+
+    // Draw once per page at identical position/rotation
+    doc.text('Draft Copy', width / 2, height / 2, {
+      align: 'center',
+      angle: 30
+    });
+
+    // Restore so later elements (like the NOTE) aren’t affected
+    doc.restoreGraphicsState();
+  }
+}
+
 
 
 
@@ -2108,11 +2118,27 @@ function exportPdf() {
 
   // 5) Let AutoTable pull directly from the HTML
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
-  doc.autoTable({
-    html: clone,
-    startY: 20,
-    margin: { left: 10, right: 10 },
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'legal' });
+// ─── Margins ───
+const sideMargin = 24;   // increased left/right margin
+const topMargin  = 36;   // increased top margin
+
+// Add heading at the top
+doc.setFont('Cambria', 'bold');
+doc.setFontSize(16);
+doc.text(
+  `Visual Findings at ${subName}`,
+  doc.internal.pageSize.getWidth() / 2,
+  topMargin - 8,
+  { align: 'center' }
+);
+
+// Table with larger margins
+doc.autoTable({
+  html: clone,
+  startY: topMargin + 8,
+  margin: { left: sideMargin, right: sideMargin },
+
     styles: {
       font: 'Cambria',
       fontSize: 11,
@@ -2139,13 +2165,58 @@ function exportPdf() {
       }
     }
   });
+addPdfWatermark(doc);
 
-  // 6) Cleanup & save
-  document.body.removeChild(container);
-  // inside exportPdf()
+
+
+// 6) Add NOTE below the table (single line, "Note:" bold)
+const noteBold   = "Note:";
+const noteNormal = " This is a draft copy of the visual findings which has been given to the concerned person instantly after the Condition Monitoring. However, the final report shall be sent through e-mail.";
+
+const pageWidth  = doc.internal.pageSize.getWidth();
+const pageHeight = doc.internal.pageSize.getHeight();
+const xMargin    = sideMargin;  
+let   y          = (doc.lastAutoTable?.finalY || topMargin) + 24;
+
+// If too close to bottom, move to a new page
+if (y > pageHeight - 36) {
+  doc.addPage();
+  y = topMargin;
+}
+
+// Render bold "Note:" + normal rest on the same line with auto-shrink
+let noteFontSize = 11;
+doc.setFontSize(noteFontSize);
+doc.setFont('Cambria', 'bold');
+const boldWidth = doc.getTextWidth(noteBold);
+
+doc.setFont('Cambria', 'normal');
+const normalWidth = doc.getTextWidth(noteNormal);
+
+const availWidth = pageWidth - xMargin * 2;
+const totalWidth = boldWidth + normalWidth;
+
+if (totalWidth > availWidth) {
+  const scale = availWidth / totalWidth;
+  noteFontSize = Math.max(8, Math.floor(noteFontSize * scale));
+  doc.setFontSize(noteFontSize);
+}
+
+// Draw bold part
+doc.setFont('Cambria', 'bold');
+doc.text(noteBold, xMargin, y, { baseline: 'top' });
+
+// Draw normal part right after bold
+doc.setFont('Cambria', 'normal');
+doc.text(noteNormal, xMargin + doc.getTextWidth(noteBold + " "), y, { baseline: 'top' });
+
+
+
+// 7) Cleanup & save
+document.body.removeChild(container);
 const dateStr = getFormattedDate();
-doc.save(`Visualfindings_${subName}_${dateStr}.pdf`
-);
+doc.save(`Visualfindings_${subName}_${dateStr}.pdf`);
+
 
 }
 
@@ -2173,8 +2244,12 @@ function addCustomOther() {
   const v = document.getElementById('customOtherInput').value.trim();
   if (!v) return;
 
-  const equip = currentPTR || currentOther;
+  const inOtherSection = document.getElementById('otherSection')?.classList.contains('active');
+  const equip = inOtherSection ? currentOther : currentPTR;
+
+  if (!equip) return;
   liveData.push({ equipment: equip, action: v, manual: true });
+
   renderLive();
   localStorage.setItem('visualFindings', JSON.stringify(liveData));
   document.getElementById('customOtherInput').value = '';
