@@ -44,10 +44,10 @@ const location2Opts = [
   'HV Bushing Connector','LV Bushing Connector','HV Bushing Stud','LV Bushing Stud','CT Connector',
   'VCB Upper Pad Connector','VCB Lower Pad Connector','VCB Upper & Lower Pad Connector','VCB Upper Pad','VCB Lower Pad',
   '1st Isolator','1st DP','2nd Isolator','Isolator before CT','Isolator after VCB','Isolator before VCB',
-  'HV LA Internal Hotspot','LV LA Internal Hotspot','11KV Feeder Isolator','11KV Cable Socket Nut-Bolt','33KV Cable Socket Nut-Bolt','Other'
+  'HV LA Internal Hotspot','LV LA Internal Hotspot','33KV Cable Internal Hotspot', '11KV Cable Internal Hotspot','11KV Cable Socket Nut-Bolt','33KV Cable Socket Nut-Bolt','11KV Feeder Isolator','Other'
 ];
 const condMap = {
-  isolator: ['Pad Connector','Female Contact','Pad Connector & Female Contact','Other'],
+  isolator: ['Pad Connector','Female Contact','Pad Connector & Female Contact','Male-Female Conact','Other'],
   feeder: ['Female Dropper Connector','Male-Female Contact','Flexible Cord Upper Side Connector',
            'Flexible Cord Lower Side Connector','Flexible Cord Lower Side Binding',
            'Flexible Cord Lower side to Pin Binding','Flexible Cord Lower side to Pin Binding & Conductor','Other']
@@ -773,16 +773,304 @@ localStorage.setItem('hotspotDocHTML', html);
 
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
+
 function downloadPdf() {
-  const original=document.getElementById('hotspotLiveTable');
-  const clone=original.cloneNode(true);
-  // inline black text + backgrounds
-  clone.querySelectorAll('th').forEach(th=>{ th.style.color='#000'; th.style.backgroundColor='#d9d9d9'; th.style.fontFamily='Cambria'; th.style.fontSize='12pt'; th.style.fontWeight='bold'; });
-  clone.querySelectorAll('td').forEach(td=>{ td.style.color='#000'; td.style.backgroundColor='#dce6f2'; td.style.fontFamily='Cambria'; td.style.fontSize='12pt'; });
-  const wrapper=document.createElement('div'); wrapper.style.position='absolute'; wrapper.style.left='-9999px'; wrapper.appendChild(clone);
+  // 1) Keep the live table up to date
+  renderLive();
+
+  // 2) Clone the live table to work on it safely
+  const original = document.getElementById('hotspotLiveTable');
+  const clone = original.cloneNode(true);
+
+// --- Add heading above table ---
+const subName = localStorage.getItem('selectedSubstation') || '[Substation Name]';
+const heading = document.createElement('h2');
+heading.textContent = `Hotspot Findings at ${subName}`;
+heading.style.fontFamily = 'Cambria';
+heading.style.fontWeight = 'bold';
+heading.style.textAlign = 'center';
+heading.style.marginBottom = '10px';
+heading.style.color = '#000';
+heading.style.textShadow = 'none';
+heading.style.background = 'transparent';
+
+
+// wrap heading + table in a container
+const container = document.createElement('div');
+container.style.backgroundColor = '#fff';
+container.style.color = '#000';
+
+// ensure at least one full page height so the rotated watermark isn’t clipped
+container.style.minHeight = '7.5in'; // (legal landscape 8.5in page height - 0.5in top - 0.5in bottom)
+
+
+
+// --- Watermark: 'Draft Copy' diagonal on all PDF pages ---
+// Ensure positioned stacking context
+container.style.position = 'relative';
+
+// Visible overlay watermark (on top of table)
+const wm = document.createElement('div');
+Object.assign(wm.style, {
+  position: 'absolute',
+  inset: '0',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  pointerEvents: 'none',
+  zIndex: '999'
+});
+
+const wmInner = document.createElement('div');
+Object.assign(wmInner.style, {
+  fontFamily: 'Cambria, serif',
+  fontSize: '90px',
+  fontWeight: 'bold',
+  color: 'gray',
+  opacity: '0.35',
+  transform: 'rotate(-35deg)',
+  whiteSpace: 'nowrap',
+});
+wmInner.textContent = 'Draft Copy';
+
+wm.appendChild(wmInner);
+container.appendChild(wm);
+
+
+
+
+container.appendChild(heading);
+container.appendChild(clone);
+
+
+// ───────────────────────────────────────────────
+// A) NORMALIZE TABLE FOR PDF (flatten spans + pad only; no rowspan)
+// ───────────────────────────────────────────────
+const bodyRows = Array.from(clone.querySelectorAll('tbody tr'));
+
+// 1) Flatten *all* existing rowspans (e.g., Action/Remarks)
+bodyRows.forEach((tr, rIdx) => {
+  Array.from(tr.children).forEach((cell, cIdx) => {
+    const rs = parseInt(cell.getAttribute('rowspan') || '1', 10);
+    if (rs > 1) {
+      cell.removeAttribute('rowspan');
+      for (let k = 1; k < rs; k++) {
+        const targetRow = bodyRows[rIdx + k];
+        if (!targetRow) break;
+        const dup = cell.cloneNode(true);
+        dup.removeAttribute('rowspan');
+        targetRow.insertBefore(dup, targetRow.children[cIdx] || null);
+      }
+    }
+  });
+});
+
+// 2) Pad every row to 9 cells so indices are identical on all rows
+//    [0]Sl [1]Loc [2]Ambient [3]R [4]Y [5]B [6]N [7]Image [8]Remarks
+bodyRows.forEach(tr => {
+  while (tr.children.length < 9) {
+    tr.appendChild(document.createElement('td'));
+  }
+});
+
+
+
+
+
+
+  // ───────────────────────────────────────────────
+  // B) INLINE STYLES (black text, borders, page-break safety)
+  // ───────────────────────────────────────────────
+  // table-wide
+  clone.style.borderCollapse = 'collapse';
+  clone.style.width = '100%';
+  clone.style.maxWidth = '100%';
+  clone.style.wordBreak = 'break-word';
+
+  // header
+  clone.querySelectorAll('thead th').forEach(th => {
+    th.style.color = '#000';
+    th.style.backgroundColor = '#d9d9d9';
+    th.style.textShadow = 'none';
+    th.style.fontFamily = 'Cambria';
+    th.style.fontSize = '11pt';
+    th.style.fontWeight = 'bold';
+    th.style.border = '1px solid #000';
+    th.style.textAlign = 'center';
+    th.style.whiteSpace = 'normal';
+    th.style.wordBreak = 'break-word';
+  });
+
+// body cells + “don’t split rows” (uniform 9‑cell rows on every line)
+clone.querySelectorAll('tbody tr').forEach(row => {
+  row.style.breakInside = 'avoid';
+  row.style.pageBreakInside = 'avoid';
+  row.style.pageBreakAfter = 'auto';
+
+  Array.from(row.children).forEach((td, idx) => {
+    td.style.border = '1px solid #000';
+    td.style.padding = '4px';
+    td.style.color = '#000';
+    td.style.fontFamily = 'Cambria';
+    td.style.fontSize = (idx === 8 ? '10pt' : '11pt'); // Remarks a touch smaller
+    td.style.textAlign = [0,2,3,4,5,6,7].includes(idx) ? 'center' : (idx === 8 ? 'left' : 'center');
+    td.style.backgroundColor = '#dce6f2';
+td.style.textShadow = 'none';
+
+    td.style.whiteSpace = 'normal';
+    td.style.wordBreak = 'break-word';
+    td.style.verticalAlign = 'top';
+  });
+});
+
+
+// ───────────────────────────────────────────────
+// C) VISUALLY MERGE AMBIENT (index 2) WITHOUT ROWSPAN
+//    → keep 9 cells per row, blank text on rows 2..n, stitch borders
+// ───────────────────────────────────────────────
+const pdfRows = Array.from(clone.querySelectorAll('tbody tr'));
+const lastRowIdx = pdfRows.length - 1;
+
+pdfRows.forEach((tr, rIdx) => {
+  const amb = tr.children[2];
+  if (!amb) return;
+
+  if (rIdx === 0) {
+    // first row keeps value; remove bottom border so it stitches with next
+    amb.style.borderBottom = (lastRowIdx === 0) ? '1px solid #000' : 'none';
+  } else if (rIdx < lastRowIdx) {
+    amb.textContent = '';
+    amb.style.borderTop = 'none';
+    amb.style.borderBottom = 'none';
+  } else {
+    // last row: blank text and draw the bottom border back
+    amb.textContent = '';
+    amb.style.borderTop = 'none';
+    amb.style.borderBottom = '1px solid #000';
+  }
+  // keep side borders so column width stays fixed
+  amb.style.borderLeft = '1px solid #000';
+  amb.style.borderRight = '1px solid #000';
+});
+
+
+// ───────────────────────────────────────────────
+// D) VISUALLY MERGE REMARKS (index 8) WITHOUT ROWSPAN
+//    • For all NON‑LA rows: one merged block showing the standard text
+//    • For LA rows: keep individual per‑row text
+// ───────────────────────────────────────────────
+const REM_DEFAULT =
+  'All the hotspots detected at switchyard must be rectified to avoid unplanned outage of supply and emergency shutdown. The IR Images are attached for ready reference.';
+const REM_LA =
+  'The Lightning Arrestor is to be replaced with a healthy one';
+
+let remarksBlockStart = null;
+
+const flushRemarksBlock = (endIdx) => {
+  if (remarksBlockStart === null) return;
+
+  for (let k = remarksBlockStart; k <= endIdx; k++) {
+    const c = pdfRows[k].children[8];
+    if (!c) continue;
+
+    if (k === remarksBlockStart) {
+      // first row keeps text; stitch border to next row if block > 1
+      c.style.borderBottom = (k === endIdx) ? '1px solid #000' : 'none';
+    } else if (k < endIdx) {
+      // middle rows: blank text, remove top/bottom borders
+      c.textContent = '';
+      c.style.borderTop = 'none';
+      c.style.borderBottom = 'none';
+    } else {
+      // last row: blank text, restore bottom border
+      c.textContent = '';
+      c.style.borderTop = 'none';
+      c.style.borderBottom = '1px solid #000';
+    }
+    // keep side borders so column widths never shift
+    c.style.borderLeft = '1px solid #000';
+    c.style.borderRight = '1px solid #000';
+  }
+
+  remarksBlockStart = null;
+};
+
+// walk the rows and group contiguous NON‑LA rows that carry the default text
+pdfRows.forEach((tr, rIdx) => {
+  const remCell = tr.children[8];
+  const txt = (remCell?.textContent || '').trim();
+
+  const isDefault = (txt === REM_DEFAULT);
+  const isLA = (txt === REM_LA);
+
+  if (isDefault && !isLA) {
+    if (remarksBlockStart === null) remarksBlockStart = rIdx;
+  } else {
+    // we hit a non-default (or LA) row → close any open default block
+    flushRemarksBlock(rIdx - 1);
+  }
+
+  // close an open block at the very end
+  if (rIdx === pdfRows.length - 1 && remarksBlockStart !== null) {
+    flushRemarksBlock(rIdx);
+  }
+});
+
+
+  // ───────────────────────────────────────────────
+  // C) RENDER USING A VISIBLE (BUT TRANSPARENT) WRAPPER
+  //    (prevents “blank PDF” from off‑screen/invisible nodes)
+  // ───────────────────────────────────────────────
+  const wrapper = document.createElement('div');
+  Object.assign(wrapper.style, {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    width: '100%',
+    backgroundColor: '#ffffff',
+    padding: '20px',
+    opacity: '0',           // keep it renderable but invisible
+    pointerEvents: 'none',
+    zIndex: '-1'
+  });
+  // --- Add note below table ---
+const note = document.createElement('div');
+note.innerHTML = "<b>Note:</b> This is a draft copy of the Hotspot findings which has been given to the concerned person instantly after the Condition Monitoring. However, the final report shall be sent through e-mail.";
+note.style.fontFamily = 'Cambria';
+note.style.fontSize = '10pt';
+note.style.marginTop = '10px';
+note.style.textAlign = 'left';
+note.style.color = '#000';
+note.style.background = 'transparent';
+note.style.textShadow = 'none';
+
+
+container.appendChild(note);
+wrapper.appendChild(container);
+
   document.body.appendChild(wrapper);
-  html2pdf().set({margin:10,filename:makeFilename('pdf'),jsPDF:{unit:'pt',format:'a4',orientation:'landscape'},html2canvas:{scale:2}}).from(clone).save().finally(()=>wrapper.remove());
+
+  // Use same filename scheme you already use
+  const filename = makeFilename('pdf');
+
+  // Match Ultrasound’s robust settings (legal, landscape, high scale)
+  html2pdf()
+    .set({
+      margin: 0.5,
+      filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, backgroundColor: '#ffffff', scrollY: 0, scrollX: 0 },
+      jsPDF: { unit: 'in', format: 'legal', orientation: 'landscape' }
+    })
+    // IMPORTANT: pass the CLONE (which is in the DOM via wrapper)
+    .from(container)  // ← now the heading + table + note are included
+    .save()
+    .finally(() => {
+      wrapper.remove();
+    });
 }
+
+
 
 // ── LIVE-TABLE PERSISTENCE ──
 
@@ -821,6 +1109,7 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   // 4) (Optional) Add a fresh blank row for the user
   addRow();
 });
+
 
 
 
