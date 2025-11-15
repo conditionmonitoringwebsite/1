@@ -71,7 +71,7 @@ const prompt2Maps = {
       default: 'Binding of the pin insulators should be done properly. IR measurement of these pin insulators is to be done. If the IR value is found low then these pin insulators may be replaced.'
     },
     '11KV Pin Insulator': {
-      default: 'Binding of the pin insulators should be done properly. IR measurement … if low then they may be replaced.'
+      default: 'Binding of the pin insulators should be done properly. IR measurement of these pin insulators is to be done. If the IR value is found low then these pin insulators may be replaced.'
     },
     'Post Insulator': {
       default: 'Binding of the post insulators should be done properly. IR measurement of these post insulators is to be done. If the IR value is found low then these post insulators may be replaced.'
@@ -901,5 +901,6 @@ window.addEventListener('load', () => {
       }
     });
 });
+
 
 
