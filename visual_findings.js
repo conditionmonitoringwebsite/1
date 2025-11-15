@@ -953,7 +953,7 @@ selLoc.onchange = () => {
     const selPhase = document.createElement('select');
     selPhase.className = 'custom-select';
     selPhase.add(new Option('-- Select Phase --', '', true, true));
-    ['R-Phase','Y-Phase','B-Phase'].forEach(o => selPhase.add(new Option(o, o)));
+    ['R-Phase','Y-Phase','B-Phase', 'All Phases'].forEach(o => selPhase.add(new Option(o, o)));
 
     const addBtn = document.createElement('button');
     addBtn.textContent = 'Add';
@@ -2263,5 +2263,6 @@ window.savePTR = savePTR;
 window.addCustomOil = addCustomOil;
 window.addCustomOther = addCustomOther;
 window.checkbox = checkbox;
+
 
 
