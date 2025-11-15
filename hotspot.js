@@ -41,8 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- Options ---
 const location1Opts = ['PTR-1','PTR-2','PTR-3','PTR-4','PTR-5','PTR-6','PTR-7','Station Service Transformer','Other'];
 const location2Opts = [
-  'HV Bushing Connector','LV Bushing Connector','HV Bushing Stud','LV Bushing Stud','CT Connector',
-  'VCB Upper Pad Connector','VCB Lower Pad Connector','VCB Upper & Lower Pad Connector','VCB Upper Pad','VCB Lower Pad',
+  'HV Bushing Connector','LV Bushing Connector','HV Bushing Stud Internal Hotspot','LV Bushing Stud Internal Hotspot','CT Connector','CT Stud & Stud Connector', 'CT Std Internal Hotspot',
+  'VCB Upper Pad Connector','VCB Lower Pad Connector','VCB Upper & Lower Pad Connector','VCB Upper Pad','VCB Lower Pad','VCB Upper Pad & Pad Connector', 'VCB Lower pad & pad Connector',
   '1st Isolator','1st DP','2nd Isolator','Isolator before CT','Isolator after VCB','Isolator before VCB',
   'HV LA Internal Hotspot','LV LA Internal Hotspot','33KV Cable Internal Hotspot', '11KV Cable Internal Hotspot','11KV Cable Socket Nut-Bolt','33KV Cable Socket Nut-Bolt','11KV Feeder Isolator','Other'
 ];
@@ -1109,7 +1109,6 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   // 4) (Optional) Add a fresh blank row for the user
   addRow();
 });
-
 
 
 
