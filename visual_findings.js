@@ -720,7 +720,7 @@ function buildOtherForm(equip) {
     const selPhase = document.createElement('select');
     selPhase.className = 'custom-select';
     selPhase.add(new Option('-- Select Phase --', '', true, true));
-    ['R-Phase','Y-Phase','B-Phase','Neutral'].forEach(o => selPhase.add(new Option(o,o)));
+    ['R-Phase','Y-Phase','B-Phase','Neutral', 'All Phases'].forEach(o => selPhase.add(new Option(o,o)));
     const selLoc = document.createElement('select');
     selLoc.className = 'custom-select';
     selLoc.add(new Option('-- Select Location --', '', true, true));
@@ -2263,6 +2263,7 @@ window.savePTR = savePTR;
 window.addCustomOil = addCustomOil;
 window.addCustomOther = addCustomOther;
 window.checkbox = checkbox;
+
 
 
 
