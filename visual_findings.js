@@ -396,7 +396,7 @@ const accGrid = accBtn.nextElementSibling;
 
     'Other O/L': [
       'Top Filtration Valve','Bottom Drain Valve','Top Sampling Valve','Conservator Tank Drain Valve',
-      'Tap Changer','MOG','POG','Buchholz Relay','OSR','Valve between Buchholz Relay & Conservator Tank'
+      'Tap Changer','MOG','POG','Buchholz Relay','OSR','Valve between Buchholz Relay & Conservator Tank','OLTC Top Cover', 'OLTC Side Cover', 'Inspection Cover'
     ]
   };
 
@@ -956,38 +956,121 @@ selLoc.onchange = () => {
     ['R-Phase','Y-Phase','B-Phase', 'All Phases'].forEach(o => selPhase.add(new Option(o, o)));
 
     const addBtn = document.createElement('button');
-    addBtn.textContent = 'Add';
+addBtn.textContent = 'Add';
 
-    addBtn.onclick = () => {
-let loc = selLoc.value;
-const phase = selPhase.value;
-if (!loc || !phase) return;
+addBtn.onclick = () => {
+  let loc = selLoc.value;
+  const phase = selPhase.value;
+  if (!loc || !phase) return;
 
-if (loc === 'Other') {
-  const manual = manualInput.value.trim();
-  if (!manual) return;  // Prevent empty entry
-  loc = manual;
-}
-const entry = `${loc} ${phase} CT`;
+  // Manual location when "Other" is selected
+  if (loc === 'Other') {
+    const manual = manualInput.value.trim();
+    if (!manual) return;  // Prevent empty entry
+    loc = manual;
+  }
 
-      config.entries.add(entry);
+  const entry = `${loc} ${phase} CT`;
 
-      // Replace only same-tag row for 33KV CT
-      liveData = liveData.filter(r => !(r.equipment === '33KV CT' && r.tag === title));
+  // 🔹 Find any existing row for this same sub-heading
+  //    (Oil Leakages / CT Missing / CT Out of Ckt.), even if `tag`
+  //    was lost due to table editing.
+  const existingRow = liveData.find(r => {
+    if (r.equipment !== '33KV CT') return false;
+    if (r.tag === title) return true;
+    if (typeof r.action !== 'string') return false;
 
-      const arr = Array.from(config.entries);
-      const text = arr.length > 1 ? config.textMulti(arr) : config.textSingle(arr[0]);
-      liveData.push({ equipment: '33KV CT', action: text, manual: false, tag: title, order: config.order });
+    if (title === 'Oil Leakages' && /Oil Leakage/i.test(r.action)) {
+      return true;
+    }
+    if (title === 'CT Missing' && /found to be missing/i.test(r.action)) {
+      return true;
+    }
+    if (title === 'CT Out of Ckt.' && /found to be out of circuit/i.test(r.action)) {
+      return true;
+    }
+    return false;
+  });
 
-      // Sort 33KV CT rows by order: Oil Leakages > CT Missing > CT Out
-      const ctEntries = liveData.filter(r => r.equipment === '33KV CT');
-      const rest = liveData.filter(r => r.equipment !== '33KV CT');
-      ctEntries.sort((a, b) => a.order - b.order);
-      liveData = [...rest, ...ctEntries];
+  // 🔹 Restore previous entries from that row (if any) into the Set
+  if (existingRow) {
+    if (Array.isArray(existingRow.entries) && existingRow.entries.length) {
+      // Preferred: reuse explicit entries array
+      existingRow.entries.forEach(v => config.entries.add(v));
+    } else if (typeof existingRow.action === 'string') {
+      // Backward-compatibility: parse text to recover list
+      let listPart = '';
 
-      renderLive();
-      localStorage.setItem('visualFindings', JSON.stringify(liveData));
-    };
+      if (title === 'Oil Leakages') {
+        // e.g. "Oil Leakages have been observed from A, B & C --- ..."
+        const m = existingRow.action.match(/from (.+?) ---/i);
+        if (m) listPart = m[1];
+      } else if (title === 'CT Missing' || title === 'CT Out of Ckt.') {
+        // e.g. "A, B & C were found to be out of circuit. ..."
+        const m = existingRow.action.match(/^(.+?) (?:was|were) found/i);
+        if (m) listPart = m[1];
+      }
+
+      if (listPart) {
+        listPart
+          .replace(/\s*&\s*/g, ', ')   // turn "A & B" into "A, B"
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean)
+          .forEach(v => config.entries.add(v));
+      }
+    }
+  }
+
+  // 🔹 Add the new entry into the persistent Set
+  config.entries.add(entry);
+
+  // 🔹 Remove the old sentence row for this sub-heading,
+  //    even if its `tag` was lost but text pattern matches
+  liveData = liveData.filter(r => {
+    if (r.equipment !== '33KV CT') return true;
+
+    if (r.tag === title) return false; // normal case with tag
+
+    if (!r.tag && typeof r.action === 'string') {
+      if (title === 'Oil Leakages' && /Oil Leakage/i.test(r.action)) {
+        return false;
+      }
+      if (title === 'CT Missing' && /found to be missing/i.test(r.action)) {
+        return false;
+      }
+      if (title === 'CT Out of Ckt.' && /found to be out of circuit/i.test(r.action)) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  const arr  = Array.from(config.entries);
+  const text = arr.length > 1
+    ? config.textMulti(arr)
+    : config.textSingle(arr[0]);
+
+  // Store 'entries' so future edits (after refresh) keep older data
+  liveData.push({
+    equipment: '33KV CT',
+    action:    text,
+    manual:    false,
+    tag:       title,
+    order:     config.order,
+    entries:   arr
+  });
+
+  // Sort 33KV CT rows by order: Oil Leakages > CT Missing > CT Out
+  const ctEntries = liveData.filter(r => r.equipment === '33KV CT');
+  const rest      = liveData.filter(r => r.equipment !== '33KV CT');
+  ctEntries.sort((a, b) => a.order - b.order);
+  liveData = [...rest, ...ctEntries];
+
+  renderLive();
+  localStorage.setItem('visualFindings', JSON.stringify(liveData));
+};
+
 
     dd2.appendChild(labelEl('Location', selLoc));
     dd2.appendChild(manualInput);
@@ -1066,7 +1149,7 @@ const entry = `${loc} ${phase} CT`;
     ['R-Phase','Y-Phase','B-Phase'].forEach(o => selPhase.add(new Option(o,o)));
 
     // Add handler (uses manualLoc when 'Other' is selected)
-    const addBtn = document.createElement('button');
+    	
     addBtn.textContent = 'Add';
     addBtn.onclick = () => {
       let loc = selLoc.value;
@@ -1538,7 +1621,83 @@ else if (equip === 'Other') {
   secRust.appendChild(manualRust);
   wrapper.appendChild(secRust);
 
+
+  // ─── Group Control PTR section ──────────────────────────────────────────
+  const secGroup = document.createElement('div');
+  secGroup.className = 'form-section';
+  secGroup.innerHTML = '<h3>Group Control PTR</h3>';
+
+  const ddGroup = document.createElement('div');
+  ddGroup.style.display = 'flex';
+  ddGroup.style.gap = '8px';
+
+  // First PTR dropdown
+  const selPtr1 = document.createElement('select');
+  selPtr1.className = 'custom-select';
+  selPtr1.add(new Option('-- Select PTR --', '', true, true));
+  ptrList.forEach(p => selPtr1.add(new Option(p, p)));
+
+  // Second PTR dropdown
+  const selPtr2 = document.createElement('select');
+  selPtr2.className = 'custom-select';
+  selPtr2.add(new Option('-- Select PTR --', '', true, true));
+  ptrList.forEach(p => selPtr2.add(new Option(p, p)));
+
+  // Add button
+  const addGroupBtn = document.createElement('button');
+  addGroupBtn.textContent = 'Add';
+  addGroupBtn.onclick = () => {
+    const p1 = selPtr1.value;
+    const p2 = selPtr2.value;
+
+    // both must be selected; initially nothing is selected
+    if (!p1 || !p2) return;
+
+
+
+// Do not add if both dropdowns have the same PTR selected
+    if (p1 === p2) return;
+
+    // Do not add duplicate combination (irrespective of order)
+    const alreadyExists = liveData.some(r =>
+      r.equipment === 'Group Control PTR' &&
+      typeof r.action === 'string' &&
+      r.action.includes(p1) &&
+      r.action.includes(p2)
+    );
+    if (alreadyExists) return;
+
+
+
+    const action = `${p1} & ${p2} are running under Group Control. Necessary action is to be taken to operate the PTRs in individual control.`;
+
+    liveData.push({
+      equipment: 'Group Control PTR',
+      action,
+      manual: false
+    });
+
+    renderLive();
+    localStorage.setItem('visualFindings', JSON.stringify(liveData));
+  };
+
+  ddGroup.appendChild(labelEl('1st PTR', selPtr1));
+  ddGroup.appendChild(labelEl('2nd PTR', selPtr2));
+  ddGroup.appendChild(addGroupBtn);
+
+  secGroup.appendChild(ddGroup);
+  wrapper.appendChild(secGroup);
+
+
+
+
+
+
+
+
+
   // ─── Other section (Aerial Earth Spike + free-text “Other”) ──────────────
+    
   const secOther = document.createElement('div');
   secOther.className = 'form-section';
   secOther.innerHTML = '<h3>Other</h3>';
@@ -1567,21 +1726,90 @@ else if (equip === 'Other') {
   lblAES.appendChild(cbAES);
   lblAES.append('Aerial Earth Spike');
   gridOther.appendChild(lblAES);
+
+  // 4) Grass on Yard
+  const lblGrass = document.createElement('label');
+  const cbGrass  = document.createElement('input');
+  cbGrass.type   = 'checkbox';
+  cbGrass.checked = liveData.some(r => r.equipment === 'Grasses on Yard');
+  cbGrass.onchange = () => {
+    // remove old Grass row
+    liveData = liveData.filter(r => r.equipment !== 'Grasses on Yard');
+    if (cbGrass.checked) {
+      liveData.push({
+        equipment: 'Grasses on Yard',
+        action:    'Grasses on the yard are to be removed.',
+        manual:    false,
+        order:     3
+      });
+    }
+    renderLive();
+    localStorage.setItem('visualFindings', JSON.stringify(liveData));
+  };
+  lblGrass.appendChild(cbGrass);
+  lblGrass.append('Grass on Yard');
+  gridOther.appendChild(lblGrass);
+
+  // 5) Kite String
+  const lblKite = document.createElement('label');
+  const cbKite  = document.createElement('input');
+  cbKite.type   = 'checkbox';
+  cbKite.checked = liveData.some(r => r.equipment === 'Kite String');
+  cbKite.onchange = () => {
+    // remove old Kite String row
+    liveData = liveData.filter(r => r.equipment !== 'Kite String');
+    if (cbKite.checked) {
+      liveData.push({
+        equipment: 'Kite String',
+        action:    'Kite Strings on the yard are to be removed.',
+        manual:    false,
+        order:     4
+      });
+    }
+    renderLive();
+    localStorage.setItem('visualFindings', JSON.stringify(liveData));
+  };
+  lblKite.appendChild(cbKite);
+  lblKite.append('Kite String');
+  gridOther.appendChild(lblKite);
+
+  // 6) Huge Pin discharge hampering US measurement
+  const lblPD = document.createElement('label');
+  const cbPD  = document.createElement('input');
+  cbPD.type   = 'checkbox';
+  cbPD.checked = liveData.some(r => r.equipment === 'Huge PD from Pin Insulators');
+  cbPD.onchange = () => {
+    // remove old Huge PD row
+    liveData = liveData.filter(r => r.equipment !== 'Huge PD from Pin Insulators');
+    if (cbPD.checked) {
+      liveData.push({
+        equipment: 'Huge PD from Pin Insulators',
+        action:    'Huge Discharges were observed from most of the 33KV Pin Insulators as noted above. Due to such severe discharge from the pin insulators, precise measurement of the ultrasonic discharges from the other important equipment could not be done. Hence, immediate necessary action is to be taken as noted above so that precise measurement of the ultrasonic discharges from other equipments can be done in the next visit of Condition Monitoring team.',
+        manual:    false,
+        order:     5
+      });
+    }
+    renderLive();
+    localStorage.setItem('visualFindings', JSON.stringify(liveData));
+  };
+  lblPD.appendChild(cbPD);
+  lblPD.append('Huge Pin discharge hampering US measurement');
+  gridOther.appendChild(lblPD);
+
   secOther.appendChild(gridOther);
 
-  // 4) Free-text “Other” entry
+  // 7) Free-text “Other” entry
   const manualOther = createManualEntry('Other detail…');
   manualOther.querySelector('button').onclick = () => {
     const inp = manualOther.querySelector('input');
     const v   = inp.value.trim();
     if (!v) return;
-     // Use the equip variable ('Other') so renderLive() will include it
-
+    // Use the equip variable ('Other') so renderLive() will include it
     liveData.push({
-    equipment: equip,
+      equipment: equip,
       action:    v,
       manual:    true,
-      order:     3
+      order:     6
     });
     renderLive();
     localStorage.setItem('visualFindings', JSON.stringify(liveData));
@@ -1591,6 +1819,7 @@ else if (equip === 'Other') {
 
   wrapper.appendChild(secOther);
   c.appendChild(wrapper);
+
 }
 
 
@@ -1625,6 +1854,31 @@ function savePTR(equip) {
   const preservedDisplay =
     (liveData.find(r => r.equipment === equip && r.displayEquip)?.displayEquip) || null;
 
+  // Capture previous oil-leakage tags for this PTR (including manual ones) before clearing auto rows.
+  // If the row does not have a `tags` array (e.g. created/edited by some other section),
+  // fall back to parsing the existing sentence text so that manual locations are not lost.
+  const previousOilRow =
+    liveData.find(r => r.equipment === equip && /Oil leakage/i.test(r.action));
+
+  let previousOilTags = [];
+  if (previousOilRow) {
+    if (Array.isArray(previousOilRow.tags) && previousOilRow.tags.length) {
+      // Normal case: use stored tags
+      previousOilTags = previousOilRow.tags.slice();
+    } else if (typeof previousOilRow.action === 'string') {
+      // Fallback: extract locations from "Oil leakage(s) were found from ... --- ..."
+      const m = previousOilRow.action.match(/from (.+?) ---/i);
+      if (m && m[1]) {
+        previousOilTags = m[1]
+          .replace(/\s*&\s*/g, ', ')   // turn "A & B" into "A, B"
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean);
+      }
+    }
+  }
+
+
   // Remove only auto-generated rows for this PTR (keep manual rows intact)
   liveData = liveData.filter(r => !(r.equipment === equip && !r.manual));
 
@@ -1653,12 +1907,26 @@ function savePTR(equip) {
     liveData.unshift(baseRow);
   }
 
+  
   // ── Oil Leakages sentence ──
-  const oil = Array.from(
+  const allOilCheckboxes = Array.from(
     document.querySelectorAll(
-      '#ptrFormContainer .form-section:nth-of-type(1) input[type="checkbox"]:checked'
+      '#ptrFormContainer .form-section:nth-of-type(1) input[type="checkbox"]'
     )
-  ).map(cb => cb.value);
+  );
+
+  const oil = allOilCheckboxes
+    .filter(cb => cb.checked)
+    .map(cb => cb.value);
+
+  const allOilValues = allOilCheckboxes.map(cb => cb.value);
+
+  // 🔹 Preserve manual custom oil-leakage locations that don't have a checkbox anymore
+  previousOilTags.forEach(tag => {
+    if (!allOilValues.includes(tag) && !oil.includes(tag)) {
+      oil.push(tag);
+    }
+  });
 
   if (oil.length) {
     const listText = oil.length > 1
@@ -1757,6 +2025,10 @@ function renderLive() {
     ...ptrList,
     ...otherList.filter(e => e !== 'Other'),
     'Rusted Structures',
+    'Group Control PTR',
+    'Grasses on Yard',
+    'Kite String',
+    'Huge PD from Pin Insulators',
     'Aerial Earth Spike',
     'Other'
   ];
