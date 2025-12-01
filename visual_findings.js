@@ -13,7 +13,7 @@ const oilLeakCols = [
 const otherCols = [
   ['Air-Oil Mix','M.Tank Silica Gel','OLTC Silica Gel','M. Tank Oil Low','OLTC Oil Low','PTR Oil Check','Low Oil on M. Tank Breather Oil Pot','Low Oil on OLTC Breather Oil Pot','M. Tank Breather Oil Pot Empty','OLTC Breather Oil Pot Empty','Broken M. Tank Breather Oil Pot','Broken OLTC Breather Oil Pot','M. Tank Breather Oil Pot Missing','OLTC Breather Oil Pot Missing'],
   ['OTI >WTI','OTI=WTI','OTI Def.','WTI Def.','MOG Def.','MOG Conn. Open','POG not Visible','MK Box Glass Cover Missing','MK Box Glass Cover Broken', 'MK Box Glass Cover Hazzy'],
-  ['MK Box Flat Earthing','OLTC Flat Earthing','Neutral Double Flat Earthing','PTR Body Rusted','PTR Radiator Rusted','PTR Con. Tank Rusted'],
+  ['MK Box Flat Earthing','OLTC Flat Earthing','Neutral Double Flat Earthing','PTR Body Rusted','PTR Radiator Rusted','PTR Con. Tank Rusted', 'Dust & Spider Web'],
   ['OLTC Count']
 ];
 
@@ -2011,7 +2011,8 @@ function otherDesc(val){
     'Neutral Double Flat Earthing':'PTR Neutral is to be earth though Double Flat and is to be connected with the PTR body earthing.',
     'PTR Body Rusted':'Rust formation on PTR body was observed. The same must be cleaned and painted with weather resisting non fading paint of Dark Admiralty Grey as per technical specification of WBSEDCL.',
     'PTR Radiator Rusted':'Rust formation on PTR Radiator was observed. The same must be cleaned and painted with weather resisting non fading paint of Dark Admiralty Grey as per technical specification of WBSEDCL.',
-    'PTR Con. Tank Rusted':'Rust formation on PTR Conservator Tank was observed. The same must be cleaned and painted with weather resisting non fading paint of Dark Admiralty Grey as per technical specification of WBSEDCL.'
+    'PTR Con. Tank Rusted':'Rust formation on PTR Conservator Tank was observed. The same must be cleaned and painted with weather resisting non fading paint of Dark Admiralty Grey as per technical specification of WBSEDCL.',
+    'Dust & Spider Web':'Dust & Spider Webs are found on the PTR. Immediate necessary action towards cleaning/removing the dust & spider web is to be taken.'
   };
   return map[val] || '';
 }
@@ -2535,6 +2536,7 @@ window.savePTR = savePTR;
 window.addCustomOil = addCustomOil;
 window.addCustomOther = addCustomOther;
 window.checkbox = checkbox;
+
 
 
 
