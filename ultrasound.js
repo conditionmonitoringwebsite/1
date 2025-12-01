@@ -5,7 +5,7 @@ const equipmentOptions = [
   'Post Insulator','Conductor','Other'
 ];
 const locationOptions = [
-  'PTR-1','PTR-2','PTR-3','PTR-4','PTR-5','PTR-6','PTR-7',
+  'PTR-1','PTR-2','PTR-3','PTR-4','PTR-5','PTR-6','PTR-7','Group Control PTR',
   'Bus PT','PT-1','PT-2','PT-3','Station Service Transformer','Other'
 ];
 const sideOptions = [
@@ -901,6 +901,7 @@ window.addEventListener('load', () => {
       }
     });
 });
+
 
 
 
