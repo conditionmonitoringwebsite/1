@@ -1408,40 +1408,113 @@ selLoc.onchange = () => {
     dd.appendChild(labelEl('HV/LV',     selHVLV));
 
     // Add button logic
-    const addBtn = document.createElement('button');
+        const addBtn = document.createElement('button');
     addBtn.textContent = 'Add';
     addBtn.onclick = () => {
       let loc = selLoc.value;
-if (loc === 'Other') {
-  const manual = manualInput.value.trim();
-  if (!manual) return;  // Don't proceed if manual field is empty
-  loc = manual;
-}
-const phase = selPhase.value;
-const hvlv  = selHVLV.value;
+
+      // Handle manual location when "Other" is selected
+      if (loc === 'Other') {
+        const manual = manualInput.value.trim();
+        if (!manual) return;  // Don't proceed if manual field is empty
+        loc = manual;
+      }
+
+      const phase = selPhase.value;
+      const hvlv  = selHVLV.value;
 
       if (!loc || !phase || !hvlv) return;
+
       const entry = `${loc} ${phase} ${hvlv}`;
+
+      // 🔎 Find any existing row for this same LA sub-heading
+      //     ("LA Missing" / "LA Out of Ckt."), even if tag was lost
+      const existingRow = liveData.find(r => {
+        if (r.equipment !== 'LA') return false;
+        if (r.tag === title) return true;
+        if (typeof r.action !== 'string') return false;
+
+        if (title === 'LA Missing' && /found to be missing/i.test(r.action)) {
+          return true;
+        }
+        if (title === 'LA Out of Ckt.' && /found to be out of circuit/i.test(r.action)) {
+          return true;
+        }
+        return false;
+      });
+
+      // ♻️ Restore previous entries from that row (if any) into the Set
+      if (existingRow) {
+        if (Array.isArray(existingRow.entries) && existingRow.entries.length) {
+          // Preferred: reuse explicit entries array
+          existingRow.entries.forEach(v => cfg.entries.add(v));
+        } else if (typeof existingRow.action === 'string') {
+          // Backward-compatibility: parse text to recover list
+          let listPart = '';
+
+          // Text patterns are like:
+          //  "A, B & C were found to be missing. ..."
+          //  "A, B & C were found to be out of circuit. ..."
+          const m = existingRow.action.match(/^(.+?) (?:was|were) found/i);
+          if (m && m[1]) {
+            listPart = m[1];
+          }
+
+          if (listPart) {
+            listPart
+              .replace(/\s*&\s*/g, ', ')   // turn "A & B" into "A, B"
+              .split(',')
+              .map(s => s.trim())
+              .filter(Boolean)
+              .forEach(v => cfg.entries.add(v));
+          }
+        }
+      }
+
+      // ➕ Add the new entry into the persistent Set
       cfg.entries.add(entry);
-      // remove previous rows for this section
-      liveData = liveData.filter(r => !(r.equipment==='LA' && r.tag===title));
+
+      // 🧹 Remove the old sentence row for this sub-heading,
+      //    even if its tag was lost but text pattern matches
+      liveData = liveData.filter(r => {
+        if (r.equipment !== 'LA') return true;
+
+        if (r.tag === title) return false; // normal case with tag
+
+        if (!r.tag && typeof r.action === 'string') {
+          if (title === 'LA Missing' && /found to be missing/i.test(r.action)) {
+            return false;
+          }
+          if (title === 'LA Out of Ckt.' && /found to be out of circuit/i.test(r.action)) {
+            return false;
+          }
+        }
+        return true;
+      });
+
       const arr  = Array.from(cfg.entries);
-      const txt  = arr.length>1 ? cfg.textMulti(arr) : cfg.textSingle(arr[0]);
+      const txt  = arr.length > 1 ? cfg.textMulti(arr) : cfg.textSingle(arr[0]);
+
+      // Store 'entries' so future edits (after refresh) keep older data
       liveData.push({
         equipment: 'LA',
         action:    txt,
         manual:    false,
         tag:       title,
-        order:     cfg.order
+        order:     cfg.order,
+        entries:   arr
       });
-      // re-sort only the LA group
-      const laGrp = liveData.filter(r => r.equipment==='LA');
-      const rest  = liveData.filter(r => r.equipment!=='LA');
-      laGrp.sort((a,b)=> a.order - b.order);
+
+      // 🔃 Re-sort only the LA group
+      const laGrp = liveData.filter(r => r.equipment === 'LA');
+      const rest  = liveData.filter(r => r.equipment !== 'LA');
+      laGrp.sort((a, b) => a.order - b.order);
       liveData = [...rest, ...laGrp];
+
       renderLive();
       localStorage.setItem('visualFindings', JSON.stringify(liveData));
     };
+
     dd.appendChild(addBtn);
     sec.appendChild(dd);
     wrapper.appendChild(sec);
