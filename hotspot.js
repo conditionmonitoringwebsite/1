@@ -43,7 +43,7 @@ const location1Opts = ['PTR-1','PTR-2','PTR-3','PTR-4','PTR-5','PTR-6','PTR-7','
 const location2Opts = [
   'HV Bushing Connector','LV Bushing Connector','HV Bushing Stud Internal Hotspot','LV Bushing Stud Internal Hotspot','CT Connector','CT Stud & Stud Connector', 'CT Stud Internal Hotspot',
   'VCB Upper Pad Connector','VCB Lower Pad Connector','VCB Upper & Lower Pad Connector','VCB Upper Pad','VCB Lower Pad','VCB Upper Pad & Pad Connector', 'VCB Lower pad & pad Connector',
-  '1st Isolator','1st DP','2nd Isolator','Isolator before CT','Isolator after VCB','Isolator before VCB',
+  '1st Isolator','1st DP','2nd Isolator','Isolator before CT','Isolator after CT','Isolator after VCB','Isolator before VCB',
   'HV LA Internal Hotspot','LV LA Internal Hotspot','33KV Cable Internal Hotspot', '11KV Cable Internal Hotspot','11KV Cable Socket Nut-Bolt','33KV Cable Socket Nut-Bolt','11KV Feeder Isolator','Other'
 ];
 const condMap = {
@@ -52,7 +52,7 @@ const condMap = {
            'Flexible Cord Lower Side Connector','Flexible Cord Lower Side Binding',
            'Flexible Cord Lower side to Pin Binding','Flexible Cord Lower side to Pin Binding & Conductor','Other']
 };
-const sideOpts = ['Both Sides','PTR Side','Bus Side','CT Side','VCB Side','Line Side','Incomer Side','Isolator Side','Cable Side','LA Side','Station Service Transformer Side','Other'];
+const sideOpts = ['Both Sides','PTR Side','Bus Side','CT Side','VCB Side','Line Side','Incomer Side','Isolator Side','Cable Side','LA Side','Station Service Transformer Side','P1 Side', 'P2 Side','Other'];
 
 // ── full-form lookup for feeder-isolator checkboxes ──
 const feederFullMap = {
@@ -220,7 +220,7 @@ function resetPhaseCells(row) {
 
     // 2) choose new third control
     const v = sel2.value;
-    if (['1st Isolator','1st DP', '2nd Isolator','Isolator before CT','Isolator after VCB','Isolator before VCB'].includes(v)) {
+    if (['1st Isolator','1st DP', '2nd Isolator','Isolator before CT','Isolator after CT','Isolator after VCB','Isolator before VCB'].includes(v)) {
       sel3 = createSelect(condMap.isolator);
     } 
 
@@ -684,7 +684,9 @@ const offset = (i === 0) ? 3 : 2;
 
 
     // Image Code
-    rrow.insertCell().textContent = tr.cells[7].querySelector('input').value || '---';
+    const imgCell = tr.cells[offset + 4];  // Image Code position depends on rowspan shifting
+rrow.insertCell().textContent = imgCell?.querySelector('input')?.value || '---';
+
     // Remarks
 // Action to be Taken
 if (laStatuses[i]) {
@@ -1109,6 +1111,7 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   // 4) (Optional) Add a fresh blank row for the user
   addRow();
 });
+
 
 
 
