@@ -1227,7 +1227,10 @@ const categories = {
 
       'Panel': [ 'Front Door not closing properly', 'Rear Cover not closing properly', 'TNC Switch Broken', 'TNC Switch Defective',
         'Breaker ON indication not glowing' 
-      ]
+      ],
+
+      'Sunlight': ['Sunlight on Breaker Chamber', 'Sunlight on Bus Chamber', 'Sunlight on CT/Cable Chamber', 'Sunlight on Bus & CT/Cable Chamber']
+
     };
 
 
@@ -1302,7 +1305,12 @@ btn.addEventListener('click', () => {
    'Rear Cover not closing properly': 'Rear side cover of the panel is not closing properly. Immediate necessary action is to be taken.',
    'TNC Switch Broken': 'TNC Switch was found to be Broken. Immediate necessary action is to be taken.',
    'TNC Switch Defective': 'TNC Switch was found to be defective. Immediate necessary action is to be taken.',
-   'Breaker ON indication not glowing': 'Breaker "ON" indication was not glowing. Immediate necessary action is to be taken.'
+   'Breaker ON indication not glowing': 'Breaker "ON" indication was not glowing. Immediate necessary action is to be taken.',
+   'Sunlight on Breaker Chamber': '<b>Note:</b> The higher temp. on the breaker chamber is likely due to sunlight falling on the breaker chamber when the temperatures were measured.',
+   'Sunlight on Bus Chamber': '<b>Note:</b> The higher temp. on the bus chamber is likely due to sunlight falling on the bus chamber when the temperatures were measured.',
+   'Sunlight on CT/Cable Chamber': '<b>Note:</b> The higher temp. on the CT/Cable chamber is likely due to sunlight falling on the CT/Cable chamber when the temperatures were measured.',
+   'Sunlight on Bus & CT/Cable Chamber': '<b>Note:</b> The higher temp. on the Bus & CT/Cable chamber is likely due to sunlight falling on the Bus & CT/Cable chamber when the temperatures were measured.'
+
 
   };
 
@@ -1453,7 +1461,9 @@ function populateOther33() {
       'Panel': [
         'Front Door not closing properly', 'Rear Cover not closing properly', 'TNC Switch Broken', 'TNC Switch Defective',
         'Breaker ON indication not glowing' 
-      ]
+      ],
+
+      'Sunlight': ['Sunlight on Breaker Chamber', 'Sunlight on Bus Chamber', 'Sunlight on CT/Cable Chamber', 'Sunlight on Bus & CT/Cable Chamber']
     };
 
     categorySelect.innerHTML = `<option value="" disabled selected hidden></option>`;
@@ -1525,7 +1535,11 @@ btn.addEventListener('click', () => {
     'Rear Cover not closing properly': 'Rear side cover of the panel is not closing properly. Immediate necessary action is to be taken.',
     'TNC Switch Broken': 'TNC Switch was found to be Broken. Immediate necessary action is to be taken.',
     'TNC Switch Defective': 'TNC Switch was found to be defective. Immediate necessary action is to be taken.',
-    'Breaker ON indication not glowing': 'Breaker "ON" indication was not glowing. Immediate necessary action is to be taken.'
+    'Breaker ON indication not glowing': 'Breaker "ON" indication was not glowing. Immediate necessary action is to be taken.',
+    'Sunlight on Breaker Chamber': '<b>Note:</b> The higher temp. on the breaker chamber is likely due to sunlight falling on the breaker chamber when the temperatures were measured.',
+    'Sunlight on Bus Chamber': '<b>Note:</b> The higher temp. on the bus chamber is likely due to sunlight falling on the bus chamber when the temperatures were measured.',
+    'Sunlight on CT/Cable Chamber': '<b>Note:</b> The higher temp. on the CT/Cable chamber is likely due to sunlight falling on the CT/Cable chamber when the temperatures were measured.',
+    'Sunlight on Bus & CT/Cable Chamber': '<b>Note:</b> The higher temp. on the Bus & CT/Cable chamber is likely due to sunlight falling on the Bus & CT/Cable chamber when the temperatures were measured.'
 
 
   };
@@ -1551,6 +1565,12 @@ if (otherActionsStore['33'][panelName].includes(actionText)) {
 }
 otherActionsStore['33'][panelName].push(actionText);
 populateLiveTable();
+
+localStorage.setItem(
+  'otherActionsStore',
+  JSON.stringify(otherActionsStore)
+);
+
 
 
 });
@@ -1587,6 +1607,12 @@ populateLiveTable();
       otherActionsStore['33'][panelName].push(text);
       manualInput.value = '';
       populateLiveTable();
+
+localStorage.setItem(
+  'otherActionsStore',
+  JSON.stringify(otherActionsStore)
+);
+
     });
 
 
@@ -1865,15 +1891,35 @@ const toRoman = (num) => {
 const kv        = is11KV ? '11' : '33';
 const panelName = r.cells[1].querySelector('input').value.trim();
 
-const manual    = otherActionsStore[kv][panelName] || [];
-const allActions = [...actions, ...manual];
+const manual = otherActionsStore[kv][panelName] || [];
+
+let allActions = [...actions, ...manual];
+
+// Keep any "Note: The higher temp...." lines always at the bottom
+const isNoteLine = (txt) => {
+  const raw = (txt || '').trim();
+  const plain = raw.replace(/<[^>]*>/g, '').trim(); // remove HTML tags like <b>...</b>
+  return /^Note:\s*The higher temp\./i.test(plain);
+};
+
+const notes = allActions.filter(t => isNoteLine(t));
+allActions = allActions.filter(t => !isNoteLine(t)).concat(notes);
+
 if (allActions.length > 0) {
- actionTd.innerHTML = allActions.map((txt, idx) =>
-   `<div style="font-size:0.6rem; text-align:left;"><b>${toRoman(idx+1)}.</b> ${txt}</div>`
- ).join('');
+  let serial = 0;
+  actionTd.innerHTML = allActions.map((txt) => {
+    const isNote = isNoteLine(txt);
+    if (!isNote) serial++;
+
+    return `<div style="font-size:0.6rem; text-align:left;">` +
+           (isNote ? `${txt}` : `<b>${toRoman(serial)}.</b> ${txt}`) +
+           `</div>`;
+  }).join('');
 } else {
   actionTd.textContent = '';
 }
+
+
 
 
 tr.appendChild(actionTd);
@@ -1926,7 +1972,17 @@ if (infoTable) {
   const division = localStorage.getItem("selectedDivision") || '';
   const substation = localStorage.getItem("selectedSubstation") || '';
   const date = localStorage.getItem("inspectionDate") || '';
-  const ambient = localStorage.getItem("ambientTemp") || '';
+  // Use latest saved ambient temp (prefer 11KV, fallback to 33KV, then old key)
+const amb11 = JSON.parse(localStorage.getItem('ambientTemp11Data') || '[]');
+const amb33 = JSON.parse(localStorage.getItem('ambientTemp33Data') || '[]');
+
+let ambient = '';
+if (amb11.length) ambient = amb11[amb11.length - 1];
+else if (amb33.length) ambient = amb33[amb33.length - 1];
+else ambient = localStorage.getItem("ambientTemp") || '';
+
+if (ambient !== '' && !String(ambient).includes('℃')) ambient = `${ambient}℃`;
+
 
   // Fill the cells using IDs
   const setText = (id, text) => {
@@ -3118,4 +3174,5 @@ if (inspTd) {
 
 
 });
+
 
