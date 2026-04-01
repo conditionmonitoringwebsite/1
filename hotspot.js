@@ -731,16 +731,92 @@ function makeFilename(ext) {
 
 // --- Download Excel/Doc/PDF ---
 function downloadExcel() {
-  const tbl=document.getElementById('hotspotLiveTable').cloneNode(true);
-  tbl.querySelectorAll('thead th').forEach(th=>{ th.style.fontFamily='Cambria'; th.style.fontSize='12pt'; th.style.fontWeight='bold'; th.style.backgroundColor='#d9d9d9'; th.style.color='#000'; });
-  tbl.querySelectorAll('tbody tr').forEach(tr=>tr.querySelectorAll('td').forEach(td=>{ td.style.fontFamily='Cambria'; td.style.fontSize='12pt'; td.style.backgroundColor='#dce6f2'; td.style.color='#000'; }));
-  const html='<html><head><meta charset="utf-8"></head><body>'+tbl.outerHTML+'</body></html>';
-  const blob = new Blob(['\ufeff', html], { type: 'application/vnd.ms-excel' });
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download = makeFilename('xls');
+  const tbl = document.getElementById('hotspotLiveTable').cloneNode(true);
 
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+// Remove header row
+tbl.querySelector('thead')?.remove();
+
+  // 1. Remove "Sl. No." column
+  tbl.querySelectorAll('tr').forEach(tr => {
+    if (tr.cells.length > 0) tr.deleteCell(0);
+  });
+
+  // 2. Replace merged Ambient Temp column with separate cells in each row
+  const bodyRows = Array.from(tbl.querySelectorAll('tbody tr'));
+  bodyRows.forEach((tr, idx) => {
+    const cells = tr.cells;
+
+    if (idx === 0) {
+      const ambCell = cells[1]; // after removing Sl. No., Ambient becomes column index 1
+      if (ambCell) ambCell.removeAttribute('rowspan');
+    } else {
+      const newAmb = tr.insertCell(1);
+      newAmb.textContent = '';
+    }
+  });
+
+  // 3. Unmerge Action/Remarks column and repeat text in all rows
+  const repeatText =
+    'All the hotspots detected at switchyard must be rectified to avoid unplanned outage of supply and emergency shutdown. The IR Images are attached for ready reference.';
+
+  bodyRows.forEach((tr, idx) => {
+    const lastCell = tr.cells[tr.cells.length - 1];
+
+    if (lastCell && lastCell.hasAttribute('rowspan')) {
+      const span = parseInt(lastCell.getAttribute('rowspan'), 10) || 1;
+      lastCell.removeAttribute('rowspan');
+
+      for (let i = 1; i < span; i++) {
+        const targetRow = bodyRows[idx + i];
+        if (targetRow) {
+          const newCell = targetRow.insertCell(targetRow.cells.length);
+          newCell.textContent = repeatText;
+        }
+      }
+    }
+  });
+
+  // 4. Replace '---' with blank
+  tbl.querySelectorAll('td').forEach(td => {
+    if (td.textContent.trim() === '---') {
+      td.textContent = '';
+    }
+  });
+
+  // Styling
+  tbl.querySelectorAll('tbody tr').forEach(tr =>
+    tr.querySelectorAll('td').forEach(td => {
+      td.style.fontFamily = 'Cambria';
+      td.style.fontSize = '12pt';
+      td.style.backgroundColor = '#dce6f2';
+      td.style.color = '#000';
+      td.style.textAlign = 'center';
+    })
+  );
+
+
+// Add single-line border to all cells
+tbl.querySelectorAll('th, td').forEach(cell => {
+  cell.style.border = '1px solid #000';
+});
+
+  const html = '<html><head><meta charset="utf-8"></head><body>' + tbl.outerHTML + '</body></html>';
+  const blob = new Blob(['\ufeff', html], { type: 'application/vnd.ms-excel' });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = makeFilename('xls');
+
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
+
+
+
+
+
 function downloadDoc() {
   const tbl=document.getElementById('hotspotLiveTable').cloneNode(true);
 // ── SAFELY CENTER COLUMNS 3–8 VIA INLINE STYLE ──
