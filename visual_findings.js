@@ -2329,18 +2329,59 @@ function getFormattedDate() {
 
 
 
-// Export functions (using libraries loaded on page)
+// Export functions 
 function exportExcel() {
-  // Converts the live table to a workbook and downloads as .xlsx
-  const wb = XLSX.utils.table_to_book(
-    document.getElementById('liveTable'),
-    { sheet: 'Findings' }
-  );
-  // inside exportExcel()
-const dateStr = getFormattedDate();
-XLSX.writeFile(wb,`Visualfindings_${subName}_${dateStr}.xlsx`
-);
+  const priorities = [
+    ...ptrList,
+    ...otherList.filter(e => e !== 'Other'),
+    'Rusted Structures',
+    'Group Control PTR',
+    'Grasses on Yard',
+    'Kite String',
+    'Huge PD from Pin Insulators',
+    'Aerial Earth Spike',
+    'Other'
+  ];
 
+  // ❌ Removed Sl. No. column
+  const rows = [];
+
+  priorities.forEach(equipKey => {
+    let group = liveData.filter(r => r.equipment === equipKey);
+
+    if (equipKey === 'SSTR') {
+      group = group.sort((a, b) => {
+        const ma = a.manual ? 1 : 0, mb = b.manual ? 1 : 0;
+        if (ma !== mb) return ma - mb;
+        const oa = a.action.startsWith('Oil Leakage'), ob = b.action.startsWith('Oil Leakage');
+        if (oa !== ob) return oa ? -1 : 1;
+        return 0;
+      });
+    } else {
+      group = group.sort((a, b) => (a.manual ? 1 : 0) - (b.manual ? 1 : 0));
+    }
+
+    if (!group.length) return;
+
+    group.forEach(row => {
+      const shownEquip =
+        row.displayEquip ??
+        (equipKey === 'SSTR' ? 'Station Service Transformer' : equipKey);
+
+      rows.push([shownEquip, row.action]);
+    });
+  });
+
+  if (rows.length === 1) {
+    rows.push(['', 'No data yet.']);
+  }
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Findings');
+
+  const dateStr = getFormattedDate();
+  XLSX.writeFile(wb, `Visualfindings_${subName}_${dateStr}.xlsx`);
 }
 
 function exportDoc() {
