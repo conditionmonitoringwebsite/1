@@ -33,7 +33,7 @@ const FINDING_MAP_11 = {
   'Top Cover Broken':
     'Some of battery cells’ top cover found to be broken (corresponding to 11KV panels). Appropriate action is to be taken to prevent deposition of dust and dirt to acid water which can deteriorate the cells.',
   'Rating Mismatch':
-    'On the Batter Set for the 11KV panels, some of batteries were found to be of rating 100AH and some of the batteries were found to be of 75AH. Immediate necessary action is to be taken to make all the batteries in the battery set having same rating as the mismatch in capacity can lead to uneven charging/discharging, reduced overall battery performance, and potential system imbalance or failure.',
+    'In 11KV panel Battery set, some batteries are of rating 100AH and others 75AH. Immediately make all batteries of same rating as rating mismatch can lead to uneven charging/discharging, reduced battery performance, and damaging the batteries.',
   'Exhaust Fan':
     'Exhaust Fan in the Battery Room was found to be missing. Exhaust fan is to be installed in the Battery room and the fan is to be kept in ON condition continuously.',
   'Sulphur Deposition':
@@ -41,7 +41,7 @@ const FINDING_MAP_11 = {
   'Top Cover Open':
     'Some of battery cells’ top cover found to be open (corresponding to 11KV panels). Appropriate action is to be taken to prevent deposition of dust and dirt to acid water which can deteriorate the cells.',
   'Earth Fault':
-    'Earth fault is showing at the battery charger for 11KV panels. Short circuit with earth has occurred at either 11KV panel side or charger side. This short circuit needs to be identified and rectified immediately to avoid malfunction of the relays.',
+    'Earth fault is showing at Battery Charger for 11KV panels. Earth short occurred at either 11KV panel side or charger side. Locate & rectify.',
   'Manual Mode':
     'Battery Charger corresponding to 11KV Panels is running in manual mode. Problems of the chargers to be rectified so that the chargers can run in auto mode.',
   'Charger Rating Mismatch':
@@ -1031,7 +1031,7 @@ function recalcBatActions() {
 
 if (pOn11 && !pOff11) {
   bat.push(
-    `11KV Panel voltage drops to ${acOn11}V when charger AC input is ON. Problem found in battery charger. The charger is unable to send the battery voltage to 11KV Panel when AC input is ON. So, Charger output voltage to be increased to such a value that sufficient voltage can reach to the panels. Cross section of the cables (From charger to panels) is also to be checked and increased if necessary.`
+    `11KV Panel voltage drops to ${acOn11}V when charger AC input is ON. Charger is unable to send req. voltage to panels. Charger output voltage to be increased. Check cross section of the cables (From charger to panels) and increase if necessary.`
   );
 }
 
@@ -1044,17 +1044,17 @@ if (pOn11 && !pOff11) {
 
   if (pOff11 && !pOn11) {
     bat.push(
-      `11KV Panel voltage drops to ${acOff11}V when charger AC input is OFF. Problem found in battery charger. The charger is unable to send the battery voltage to 11 KV Panel when AC input is OFF. So, Charger output voltage to be increased to such a value that sufficient voltage can reach to the panels. Cross section of the cables (From charger to panels) is also to be checked and increased if necessary.`
+      `11KV Panel voltage drops to ${acOff11}V when charger AC input is OFF. Charger is unable to send req. voltage to panels. Charger output voltage to be increased. Check cross section of the cables (From charger to panels) and increase if necessary.`
     );
   }
   if (pOn11 && pOff11) {
     bat.push(
-      `11KV panel voltage drops to ${acOn11}V when charger AC input is ON and ${acOff11}V when charger AC input is OFF. Problem found in battery charger. The charger is unable to send the battery voltage to 11 KV panel when AC input is OFF. So, Charger output voltage to be increased to such a value that sufficient voltage can reach to the panels. Cross section of the cables (From charger to panels) is also to be checked and increased if necessary.`
+      `11KV panel volt drops to ${acOn11}V when charger AC input is ON and ${acOff11}V when AC input is OFF. Charger is unable to send req. volt to panels. Increase charger output volt. Check cross section of the cables (From charger to panels) and increase if necessary.`
     );
   }
   if (find11.includes('Some Batteries Defective')) {
     bat.push(
-      `Battery Cell voltage corresponding to 11KV Panels found to be ${cellV11}V. Hence, individual cell voltages are to be measured to identify the defective voltage and necessary action is to be taken towards replacement of the defective battery cells with the healthy one of the same rating.`
+      `Battery Cell voltage corresponding to 11KV Panels found to be ${cellV11}V. Defective cells were identified. Replace them with the healthy one of the same rating.`
     );
   }
   find11.forEach(f => {
@@ -1071,7 +1071,7 @@ if (pOn11 && !pOff11) {
 // ONLY AC-ON problem (new)
 if (pOn33 && !pOff33) {
   bat.push(
-    `33KV Panel voltage drops to ${acOn33}V when charger AC input is ON. Problem found in battery charger. The charger is unable to send the battery voltage to 33KV Panel when AC input is ON. So, Charger output voltage to be increased to such a value that sufficient voltage can reach to the panels. Cross section of the cables (From charger to panels) is also to be checked and increased if necessary.`
+    `33KV Panel voltage drops to ${acOn33}V when charger AC input is ON. Charger is unable to send req. voltage to panels. Charger output voltage to be increased. Check cross section of the cables (From charger to panels) and increase if necessary.`
   );
 }
 
@@ -1084,17 +1084,17 @@ if (pOn33 && !pOff33) {
 
   if (pOff33 && !pOn33) {
     bat.push(
-      `33KV Panel voltage drops to ${acOff33}V when charger AC input is OFF. Problem found in battery charger. The charger is unable to send the battery voltage to 33 KV Panel when AC input is OFF. So, Charger output voltage to be increased to such a value that sufficient voltage can reach to the panels. Cross section of the cables (From charger to panels) is also to be checked and increased if necessary.`
+      `33KV Panel voltage drops to ${acOff33}V when charger AC input is OFF. Charger is unable to send req. voltage to panels. Charger output voltage to be increased. Check cross section of the cables (From charger to panels) and increase if necessary.`
     );
   }
   if (pOn33 && pOff33) {
     bat.push(
-      `33KV panel voltage drops to ${acOn33}V when charger AC input is ON and ${acOff33}V when charger AC input is OFF. Problem found in battery charger. The charger is unable to send the battery voltage to 33 KV panel when AC input is OFF. So, Charger output voltage to be increased to such a value that sufficient voltage can reach to the panels. Cross section of the cables (From charger to panels) is also to be checked and increased if necessary.`
+      `33KV panel volt drops to ${acOn33}V when charger AC input is ON and ${acOff33}V when AC input is OFF. Charger is unable to send req. volt to panels. Increase charger output volt. Check cross section of the cables (From charger to panels) and increase if necessary.`
     );
   }
   if (find33.includes('Some Batteries Defective')) {
     bat.push(
-      `Battery Cell voltage corresponding to 33KV Panels found to be ${cellV33}V. Hence, individual cell voltages are to be measured to identify the defective voltage and necessary action is to be taken towards replacement of the defective battery cells with the healthy one of the same rating.`
+      `Battery Cell voltage corresponding to 33KV Panels found to be ${cellV33}V. Defective cells were identified. Replace them with the healthy one of the same rating.`
     );
   }
   find33.forEach(f => {
@@ -1229,7 +1229,7 @@ const categories = {
         'Breaker ON indication not glowing' 
       ],
 
-      'Sunlight': ['Sunlight on Breaker Chamber', 'Sunlight on Bus Chamber', 'Sunlight on CT/Cable Chamber', 'Sunlight on Bus & CT/Cable Chamber']
+      'Sunlight': ['Sunlight on Breaker Chamber', 'Sunlight on rear Bus Chamber', 'Sunlight on CT/Cable Chamber', 'Sunlight on rear Bus & CT/Cable Chamber']
 
     };
 
@@ -1269,47 +1269,49 @@ btn.addEventListener('click', () => {
   if (!panelName) return alert('Enter Panel Name first');
 
   const actionsMap = {
-    'Heater is to be checked': 'Space heaters should be checked.',
-    'Heater Defective': 'Space heater was found defective. Hence, heater circuit must be checked and necessary rectification is to be taken for protection of VCB & line spouts from moisture.',
-    'Breaker Chamber Heater Defective': 'Space heater of VCB Chamber was found defective. Hence, heater circuit must be checked and necessary rectification is to be taken for protection of VCB & line spouts from moisture.',
-    'Cable Chamber Heater Defective': 'Space heater of Cable/CT Chamber was found defective. Hence, heater circuit must be checked and necessary rectification is to be taken for protection of Cable, CT & line spouts from moisture.',
-    '1 no. Heater Defective': 'One no. Space heater was found defective. Hence, heater circuit must be checked and necessary rectification is to be taken for protection of Bus & line spouts from moisture.',
-    '2 nos. Heater Defective': 'Two nos. Space heaters were found defective. Hence, heater circuits must be checked and necessary rectification is to be taken for protection of Bus & line spouts from moisture.',
-    'All Heaters defective': 'All Space heaters were found defective. Hence, heater circuits must be checked and necessary rectification is to be taken for protection of Bus & line spouts from moisture.',
-    'Heater Ckt. Short-Ckt.': 'HD circuits were found as short circuited. Necessary action is to be taken.',
-    'Heater Ammeter Defective': 'Ammeter of the Space heater was found to be defective. Necessary action to be taken to address the same.',
-    'Heater Toggle Switch Defective': 'Heater Toggle Switch was found to be Defective. Necessary action is to be taken.',
-    'Thermostat Problem': 'Problem in thermostat was noticed.  Necessary action is to be taken. Also, Heater thermostat settings must be checked and & it should be in between 40’C to 45’C.',
-    'R-Ph Ammeter Defective': 'R-Phase Ammeter was found to be defective. Necessary action to be taken.',
-    'Y-Ph Ammeter Defective': 'Y-Phase Ammeter was found to be defective. Necessary action to be taken.',
-    'B-Ph Ammeter Defective': 'B-Phase Ammeter was found to be defective. Necessary action to be taken.',
-    'All Ammeters Defective': 'All Phase Ammeters were found to be defective. Necessary action to be taken.',
-    'R-Ph Ammeter Display Problem': 'Display of R-Phase Ammeter was found to be defective. Necessary action is to be taken.',
-    'Y-Ph Ammeter Display Problem': 'Display of Y-Phase Ammeter was found to be defective. Necessary action is to be taken.',
-    'B-Ph Ammeter Display Problem': 'Display of B-Phase Ammeter was found to be defective. Necessary action is to be taken.',
-    'All Ammeters Display Problem': 'Display of All Phase Ammeters were found to be defective. Necessary action is to be taken.',
-   'Voltmeter Defective': 'Display of Voltmeter was found to be defective. Necessary action is to be taken.',
-   'Voltmeter Display Problem': 'Display of Voltmeter was found to be defective. Necessary action is to be taken.',
-   'PT Out of Circuit': 'PT was found to be out of circuit. Necessary action is to be taken.',
-   'PT Missing': 'PT was found to be missing. Necessary action is to be taken.',
-   'Relay Healthy LED not glowing': '"Relay Healthy" LED was not glowing on the O/C E/F Relay. Immediate necessary action is to be taken.',
-   'Trip Ckt. Unhealthy Indication on relay': '"Trip Ckt. Unhealthy" indication was showing on the relay. Immediate necessary action is to be taken.',
-   'Relay Display Out': 'No display was visible on the Relay. Necessary action is to be taken.',
-   'Replay Display Problem': 'Display of the O/C E/F Relay was found to be defective. Necessary action is to be taken.',
-   'HMI Key Defective': 'HMI Key of the O/C E/F Relay was found to be defective. Necessary action is to be taken.',
-   'Clear button of relay defective': 'Clear button of the O/C E/F Relay was found to be defective. Necessary action is to be taken.',
-   'Annunciator Defective': 'Annunciator was found to be defective. Necessary action is to be taken.',
-   'Trip Ckt. Unhealthy Showing': '"Trip Ckt. Unhealthy" indication was showing on the Annunciator. Immediate necessary action is to be taken.',
-   'Hooter Not working':'Hooter was found to be defective. Immediate necessary action is to be taken.',
-   'Front Door not closing properly': 'Front door of the VCB chamber is not closing properly. Immediate necessary action is to be taken.',
-   'Rear Cover not closing properly': 'Rear side cover of the panel is not closing properly. Immediate necessary action is to be taken.',
-   'TNC Switch Broken': 'TNC Switch was found to be Broken. Immediate necessary action is to be taken.',
-   'TNC Switch Defective': 'TNC Switch was found to be defective. Immediate necessary action is to be taken.',
-   'Breaker ON indication not glowing': 'Breaker "ON" indication was not glowing. Immediate necessary action is to be taken.',
-   'Sunlight on Breaker Chamber': '<b>Note:</b> The higher temp. on the breaker chamber is likely due to sunlight falling on the breaker chamber when the temperatures were measured.',
-   'Sunlight on Bus Chamber': '<b>Note:</b> The higher temp. on the bus chamber is likely due to sunlight falling on the bus chamber when the temperatures were measured.',
-   'Sunlight on CT/Cable Chamber': '<b>Note:</b> The higher temp. on the CT/Cable chamber is likely due to sunlight falling on the CT/Cable chamber when the temperatures were measured.',
-   'Sunlight on Bus & CT/Cable Chamber': '<b>Note:</b> The higher temp. on the Bus & CT/Cable chamber is likely due to sunlight falling on the Bus & CT/Cable chamber when the temperatures were measured.'
+    'No Heater found': 'No heater found. Install new heater.',
+    'Heater is to be checked': 'Check Heaters.',
+    'Heater Defective': 'Heater def. Check & rectify.',
+    'Breaker Chamber Heater Defective': 'VCB Chamber heater def. Check & rectify.',
+    'Cable Chamber Heater Defective': 'Cable/CT Chamber heater def. Check & rectify.',
+    '1 no. Heater Defective': '01 heater def. Check & rectify.',
+    '2 nos. Heater Defective': '02 heaters def. Check & rectify.',
+    'All Heaters defective': 'All heaters def. Check & rectify.',
+    'Heater Ckt. Short-Ckt.': 'Heater circuits found short circuited. Rectify.',
+    'Heater Ammeter Defective': 'Heater Ammeter def. Rectify.',
+    'Heater Toggle Switch Defective': 'Heater Toggle Switch def. Rectify.',
+    'Thermostat Problem': 'Problem in thermostat. Rectify & set b/w 40’C to 45’C.',
+    'R-Ph Ammeter Defective': 'R-Ph Ammeter def. Rectify.',
+    'Y-Ph Ammeter Defective': 'Y-Ph Ammeter def. Rectify.',
+    'B-Ph Ammeter Defective': 'B-Ph Ammeter def. Rectify.',
+    'All Ammeters Defective': 'All Ph Ammeters Def. Rectify.',
+    'R-Ph Ammeter Display Problem': 'R-Phase Ammeter display def. Rectify.',
+    'Y-Ph Ammeter Display Problem': 'Y-Phase Ammeter display def. Rectify.',
+    'B-Ph Ammeter Display Problem': 'B-Phase Ammeter display def. Rectify.',
+    'All Ammeters Display Problem': 'All Phase Ammeter display def. Rectify.',
+   'Voltmeter Defective': 'Voltmeter def. Rectify.',
+   'Voltmeter Display Problem': 'Voltmeter display def. Rectify.',
+   'PT Out of Circuit': 'PT out of ckt. Rectify.',
+   'PT Missing': 'PT missing. Rectify.',
+   'Relay Healthy LED not glowing': '"Relay Healthy" LED not glowing on O/C E/F Relay. Immediately rectify.',
+   'Trip Ckt. Unhealthy Indication on relay': '"TCS Unhealthy" on Relay. Immediately rectify.',
+   'Relay Display Out': 'Relay display out. Rectify.',
+   'Replay Display Problem': 'O/C E/F Relay display def. Rectify.',
+   'HMI Key Defective': 'O/C E/F Relay HMI Key def. Rectify.',
+   'Clear button of relay defective': 'O/C E/F Relay Clear button def. Rectify.',
+   'O/C E/F Relay Missing': 'O/C E/F Relay missing. Immediately install.',
+   'Annunciator Defective': 'Annunciator def. Rectify.',
+   'Trip Ckt. Unhealthy Showing': '"Trip Ckt. Unhealthy" showing on Annunciator. Immediately rectify.',
+   'Hooter not working':'Hooter def. Rectify.',
+   'Front Door not closing properly': 'Panel Front door not closing properly. Rectify.',
+   'Rear Cover not closing properly': 'Panel rear cover not closing properly. Rectify.',
+   'TNC Switch Broken': 'TNC Switch broken. Immediately rectify.',
+   'TNC Switch Defective': 'TNC Switch def. Immediately rectify.',
+   'Breaker ON indication not glowing': 'Breaker ON indication not glowing. Immediately rectify.',
+   'Sunlight on Breaker Chamber': '<b>Note:</b>sunlight on VCB.',
+   'Sunlight on rear Bus Chamber': '<b>Note:</b>sunlight on rear bus.',
+   'Sunlight on CT/Cable Chamber': '<b>Note:</b>sunlight on CT/Cable chamber.',
+   'Sunlight on rear Bus & CT/Cable Chamber': '<b>Note:</b>sunlight on rear Bus & CT/Cable chamber.'
 
 
   };
@@ -1453,9 +1455,9 @@ function populateOther33() {
       'Voltmeter': ['Voltmeter Defective', 'Voltmeter Display Problem'],
       'PT': ['PT Out of Circuit', 'PT Missing'],
       'Relay': [
-        'Diffrential Relay Healthy LED not glowing', 'O/C E/F Relay Healthy LED not glowing','Trip Ckt. Unhealthy Indication on relay', 'Relay Display Out',
+        'Differential Relay Healthy LED not glowing', 'O/C E/F Relay Healthy LED not glowing','Trip Ckt. Unhealthy Indication on relay', 'Relay Display Out',
         'Replay Display Problem', 'HMI Key Defective', 'Clear button of relay defective',
-        'O/C E/F Relay Missing'
+        'O/C E/F Relay Missing', 'Differential Relay Missing'
       ],
       'Annunciator': ['Annunciator Defective', 'Trip Ckt. Unhealthy Showing', 'Hooter not working'],
       'Panel': [
@@ -1463,7 +1465,7 @@ function populateOther33() {
         'Breaker ON indication not glowing' 
       ],
 
-      'Sunlight': ['Sunlight on Breaker Chamber', 'Sunlight on Bus Chamber', 'Sunlight on CT/Cable Chamber', 'Sunlight on Bus & CT/Cable Chamber']
+      'Sunlight': ['Sunlight on Breaker Chamber', 'Sunlight on rear Bus Chamber', 'Sunlight on CT/Cable Chamber', 'Sunlight on rear Bus & CT/Cable Chamber']
     };
 
     categorySelect.innerHTML = `<option value="" disabled selected hidden></option>`;
@@ -1499,47 +1501,51 @@ btn.addEventListener('click', () => {
   if (!panelName) return alert('Enter Panel Name first');
 
   const actionsMap = {
-    'Heater is to be checked': 'Space heaters should be checked.',
-    'Heater Defective': 'Space heater was found defective. Hence, heater circuit must be checked and necessary rectification is to be taken for protection of VCB & line spouts from moisture.',
-    'Breaker Chamber Heater Defective': 'Space heater of VCB Chamber was found defective. Hence, heater circuit must be checked and necessary rectification is to be taken for protection of VCB & line spouts from moisture.',
-    'Cable Chamber Heater Defective': 'Space heater of Cable/CT Chamber was found defective. Hence, heater circuit must be checked and necessary rectification is to be taken for protection of Cable, CT & line spouts from moisture.',
-    '1 no. Heater Defective': 'One no. Space heater was found defective. Hence, heater circuit must be checked and necessary rectification is to be taken for protection of Bus & line spouts from moisture.',
-    '2 nos. Heater Defective': 'Two nos. Space heaters were found defective. Hence, heater circuits must be checked and necessary rectification is to be taken for protection of Bus & line spouts from moisture.',
-    'All Heaters defective': 'All Space heaters were found defective. Hence, heater circuits must be checked and necessary rectification is to be taken for protection of Bus & line spouts from moisture.',
-    'Heater Ckt. Short-Ckt.': 'HD circuits were found as short circuited. Necessary action is to be taken.',
-    'Heater Ammeter Defective': 'Ammeter of the Space heater was found to be defective. Necessary action to be taken to address the same.',
-    'Heater Toggle Switch Defective': 'Heater Toggle Switch was found to be Defective. Necessary action is to be taken.',
-    'Thermostat Problem': 'Problem in thermostat was noticed.  Necessary action is to be taken. Also, Heater thermostat settings must be checked and & it should be in between 40’C to 45’C.',
-    'R-Ph Ammeter Defective': 'R-Phase Ammeter was found to be defective. Necessary action to be taken.',
-    'Y-Ph Ammeter Defective': 'Y-Phase Ammeter was found to be defective. Necessary action to be taken.',
-    'B-Ph Ammeter Defective': 'B-Phase Ammeter was found to be defective. Necessary action to be taken.',
-    'All Ammeters Defective': 'All Phase Ammeters were found to be defective. Necessary action to be taken.',
-    'R-Ph Ammeter Display Problem': 'Display of R-Phase Ammeter was found to be defective. Necessary action is to be taken.',
-    'Y-Ph Ammeter Display Problem': 'Display of Y-Phase Ammeter was found to be defective. Necessary action is to be taken.',
-    'B-Ph Ammeter Display Problem': 'Display of B-Phase Ammeter was found to be defective. Necessary action is to be taken.',
-    'All Ammeters Display Problem': 'Display of All Phase Ammeters were found to be defective. Necessary action is to be taken.',
-    'Voltmeter Defective': 'Display of Voltmeter was found to be defective. Necessary action is to be taken.',
-    'Voltmeter Display Problem': 'Display of Voltmeter was found to be defective. Necessary action is to be taken.',
-    'PT Out of Circuit': 'PT was found to be out of circuit. Necessary action is to be taken.',
-    'PT Missing': 'PT was found to be missing. Necessary action is to be taken.',
-    'Relay Healthy LED not glowing': '"Relay Healthy" LED was not glowing on the O/C E/F Relay. Immediate necessary action is to be taken.',
-    'Trip Ckt. Unhealthy Indication on relay': '"Trip Ckt. Unhealthy" indication was showing on the relay. Immediate necessary action is to be taken.',
-    'Relay Display Out': 'No display was visible on the Relay. Necessary action is to be taken.',
-    'Replay Display Problem': 'Display of the O/C E/F Relay was found to be defective. Necessary action is to be taken.',
-    'HMI Key Defective': 'HMI Key of the O/C E/F Relay was found to be defective. Necessary action is to be taken.',
-    'Clear button of relay defective': 'Clear button of the O/C E/F Relay was found to be defective. Necessary action is to be taken.',
-    'Annunciator Defective': 'Annunciator was found to be defective. Necessary action is to be taken.',
-    'Trip Ckt. Unhealthy Showing': '"Trip Ckt. Unhealthy" indication was showing on the Annunciator. Immediate necessary action is to be taken.',
-    'Hooter Not working':'Hooter was found to be defective. Immediate necessary action is to be taken.',
-    'Front Door not closing properly': 'Front door of the VCB chamber is not closing properly. Immediate necessary action is to be taken.',
-    'Rear Cover not closing properly': 'Rear side cover of the panel is not closing properly. Immediate necessary action is to be taken.',
-    'TNC Switch Broken': 'TNC Switch was found to be Broken. Immediate necessary action is to be taken.',
-    'TNC Switch Defective': 'TNC Switch was found to be defective. Immediate necessary action is to be taken.',
-    'Breaker ON indication not glowing': 'Breaker "ON" indication was not glowing. Immediate necessary action is to be taken.',
-    'Sunlight on Breaker Chamber': '<b>Note:</b> The higher temp. on the breaker chamber is likely due to sunlight falling on the breaker chamber when the temperatures were measured.',
-    'Sunlight on Bus Chamber': '<b>Note:</b> The higher temp. on the bus chamber is likely due to sunlight falling on the bus chamber when the temperatures were measured.',
-    'Sunlight on CT/Cable Chamber': '<b>Note:</b> The higher temp. on the CT/Cable chamber is likely due to sunlight falling on the CT/Cable chamber when the temperatures were measured.',
-    'Sunlight on Bus & CT/Cable Chamber': '<b>Note:</b> The higher temp. on the Bus & CT/Cable chamber is likely due to sunlight falling on the Bus & CT/Cable chamber when the temperatures were measured.'
+    'No Heater found': 'No heater found. Install new heater.',    
+    'Heater is to be checked': 'Check Heaters.',
+    'Heater Defective': 'Heater def. Check & rectify.',
+    'Breaker Chamber Heater Defective': 'VCB Chamber heater def. Check & rectify.',
+    'Cable Chamber Heater Defective': 'Cable/CT Chamber heater def. Check & rectify.',
+    '1 no. Heater Defective': '01 heater def. Check & rectify.',
+    '2 nos. Heater Defective': '02 heaters def. Check & rectify.',
+    'All Heaters defective': 'All heaters def. Check & rectify.',
+    'Heater Ckt. Short-Ckt.': 'Heater circuits found short circuited. Rectify.',
+    'Heater Ammeter Defective': 'Heater Ammeter def. Rectify.',
+    'Heater Toggle Switch Defective': 'Heater Toggle Switch def. Rectify.',
+    'Thermostat Problem': 'Problem in thermostat. Rectify & set b/w 40’C to 45’C.',
+    'R-Ph Ammeter Defective': 'R-Ph Ammeter def. Rectify.',
+    'Y-Ph Ammeter Defective': 'Y-Ph Ammeter def. Rectify.',
+    'B-Ph Ammeter Defective': 'B-Ph Ammeter def. Rectify.',
+    'All Ammeters Defective': 'All Ph Ammeters Def. Rectify.',
+    'R-Ph Ammeter Display Problem': 'R-Phase Ammeter display def. Rectify.',
+    'Y-Ph Ammeter Display Problem': 'Y-Phase Ammeter display def. Rectify.',
+    'B-Ph Ammeter Display Problem': 'B-Phase Ammeter display def. Rectify.',
+    'All Ammeters Display Problem': 'All Phase Ammeter display def. Rectify.',
+    'Voltmeter Defective': 'Voltmeter def. Rectify.',
+    'Voltmeter Display Problem': 'Voltmeter display def. Rectify.',
+    'PT Out of Circuit': 'PT out of ckt. Rectify.',
+    'PT Missing': 'PT missing. Rectify.',
+    'Differential Relay Healthy LED not glowing': '"Relay Healthy" LED not glowing on O/C E/F Relay. Immediately rectify.',
+    'O/C E/F Relay Healthy LED not glowing': '"Relay Healthy" LED was not glowing on the O/C E/F Relay. Immediate necessary action is to be taken.',
+    'Trip Ckt. Unhealthy Indication on relay': '"TCS Unhealthy" on Relay. Immediately rectify.',
+    'Relay Display Out': 'Relay display out. Rectify.',
+    'Replay Display Problem': 'O/C E/F Relay display def. Rectify.',
+    'HMI Key Defective': 'O/C E/F Relay HMI Key def. Rectify.',
+    'Clear button of relay defective': 'O/C E/F Relay Clear button def. Rectify.',
+    'Differential Relay Missing': 'Differential Relay missing. Immediately install.',
+    'O/C E/F Relay Missing': 'O/C E/F Relay missing. Immediately install.',
+    'Annunciator Defective': 'Annunciator def. Rectify.',
+    'Trip Ckt. Unhealthy Showing': '"Trip Ckt. Unhealthy" showing on Annunciator. Immediately rectify.',
+    'Hooter not working':'Hooter def. Rectify.',
+    'Front Door not closing properly': 'Panel Front door not closing properly. Rectify.',
+    'Rear Cover not closing properly': 'Panel rear cover not closing properly. Rectify.',
+    'TNC Switch Broken': 'TNC Switch broken. Immediately rectify.',
+    'TNC Switch Defective': 'TNC Switch def. Immediately rectify.',
+    'Breaker ON indication not glowing': 'Breaker ON indication not glowing. Immediately rectify.',
+    'Sunlight on Breaker Chamber': '<b>Note:</b>sunlight on VCB.',
+    'Sunlight on rear Bus Chamber': '<b>Note:</b>sunlight on rear bus.',
+    'Sunlight on CT/Cable Chamber': '<b>Note:</b>sunlight on CT/Cable chamber.',
+    'Sunlight on rear Bus & CT/Cable Chamber': '<b>Note:</b>sunlight on rear Bus & CT/Cable chamber.'
 
 
   };
@@ -1713,17 +1719,16 @@ otherSection.querySelectorAll('.sub-tab-btn').forEach(btn => {
     // mark panel rows for Word CSS
     tr.classList.add(is11KV ? 'kv-11' : 'kv-33');
 
-    const values = [
-      r.index + 1,
-      r.cells[1].querySelector('input').value,
-      r.cells[2].querySelector('select').value,
-      r.cells[3].querySelector('input').value
-    ];
-    values.forEach(txt => {
-      const td = document.createElement('td');
-      td.textContent = txt;
-      tr.appendChild(td);
-    });
+const values = [
+  r.index + 1,
+  r.cells[1].querySelector('input').value,
+  r.cells[2].querySelector('select').value
+];
+values.forEach(txt => {
+  const td = document.createElement('td');
+  td.textContent = txt;
+  tr.appendChild(td);
+});
 
     const tableId = is11KV ? '11' : '33';
 
@@ -1750,6 +1755,15 @@ document.querySelectorAll('#liveTable tbody td').forEach(td => {
 
   tr.appendChild(td);
 });
+
+
+
+const loadTd = document.createElement('td');
+loadTd.textContent = r.cells[3].querySelector('input').value || '---';
+tr.appendChild(loadTd);
+
+
+
 
 
     const tempRows = document.querySelectorAll(`#tableTemp${tableId} tbody tr`);
@@ -1805,16 +1819,16 @@ if (tempRow) {
   const b2Val = tempRow.cells[6].querySelector('input[type="number"]').value;
 
   if (f1H) {
-    actions.push("Hotspot has been detected at VCB chamber of the panel. Necessary checking of breaker Male-Female contact points are to be done. Proper tightening of breaker spout contacts and all other junction points must be carried out. IR value of VIs must also be checked.");
+    actions.push("HS at VCB. Check M-F contact. Tighten brkr. spouts, other junctions. Check IR of VI.");
   }
   if (b1H && !b2Val) {
-    actions.push("Hotspot has been detected at rear Bus Section/CT/Cable chamber. Thus, necessary checking bus contact point, bus spout & bus support insulator must be checked and tightened . Also, all the CT/cable contact points & nut bolts of CT/Cable Chamber are needed to be tightened. Thorough Cleaning & maintenance of the said CT/cable chambers also should be done.");
+    actions.push("HS at rear Bus Sec/CT/Cable chamber. Check/tighten bus cont. point, bus spout, bus support insulators, CT/Cable cont. points & nutbolts. Do cleaning & maintenance.");
   }
   if (b1H && b2Val) {
-    actions.push("Hotspot has been detected at rear Bus section of the panel. Necessary checking bus contact point, bus spout & bus support insulator must be checked and tightened.");
+    actions.push("HS at rear bus sec. Check/tighten bus contacts, spouts & support inslrs.");
   }
   if (b2H) {
-    actions.push("Hotspot has been detected at CT/Cable chamber. All the CT/cable contact points & nut bolts of CT/Cable Chamber are needed to be tightened. Thorough Cleaning & maintenance of the said CT/cable chambers also should be done.");
+    actions.push("HS at CT/Cable chamber. Tighten CT/Cable contact points & nutbolts. Do cleaning & maintenance.");
   }
 // ── Add S1/S2 and PT “H” logic ──
 const s12H = tempRow.cells[7]
@@ -1822,7 +1836,7 @@ const s12H = tempRow.cells[7]
                  .checked;
 if (s12H) {
   actions.push(
-    "Hotspot has been detected at side bus section. Thorough checking of bus chambers, bus spouts and bus support insulators should be done. Cleaning & maintenance of the bus chamber also should be done. Further, Male-female contact point between Bus & VCB of the adjacent panel is also to be checked."
+    "HS at side bus sec. Check bus chambers, bus spouts & bus support insulators. Do Bus Cleaning & maintenance. Check M-F contacts b/w Bus & VCB of the adjacent panel. "
   );
 }
 
@@ -1831,7 +1845,7 @@ const ptH = tempRow.cells[8]
                .checked;
 if (ptH) {
   actions.push(
-    "Hotspot has been detected at PT chamber of the panel. Necessary maintenance of the said PT chamber including fixed and moving parts is to be done. Tightness of all PT terminals, lugs and busbar connections are to be checked."
+    "HS at PT. Do PT maintenance. Check all PT terminals, lugs & busbar connections."
   );
 }
 
@@ -1849,32 +1863,32 @@ if (usRow) {
   const tempB2Val = tempRow?.cells[6].querySelector('input[type="number"]')?.value;
 
   if (f1Val) {
-    actions.push("Partial Discharge as noted, was found on the VCB chamber of the panel. Thus, maintenance, cleaning of the said VCB chambers as well as checking of breaker alignment and Insulation Measurement of the VI must be done.");
+    actions.push("PD at VCB. Do cleaning & maintenance. Check breaker alignment. Check IR of VI.");
   }
 
   if (b1Val && b2Val) {
-    actions.push("Partial Discharge as noted, was found on the rear side of Bus Section of the panel. Thus, thorough checking of bus chambers, bus spouts and bus support insulators of these panels should be done. Cleaning & maintenance of the said bus chambers also should be done.");
-    actions.push("Partial Discharge as noted, was found on the rear side of CT/Cable Chamber of the panel. Thus, thorough maintenance of the CT/Cable chamber should be done. Bus & CT spouts are to be checked. Electrical clearance of cable lead between phases and phase to earth to be checked.");
+    actions.push("PD at rear Bus Sec. Check bus chambers, bus spouts & bus support insulators. Do Cleaning & maintenance.");
+    actions.push("PD at CT/Cable Chamber. Do CT/Cable chamber maintenance. Check Bus & CT spouts. Check cable lead clearance b/w ph and ph-earth.");
   } 
 
   else if (b1Val && !tempB2Val) {
-    actions.push("Partial Discharge as noted, was found on the rear side of Bus Section/CT/Cable Chamber of the panel. Thus, thorough checking of bus chambers, bus spouts and bus support insulators of these panels should be done. Cleaning & maintenance of the said bus chambers also should be done. Also, thorough maintenance of the CT/Cable chamber should be done. Bus & CT spouts are to be checked. Electrical clearance of cable lead between phases and phase to earth to be checked.");
+    actions.push("PD at rear side of Bus Sec/CT/Cable Chamber. Do Cleaning & maintenance of Bus, CT/Cable Chamber.  Check Bus & CT spouts. Check cable lead clearance b/w ph and ph-earth.");
   }  
 
   else if (b1Val && tempB2Val && !b2Val) {
-    actions.push("Partial Discharge as noted, was found on the rear side of Bus Section of the panel. Thus, thorough checking of bus chambers, bus spouts and bus support insulators of these panels should be done. Cleaning & maintenance of the said bus chambers also should be done.");
+    actions.push("PD at rear Bus Section. Check bus chambers, bus spouts & bus support insulators. Do Cleaning & maintenance.");
   }  
   
   else if (!b1Val && b2Val) {
-    actions.push("Partial Discharge as noted, was found on the rear side of CT/Cable Chamber of the panel. Thus, thorough maintenance of the CT/Cable chamber should be done. Bus & CT spouts are to be checked. Electrical clearance of cable lead between phases and phase to earth to be checked.");
+    actions.push("PD at CT/Cable Chamber. Do CT/Cable chamber maintenance. Check Bus & CT spouts. Check cable lead clearance b/w ph and ph-earth.");
   }
 
   if (ptVal) {
-    actions.push("Partial Discharge as noted, was found on the PT chamber of the panel. Maintenance of the said PT chamber including fixed and moving parts is to be done. Checking of PT alignment must also to be done.");
+    actions.push("PD at PT. Do PT maintenance. Check PT alignment.");
   }
 
   if (s1Val || s2Val) {
-    actions.push("Partial Discharge as noted, was found on the side Bus Section of the panel. Thus, maintenance of side bus section is be done.");
+    actions.push("PD at Side Bus Section. Do Side Bus Section maintenance.");
   }
 
 
@@ -2371,11 +2385,11 @@ const crpIssueOptions = {
   ],
   'Voltmeter': ['Voltmeter Defective','Voltmeter Display Problem'],
   'Relay': [
-    'Diffrential Relay Healthy LED not glowing','O/C E/F Relay Healthy LED not gowing',
+    'Differential Relay Healthy LED not glowing','O/C E/F Relay Healthy LED not glowing',
     'Trip Ckt. Unhealthy Indication on relay',
     'Differential Relay Display Out', 'O/C E/F Relay Display Out', 'Differential Relay Display Problem', 'O/C E/F Relay Display Problem',
     'Differential Relay HMI Key Defective','O/C E/F Relay HMI Key Defective','Clear button of Differential Relay defective','Clear button of O/C E/F Relay defective',
-    'O/C E/F Relay Missing'
+    'Differential Relay Missing', 'O/C E/F Relay Missing'
   ],
   'Annunciator': ['Annunciator Defective','Trip Ckt. Unhealthy Showing','Hooter not working'],
   'Panel': ['TNC Switch Broken','TNC Switch Defective','Breaker ON indication not glowing']
@@ -2446,7 +2460,7 @@ document.getElementById('addCRPBtn').addEventListener('click', () => {
     actionText = `Display Problem was noticed on the Voltmeter of the ${ptr} CRP. Necessary action is to be taken.`;
     break;
 
-  // Relay LEDs & Display
+  // Relay 
   case 'Differential Relay Healthy LED not glowing':
     actionText = `"Relay Healthy" LED of the Differential Relay is not glowing on the ${ptr} CRP. Immediate necessary action is to be taken.`;
     break;
@@ -2484,6 +2498,9 @@ document.getElementById('addCRPBtn').addEventListener('click', () => {
     break;
 
   // Missing relay
+  case 'Differential Relay Missing':
+    actionText = `Differential Relay was found to be missing on the ${ptr} CRP. Immediate necessary action is to be taken.`;
+    break;
   case 'O/C E/F Relay Missing':
     actionText = `O/C E/F Relay was found to be missing on the ${ptr} CRP. Immediate necessary action is to be taken.`;
     break;
@@ -2506,7 +2523,7 @@ document.getElementById('addCRPBtn').addEventListener('click', () => {
   case 'TNC Switch Defective':
     actionText = `TNC Switch of the ${ptr} CRP was found to be defective. Immediate necessary action is to be taken.`;
     break;
-  case '"Breaker ON" indication not glowing':
+  case 'Breaker ON indication not glowing':
     actionText = `"Breaker ON indication was not glowing of the ${ptr} CRP. Immediate necessary action is to be taken.`;
     break;
 
@@ -2768,6 +2785,12 @@ rtccSelect.addEventListener('change', () => {
        break;
      case 'RWTI Open':
        actionText = `RWTI of the ${rtcc} was found to be OPEN. Necessary action is to be taken.`;
+       break;
+     case 'ROTI Defective':
+       actionText = `ROTI of the ${rtcc} was found to be defective. Necessary action is to be taken.`;
+       break;
+     case 'RWTI Defective':
+       actionText = `RWTI of the ${rtcc} was found to be defective. Necessary action is to be taken.`;
        break;
      case 'ROTI Display Defective':
        actionText = `Display of ROTI of the ${rtcc} was found to be defective. Necessary action is to be taken.`;
@@ -3115,6 +3138,380 @@ document.getElementById('downloadPdfBtn').addEventListener('click', () => {
     document.head.removeChild(pdfStyle);
   });
 });
+// ── DOWNLOAD EXCEL FUNCTION FOR LIVE TABLE ──
+document.getElementById('downloadExcelBtn').addEventListener('click', function () {
+  const table = document.getElementById('liveTable');
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.table_to_sheet(table);
+
+const range = XLSX.utils.decode_range(ws['!ref']);
+for (let R = range.s.r; R <= range.e.r; ++R) {
+  for (let C = range.s.c; C <= range.e.c; ++C) {
+    const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+    const cell = ws[cellRef];
+    if (cell && typeof cell.v === 'string' && cell.v.trim() === '---') {
+      cell.v = '';
+      cell.w = '';
+    }
+  }
+}
+
+
+const oldLastCol = range.e.c;
+const actionCol = oldLastCol;
+
+
+function splitActionIntoColumns(text) {
+  const limits = [250, 250, 1000];
+  const parts = ['', '', ''];
+
+  const bullets = text.includes('•')
+    ? text.split(/(?=•\s)/).map(s => s.trim()).filter(Boolean)
+    : [text];
+
+  let col = 0;
+
+  bullets.forEach(bullet => {
+    if (col > 2) {
+      parts[2] += (parts[2] ? ' ' : '') + bullet;
+      return;
+    }
+
+    if (!parts[col]) {
+      parts[col] = bullet;
+      return;
+    }
+
+    if ((parts[col] + ' ' + bullet).length <= limits[col]) {
+      parts[col] += ' ' + bullet;
+      return;
+    }
+
+    col++;
+
+    if (col > 2) {
+      parts[2] += (parts[2] ? ' ' : '') + bullet;
+    } else {
+      parts[col] = bullet;
+    }
+  });
+
+  return parts;
+}
+
+
+// Split Action to be Taken into 3 columns, max 250 chars each, no new lines
+for (let R = range.s.r; R <= range.e.r; ++R) {
+  const actionRef = XLSX.utils.encode_cell({ r: R, c: actionCol });
+  const actionCell = ws[actionRef];
+
+  let text = actionCell && actionCell.v != null ? String(actionCell.v) : '';
+  text = text.replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').trim();
+
+
+text = text
+  .replace(/(^|\s+|\.)(?:i{1,3}|iv|v|vi{0,3}|ix|x|\d+)\.\s*/g, '$1• ')
+  .replace(/\.•/g, '. •')
+  .replace(/\s*•\s*/g, ' • ')
+  .replace(/^ • /, '• ')
+  .trim();
+
+
+
+  let part1 = '';
+  let part2 = '';
+  let part3 = '';
+
+  // First header row
+  if (R === range.s.r) {
+    part1 = 'Action to be Taken 1';
+    part2 = 'Action to be Taken 2';
+    part3 = 'Action to be Taken 3';
+  }
+  // Second header row under merged header should remain blank
+  else if (R === range.s.r + 1) {
+    part1 = '';
+    part2 = '';
+    part3 = '';
+  }
+  // Data rows
+  else if (text) {
+    part1 = text.slice(0, 250);
+    part2 = text.slice(250, 500);
+    part3 = text.slice(500, 1500);
+
+const smartParts = splitActionIntoColumns(text);
+part1 = smartParts[0];
+part2 = smartParts[1];
+part3 = smartParts[2];
+
+
+  }
+
+  ws[actionRef] = { t: 's', v: part1 };
+
+  ws[XLSX.utils.encode_cell({ r: R, c: actionCol + 1 })] = { t: 's', v: part2 };
+  ws[XLSX.utils.encode_cell({ r: R, c: actionCol + 2 })] = { t: 's', v: part3 };
+}
+
+// Extend only full-width horizontal merges up to the new last column
+if (ws['!merges']) {
+  ws['!merges'].forEach(m => {
+    if (m.s.c < m.e.c && m.e.c === oldLastCol) {
+      m.e.c = oldLastCol + 2;
+    }
+  });
+}
+
+range.e.c = oldLastCol + 2;
+ws['!ref'] = XLSX.utils.encode_range(range);
+
+
+const allRows = XLSX.utils.sheet_to_json(ws, {
+  header: 1,
+  raw: false,
+  defval: ''
+});
+
+const normalize = (v) => String(v || '').replace(/\s+/g, ' ').trim();
+
+const headerRows = allRows.slice(0, 2);
+const idx11 = allRows.findIndex(r => normalize(r[0]) === '11KV Panels');
+const idx33 = allRows.findIndex(r => normalize(r[0]) === '33KV Panels');
+const idxObs = allRows.findIndex(
+  r => normalize(r[0]) === 'Observations of Battery & Battery Charger/33KV CRP/RTCC Panels/Other General Observations'
+);
+
+function buildSectionSheet(startIdx, endIdx) {
+  const rows = headerRows.map(r => [...r]);
+
+  if (startIdx !== -1) {
+    for (let i = startIdx; i < endIdx; i++) {
+      rows.push([...(allRows[i] || [])]);
+    }
+  }
+
+  return XLSX.utils.aoa_to_sheet(rows);
+}
+
+const end11 = idx33 !== -1 ? idx33 : (idxObs !== -1 ? idxObs : allRows.length);
+const end33 = idxObs !== -1 ? idxObs : allRows.length;
+
+const ws11 = buildSectionSheet(idx11, end11);
+const ws33 = buildSectionSheet(idx33, end33);
+const wsObs = buildSectionSheet(idxObs, allRows.length);
+
+
+function removeTopRows(ws, count) {
+  const data = XLSX.utils.sheet_to_json(ws, {
+    header: 1,
+    raw: false,
+    defval: ''
+  });
+
+  const cleaned = data.slice(count);
+
+  const newWs = XLSX.utils.aoa_to_sheet(cleaned.length ? cleaned : [[]]);
+
+  Object.keys(ws).forEach(key => delete ws[key]);
+  Object.assign(ws, newWs);
+}
+
+// Remove all header rows from each sheet
+removeTopRows(ws11, 3);
+removeTopRows(ws33, 3);
+removeTopRows(wsObs, 3);
+
+
+function removeFirstColumn(ws) {
+  const data = XLSX.utils.sheet_to_json(ws, {
+    header: 1,
+    raw: false,
+    defval: ''
+  });
+
+  const cleaned = data.map(row => row.slice(1));
+  const newWs = XLSX.utils.aoa_to_sheet(cleaned.length ? cleaned : [[]]);
+
+  Object.keys(ws).forEach(key => delete ws[key]);
+  Object.assign(ws, newWs);
+}
+
+removeFirstColumn(ws11);
+removeFirstColumn(ws33);
+removeFirstColumn(wsObs);
+
+
+
+function applySingleBorder(ws) {
+  if (!ws['!ref']) return;
+
+  const range = XLSX.utils.decode_range(ws['!ref']);
+
+  for (let R = range.s.r; R <= range.e.r; ++R) {
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+
+      if (!ws[cellRef]) {
+        ws[cellRef] = { t: 's', v: '' };
+      }
+
+      ws[cellRef].s = ws[cellRef].s || {};
+      ws[cellRef].s.border = {
+        top:    { style: 'thin', color: { rgb: '000000' } },
+        bottom: { style: 'thin', color: { rgb: '000000' } },
+        left:   { style: 'thin', color: { rgb: '000000' } },
+        right:  { style: 'thin', color: { rgb: '000000' } }
+      };
+    }
+  }
+}
+
+applySingleBorder(ws11);
+applySingleBorder(ws33);
+applySingleBorder(wsObs);
+
+
+function formatPanelSheet(ws) {
+  if (!ws['!ref']) return;
+
+  const range = XLSX.utils.decode_range(ws['!ref']);
+
+  // After removing Sl. No. column, Action columns become:
+  // 20 = Action to be Taken 1
+  // 21 = Action to be Taken 2
+  // 22 = Action to be Taken 3
+  const actionCols = [20, 21, 22];
+
+  for (let R = range.s.r; R <= range.e.r; ++R) {
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+
+      if (!ws[cellRef]) {
+        ws[cellRef] = { t: 's', v: '' };
+      }
+
+      ws[cellRef].s = ws[cellRef].s || {};
+
+      // Center align every cell
+      ws[cellRef].s.alignment = {
+        horizontal: 'center',
+        vertical: 'center'
+      };
+
+      // Action columns: wrap text + font size 6
+      if (actionCols.includes(C)) {
+        ws[cellRef].s.alignment = {
+          horizontal: 'center',
+          vertical: 'center',
+          wrapText: true
+        };
+        ws[cellRef].s.font = {
+          sz: 6
+        };
+      }
+    }
+  }
+}
+
+formatPanelSheet(ws11);
+formatPanelSheet(ws33);
+
+function applyRowFillColor(ws, color) {
+  if (!ws['!ref']) return;
+
+  const range = XLSX.utils.decode_range(ws['!ref']);
+
+  for (let R = range.s.r; R <= range.e.r; ++R) {
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+
+      if (!ws[cellRef]) {
+        ws[cellRef] = { t: 's', v: '' };
+      }
+
+      ws[cellRef].s = ws[cellRef].s || {};
+      ws[cellRef].s.fill = {
+        patternType: 'solid',
+        fgColor: { rgb: 'DCE6F2' }
+      };
+    }
+  }
+}
+
+applyRowFillColor(ws11, 'DCE6F2');
+applyRowFillColor(ws33, 'DCE6F2');
+applyRowFillColor(wsObs, 'DCE6F2');
+
+
+
+
+function highlightLongAction3(ws) {
+  if (!ws['!ref']) return;
+
+  const range = XLSX.utils.decode_range(ws['!ref']);
+
+  for (let R = range.s.r; R <= range.e.r; ++R) {
+    const cellRef = XLSX.utils.encode_cell({ r: R, c: 22 }); // 3rd Action column
+    const cell = ws[cellRef];
+
+    if (cell && typeof cell.v === 'string' && cell.v.length > 250) {
+      cell.s = cell.s || {};
+      cell.s.fill = {
+        patternType: 'solid',
+        fgColor: { rgb: 'FF0000' }
+      };
+    }
+  }
+}
+
+highlightLongAction3(ws11);
+highlightLongAction3(ws33);
+
+
+function keepOnlySecondColumn(ws) {
+  const data = XLSX.utils.sheet_to_json(ws, {
+    header: 1,
+    raw: false,
+    defval: ''
+  });
+
+  const cleaned = data.map(row => [row[1] || '']);
+  const newWs = XLSX.utils.aoa_to_sheet(cleaned.length ? cleaned : [[]]);
+
+  Object.keys(ws).forEach(key => delete ws[key]);
+  Object.assign(ws, newWs);
+}
+
+keepOnlySecondColumn(wsObs);
+
+// Re-apply border and fill after rebuilding the sheet
+applySingleBorder(wsObs);
+applyRowFillColor(wsObs, 'DCE6F2');
+
+
+
+
+XLSX.utils.book_append_sheet(wb, ws11, '11KV Panels');
+XLSX.utils.book_append_sheet(wb, ws33, '33KV Panels');
+XLSX.utils.book_append_sheet(wb, wsObs, 'Battery Batt Charger RTCC Other');
+
+
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Control Room');
+
+
+delete wb.Sheets['Control Room'];
+wb.SheetNames = wb.SheetNames.filter(name => name !== 'Control Room');
+
+  const substation = localStorage.getItem('selectedSubstation') || 'Substation';
+  const date = localStorage.getItem('inspectionDate') || new Date().toISOString().split('T')[0];
+  const fileName = `${substation}_${date}.xlsx`;
+
+  XLSX.writeFile(wb, fileName, { cellStyles: true });
+});
+
+
 
 
 
