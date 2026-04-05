@@ -1148,6 +1148,10 @@ addBtn.onclick = () => {
     selPhase.add(new Option('-- Select Phase --','',true,true));
     ['R-Phase','Y-Phase','B-Phase'].forEach(o => selPhase.add(new Option(o,o)));
 
+
+
+const addBtn = document.createElement('button');
+
     // Add handler (uses manualLoc when 'Other' is selected)
     	
     addBtn.textContent = 'Add';
@@ -1162,14 +1166,77 @@ addBtn.onclick = () => {
       }
 
       const entry = `${loc} ${selPhase.value}`;
+
+
+// ADD BELOW: const entry = `${loc} ${selPhase.value}`;
+const existingRow = liveData.find(r => {
+  if (r.equipment !== '33KV PT') return false;
+  if (r.tag === title) return true;
+  if (typeof r.action !== 'string') return false;
+
+  if (title === 'Oil Leakages' && /Oil Leakage/i.test(r.action)) return true;
+  if (title === 'PT Missing' && /found to be missing/i.test(r.action)) return true;
+  if (title === 'PT Out of Ckt.' && /found to be out of circuit/i.test(r.action)) return true;
+
+  return false;
+});
+
+if (existingRow) {
+  if (Array.isArray(existingRow.entries) && existingRow.entries.length) {
+    existingRow.entries.forEach(v => cfg.entries.add(v));
+  } else if (typeof existingRow.action === 'string') {
+    let listPart = '';
+
+    if (title === 'Oil Leakages') {
+      const m = existingRow.action.match(/from (.+?) ---/i);
+      if (m) listPart = m[1];
+    } else if (title === 'PT Missing' || title === 'PT Out of Ckt.') {
+      const m = existingRow.action.match(/^(.+?) (?:was|were) found/i);
+      if (m) listPart = m[1];
+    }
+
+    if (listPart) {
+      listPart
+        .replace(/\s*&\s*/g, ', ')
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean)
+        .forEach(v => cfg.entries.add(v));
+    }
+  }
+}
+
+
+
+
       cfg.entries.add(entry);
 
       // Replace prior sentence of same tag
       liveData = liveData.filter(r => !(r.equipment==='33KV PT' && r.tag===title));
 
+
+
+// ADD BELOW: liveData = liveData.filter(r => !(r.equipment==='33KV PT' && r.tag===title));
+liveData = liveData.filter(r => {
+  if (r.equipment !== '33KV PT') return true;
+
+  if (!r.tag && typeof r.action === 'string') {
+    if (title === 'Oil Leakages' && /Oil Leakage/i.test(r.action)) return false;
+    if (title === 'PT Missing' && /found to be missing/i.test(r.action)) return false;
+    if (title === 'PT Out of Ckt.' && /found to be out of circuit/i.test(r.action)) return false;
+  }
+
+  return true;
+});
+
+
+
       const arr  = Array.from(cfg.entries);
       const text = arr.length > 1 ? cfg.textMulti(arr) : cfg.textSingle(arr[0]);
       liveData.push({ equipment: '33KV PT', action: text, manual: false, tag: title, order: cfg.order });
+
+
+liveData[liveData.length - 1].entries = arr;
 
       // Keep only 33KV PT rows ordered
       const ptGroup = liveData.filter(r => r.equipment==='33KV PT').sort((a,b)=>a.order-b.order);
@@ -1616,6 +1683,35 @@ else if (equip === 'Other') {
   wrapper.className = 'form-container';
 
   // ─── Rusted Structure section ───────────────────────────────────────────
+
+
+const existingRustRow = liveData.find(r =>
+  r.equipment === 'Rusted Structures' &&
+  (
+    r.tag === 'Rusted Structure' ||
+    (typeof r.action === 'string' && /Rust formation(?:s)? on .+? at switchyard/i.test(r.action))
+  )
+);
+
+if (existingRustRow) {
+  rustedSet.clear();
+
+  if (Array.isArray(existingRustRow.entries) && existingRustRow.entries.length) {
+    existingRustRow.entries.forEach(v => rustedSet.add(v));
+  } else if (typeof existingRustRow.action === 'string') {
+    const m = existingRustRow.action.match(/Rust formation(?:s)? on (.+?) at switchyard/i);
+    if (m && m[1]) {
+      m[1]
+        .replace(/\s*&\s*/g, ', ')
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean)
+        .forEach(v => rustedSet.add(v));
+    }
+  }
+}
+
+
   const secRust = document.createElement('div');
   secRust.className = 'form-section';
   secRust.innerHTML = '<h3>Rusted Structure</h3>';
@@ -1635,6 +1731,15 @@ else if (equip === 'Other') {
         liveData = liveData.filter(r =>
           !(r.equipment==='Rusted Structures' && r.tag==='Rusted Structure')
         );
+
+
+liveData = liveData.filter(r => {
+  if (r.equipment !== 'Rusted Structures') return true;
+  if (r.tag === 'Rusted Structure') return false;
+  if (!r.tag && typeof r.action === 'string' && /Rust formation(?:s)? on .+? at switchyard/i.test(r.action)) return false;
+  return true;
+});
+
         if (rustedSet.size) {
           const arr   = Array.from(rustedSet);
           const multi = arr.length > 1;
@@ -1651,6 +1756,11 @@ else if (equip === 'Other') {
             tag:        'Rusted Structure',
             order:      1
           });
+
+liveData[liveData.length - 1].entries = arr;
+
+liveData[liveData.length - 1].entries = Array.from(rustedSet);
+
         }
         renderLive();
         localStorage.setItem('visualFindings', JSON.stringify(liveData));
@@ -1673,6 +1783,16 @@ else if (equip === 'Other') {
     liveData = liveData.filter(r =>
       !(r.equipment==='Rusted Structures' && r.tag==='Rusted Structure')
     );
+
+
+liveData = liveData.filter(r => {
+  if (r.equipment !== 'Rusted Structures') return true;
+  if (r.tag === 'Rusted Structure') return false;
+  if (!r.tag && typeof r.action === 'string' && /Rust formation(?:s)? on .+? at switchyard/i.test(r.action)) return false;
+  return true;
+});
+
+
     const arr   = Array.from(rustedSet);
     const multi = arr.length > 1;
     const last  = arr.pop();
@@ -1688,6 +1808,11 @@ else if (equip === 'Other') {
       tag:        'Rusted Structure',
       order:      1
     });
+
+liveData[liveData.length - 1].entries = arr;
+
+liveData[liveData.length - 1].entries = Array.from(rustedSet);
+
     renderLive();
     localStorage.setItem('visualFindings', JSON.stringify(liveData));
   };
@@ -1857,7 +1982,7 @@ else if (equip === 'Other') {
     if (cbPD.checked) {
       liveData.push({
         equipment: 'Huge PD from Pin Insulators',
-        action:    'Huge Discharges were observed from most of the 33KV Pin Insulators as noted above. Due to such severe discharge from the pin insulators, precise measurement of the ultrasonic discharges from the other important equipment could not be done. Hence, immediate necessary action is to be taken as noted above so that precise measurement of the ultrasonic discharges from other equipments can be done in the next visit of Condition Monitoring team.',
+        action:    'Huge PD observed from most of the 33KV Pins. Due to such severe discharge from pin, precise measurement of PD from the other imp equip could not be done. Rectify the same immediately & call for re-checking to get accurate PD from other imp equip.',
         manual:    false,
         order:     5
       });
@@ -2067,7 +2192,7 @@ function otherDesc(val){
     'Broken OLTC Breather Oil Pot':'Oil pot of the OLTC conservator tank breather was found broken. Appropriate action to be taken.',
     'M. Tank Breather Oil Pot Missing':'Oil pot of the Main Tank conservator tank breather was found missing. Appropriate action to be taken.',
     'OLTC Breather Oil Pot Missing':'Oil pot of the OLTC conservator tank breather was found missing. Appropriate action to be taken.',
-    'OTI >WTI':'OTI temperature has found higher than WTI temperature. So, proper checking of thermal image sensor against their respective pocket is to be done. If found ok, then cleaning of OTI/WTI thermal image sensor is to be done and also, WTI & OTI pockets to be filled with transformer oil. Calibration test of OTI & WTI may also be done.',
+    'OTI >WTI':'OTI temperature was found higher than WTI temperature. So, check whether thermal image sensors are placed correctly in their respective pockets. Clean OTI/WTI thermal image sensors. Fill WTI & OTI pockets with transformer oil.',
     'OTI=WTI':'OTI temperature has been found same as WTI temperature. So, cleaning of OTI/WTI thermal image sensor is to be done and also, WTI & OTI pockets to be filled with transformer oil. Calibration test of OTI & WTI may also be done.',
     'OTI Def.':'OTI was found to be defective. Appropriate action to be taken.',
     'WTI Def.':'WTI was found to be defective. Appropriate action to be taken.',
@@ -2330,7 +2455,39 @@ function getFormattedDate() {
 
 
 // Export functions 
-function exportExcel() {
+async function exportExcel() {
+  // Load style-capable XLSX only when needed
+  async function getStyledXLSX() {
+    if (window.XLSX && window.XLSX.style_version) {
+      return window.XLSX;
+    }
+
+    await new Promise((resolve, reject) => {
+      const existing = document.querySelector('script[data-xlsx-style="1"]');
+      if (existing) {
+        existing.addEventListener('load', () => resolve(), { once: true });
+        existing.addEventListener('error', () => reject(new Error('Failed to load xlsx-js-style')), { once: true });
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';
+      script.async = true;
+      script.setAttribute('data-xlsx-style', '1');
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load xlsx-js-style'));
+      document.head.appendChild(script);
+    });
+
+    if (!window.XLSX) {
+      throw new Error('Styled XLSX library not available');
+    }
+
+    return window.XLSX;
+  }
+
+  const XLSX = await getStyledXLSX();
+
   const priorities = [
     ...ptrList,
     ...otherList.filter(e => e !== 'Other'),
@@ -2343,7 +2500,6 @@ function exportExcel() {
     'Other'
   ];
 
-  // ❌ Removed Sl. No. column
   const rows = [];
 
   priorities.forEach(equipKey => {
@@ -2353,7 +2509,8 @@ function exportExcel() {
       group = group.sort((a, b) => {
         const ma = a.manual ? 1 : 0, mb = b.manual ? 1 : 0;
         if (ma !== mb) return ma - mb;
-        const oa = a.action.startsWith('Oil Leakage'), ob = b.action.startsWith('Oil Leakage');
+        const oa = a.action.startsWith('Oil Leakage');
+        const ob = b.action.startsWith('Oil Leakage');
         if (oa !== ob) return oa ? -1 : 1;
         return 0;
       });
@@ -2372,11 +2529,52 @@ function exportExcel() {
     });
   });
 
-  if (rows.length === 1) {
+  if (rows.length === 0) {
     rows.push(['', 'No data yet.']);
   }
 
   const ws = XLSX.utils.aoa_to_sheet(rows);
+
+  // Fixed column widths
+  ws['!cols'] = [
+    { wch: 25 },
+    { wch: 125 }
+  ];
+
+  const baseStyle = {
+    alignment: {
+      wrapText: true,
+      vertical: 'top'
+    },
+    border: {
+      top:    { style: 'thin', color: { rgb: '000000' } },
+      bottom: { style: 'thin', color: { rgb: '000000' } },
+      left:   { style: 'thin', color: { rgb: '000000' } },
+      right:  { style: 'thin', color: { rgb: '000000' } }
+    }
+  };
+
+  if (ws['!ref']) {
+    const range = XLSX.utils.decode_range(ws['!ref']);
+
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+        if (!ws[cellRef]) continue;
+
+        const cellText = ws[cellRef].v == null ? '' : String(ws[cellRef].v);
+        const isOver250 = cellText.length > 250;
+
+        ws[cellRef].s = {
+          ...baseStyle,
+          fill: {
+            fgColor: { rgb: isOver250 ? 'FF0000' : 'DCE6F2' }
+          }
+        };
+      }
+    }
+  }
+
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Findings');
 
