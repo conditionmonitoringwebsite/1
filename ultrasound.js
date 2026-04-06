@@ -38,27 +38,27 @@ const prompt2Maps = {
   actionTemplates: {
     '33KV CT': {
       'Corona':                      'Necessary action to be taken care of towards cleaning, maintenance and oil checking of the said CT.',
-      'Destructive Corona':          'Oil checking as well as necessary cleaning and maintenance of this CT should be done. Necessary checking of tightness of the said CT secondary wires is also required.',
+      'Destructive Corona':          'Oil checking, cleaning and maintenance of this CT should be done. Check tightness of the said CT secondary wires.',
       'Mild Tracking':               'Necessary action to be taken care of towards cleaning, maintenance and oil checking of the said CT.',
-      'Tracking':                    'Necessary cleaning and maintenance are required. Insulation resistance in between CT primary to earth and primary to secondary by 5 kV megger and CT secondary to earth by 500 V megger are to be measured and if low, appropriate action taken.',
+      'Tracking':                    'Necessary cleaning and maintenance are required. Measure IR between CT primary-earth and primary-secondary by 5 kV IR Tester and CT secondary-earth by 500 V IR Tester and if low, appropriate action taken.',
       'Corona with Mild Tracking':   'Necessary action to be taken care of towards cleaning, maintenance and oil checking of the said CT.',
-      'Corona with Tracking':        'Necessary action to be taken care of towards cleaning, maintenance and oil checking of the said CT. Also, Insulation resistance in between CT primary to earth and Primary to secondary by 5KV megger and CT secondary to earth by 500Volt megger are to be measured and if found low then appropriate action is to be taken.',
-      'Destructive Corona with Tracking': 'Oil checking as well as necessary cleaning and maintenance of this CT should be done. Necessary checking of tightness of the said CT secondary wires is also required. Also perform IR checks as above and take action if low.Insulation resistance in between CT primary to earth and Primary to secondary by 5KV megger and CT secondary to earth by 500Volt megger are to be measured and if found low then appropriate action is to be taken.',
-      'Severe Tracking':             'Necessary cleaning and maintenance are required. Insulation resistance in between CT primary to earth and Primary to secondary by 5KV megger and CT secondary to earth by 500Volt megger are to be measured and if found low then the CT is to be replaced.',
-      'Corona with Severe Tracking': 'Necessary cleaning, maintenance and oil checking of the said CT. Insulation resistance in between CT primary to earth and Primary to secondary by 5KV megger and CT secondary to earth by 500Volt megger are to be measured and if found low then the CT is to be replaced.',
+      'Corona with Tracking':        'Perform cleaning, maintenance and oil checking of the CT. Also, measure IR between CT primary-earth and primary-secondary by 5 kV IR Tester and CT secondary-earth by 500 V IR Tester and if low, appropriate action taken.',
+      'Destructive Corona with Tracking': 'Perform cleaning, maintenance and oil checking of the CT. Also, measure IR between CT primary-earth and primary-secondary by 5 kV IR Tester and CT secondary-earth by 500 V IR Tester and if low, appropriate action taken.',
+      'Severe Tracking':             'Perform cleaning, maintenance and oil checking of the CT. Also, measure IR between CT primary-earth and primary-secondary by 5 kV IR Tester and CT secondary-earth by 500 V IR Tester and if low, then the CT is to be sent for reconditioning.',
+      'Corona with Severe Tracking': 'Perform cleaning, maintenance and oil checking of the CT. Also, measure IR between CT primary-earth and primary-secondary by 5 kV IR Tester and CT secondary-earth by 500 V IR Tester and if low, then the CT is to be sent for reconditioning.',
       'Arcing':                      'Necessary action to be taken care of towards replacement of the CT with a healthy one.'
     },
     '33KV PT': {
       /* same as CT but “PT” */
       'Corona':                      'Necessary action to be taken care of towards cleaning, maintenance and oil checking of the said PT.',
-      'Destructive Corona':          'Oil checking as well as necessary cleaning and maintenance of this PT should be done. Necessary checking of tightness of the said PT secondary wires is also required.',
+      'Destructive Corona':          'Oil checking, cleaning and maintenance of this PT should be done. Check tightness of the said CT secondary wires.',
       'Mild Tracking':               'Necessary action to be taken care of towards cleaning, maintenance and oil checking of the said PT.',
-      'Tracking':                    'Necessary cleaning and maintenance are required. Insulation resistance in between PT primary to earth and primary to secondary by 5 kV megger and PT secondary to earth by 500 V megger are to be measured and if low, appropriate action taken.',
+      'Tracking':                    'Necessary cleaning and maintenance are required. Measure IR between PT primary-earth and primary-secondary by 5 kV IR Tester and PT secondary-earth by 500 V IR Tester and if low, appropriate action taken.',
       'Corona with Mild Tracking':   'Necessary action to be taken care of towards cleaning, maintenance and oil checking of the said PT.',
-      'Corona with Tracking':        'Necessary action to be taken care of towards cleaning, maintenance and oil checking of the said PT. Insulation resistance in between PT primary to earth and primary to secondary by 5 kV megger and PT secondary to earth by 500 V megger are to be measured and if low, appropriate action taken.',
-      'Destructive Corona with Tracking': 'Oil checking as well as necessary cleaning and maintenance of this PT should be done. Insulation resistance in between PT primary to earth and primary to secondary by 5 kV megger and PT secondary to earth by 500 V megger are to be measured and if low, appropriate action taken.',
-      'Severe Tracking':             'Necessary cleaning and maintenance are required. Insulation resistance in between PT primary to earth and Primary to secondary by 5KV megger and PT secondary to earth by 500Volt megger are to be measured and if found low then the PT is to be replaced.',
-      'Corona with Severe Tracking': 'Necessary cleaning, maintenance and oil checking of the said PT. Insulation resistance in between PT primary to earth and Primary to secondary by 5KV megger and PT secondary to earth by 500Volt megger are to be measured and if found low then the PT is to be replaced.',
+      'Corona with Tracking':        'Perform cleaning, maintenance and oil checking of the PT. Also, measure IR between PT primary-earth and primary-secondary by 5 kV IR Tester and PT secondary-earth by 500 V IR Tester and if low, appropriate action taken.',
+      'Destructive Corona with Tracking': 'Perform cleaning, maintenance and oil checking of the PT. Also, measure IR between PT primary-earth and primary-secondary by 5 kV IR Tester and PT secondary-earth by 500 V IR Tester and if low, appropriate action taken.',
+      'Severe Tracking':             'Perform cleaning, maintenance and oil checking of the PT. Also, measure IR between PT primary-earth and primary-secondary by 5 kV IR Tester and PT secondary-earth by 500 V IR Tester and if low, then the PT is to be sent for reconditioning.',
+      'Corona with Severe Tracking': 'Perform cleaning, maintenance and oil checking of the PT. Also, measure IR between PT primary-earth and primary-secondary by 5 kV IR Tester and PT secondary-earth by 500 V IR Tester and if low, then the PT is to be sent for reconditioning.',
       'Arcing':                      'Necessary action to be taken care of towards replacement of the PT with a healthy one.'
     },
     '33KV VCB': {
@@ -363,7 +363,7 @@ if(v && cls){
             const tmpl=prompt2Maps.actionTemplates[eq]||{};
             if(tmpl[cls]) arr.push(tmpl[cls]);
             else if(tmpl['default']) arr.push(tmpl['default']);
-            if(cbs['IR']) arr.push('Insulation resistance in between primary to earth and Primary to secondary by 5KV megger and secondary to earth by 500Volt megger are to be measured and if found low then appropriate action is to be taken.');
+            if(cbs['IR']) arr.push('Measure IR b/w primary-earth and Primary-secondary by 5KV IR Tester and secondary to earth by 500V IR Tester and if found low, take n/a.');
             if(eq==='Cable'){
               ['X-Cbl','C-Dep','Trck Mrk'].forEach(fl=>{
                 if(cbs[fl]&&tmpl[fl]) arr.push(tmpl[fl]);
@@ -516,8 +516,477 @@ document.getElementById('downloadDocBtn').addEventListener('click', downloadDoc)
 document.getElementById('downloadPdfBtn').addEventListener('click', downloadPdf);
 
 function downloadExcel() {
+
+
+  const liveTable = document.getElementById('liveTable');
+  const liveTbody = liveTable.querySelector('tbody');
+  const originalTbodyHTML = liveTbody.innerHTML;
+
+
+
+const liveThead = liveTable.querySelector('thead');
+const originalTheadHTML = liveThead ? liveThead.innerHTML : '';
+
+  const bodyRows = Array.from(liveTbody.querySelectorAll('tr'));
+  bodyRows.forEach((tr, idx) => {
+    const equipmentCell = tr.querySelector('td[rowspan]');
+    if (!equipmentCell) return;
+
+    const spanCount = parseInt(equipmentCell.getAttribute('rowspan'), 10) || 1;
+    const equipmentText = equipmentCell.textContent.trim();
+
+    equipmentCell.removeAttribute('rowspan');
+
+    for (let k = 1; k < spanCount; k++) {
+      const targetRow = bodyRows[idx + k];
+      if (!targetRow) continue;
+
+      const dupCell = document.createElement('td');
+      dupCell.textContent = equipmentText;
+      targetRow.insertBefore(dupCell, targetRow.children[1] || null);
+    }
+  });
+
+  // Make "Action to be taken" single-line in downloaded Excel only
+  const actionColIndex = Array.from(liveTable.querySelectorAll('thead th'))
+    .findIndex(th => th.textContent.trim().toLowerCase() === 'action to be taken');
+
+  if (actionColIndex !== -1) {
+    liveTbody.querySelectorAll('tr').forEach(tr => {
+      const actionCell = tr.children[actionColIndex];
+      if (!actionCell) return;
+
+      const singleLineAction = actionCell.innerHTML
+        .replace(/<br\s*\/?>/gi, ' ')
+        .replace(/<\/?(u|strong|b|i|em)[^>]*>/gi, '')
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      actionCell.textContent = singleLineAction;
+      actionCell.style.whiteSpace = 'nowrap';
+    });
+  }
+
+
+  // Merge Action cell for 33KV VCB rows in downloaded Excel only
+  const equipmentColIndex = 1; // after flattening, Equipment column stays at index 1
+  const vcbActionText = 'IR to be measured between upper pad and lower pad of the VCBs for checking of VI insulation and lower pad to earth for tie rod insulation. IR test should be executed through 5 KV IR Tester.';
+
+  const excelRows = Array.from(liveTbody.querySelectorAll('tr'));
+
+  for (let i = 0; i < excelRows.length; ) {
+    const eqCell = excelRows[i].children[equipmentColIndex];
+    const eqText = eqCell ? eqCell.textContent.trim() : '';
+
+    if (eqText !== '33KV VCB') {
+      i++;
+      continue;
+    }
+
+    let j = i;
+    while (j < excelRows.length) {
+      const cell = excelRows[j].children[equipmentColIndex];
+      const text = cell ? cell.textContent.trim() : '';
+      if (text !== '33KV VCB') break;
+      j++;
+    }
+
+    const spanCount = j - i;
+    const firstActionCell = excelRows[i].children[actionColIndex];
+
+    if (firstActionCell) {
+      firstActionCell.textContent = vcbActionText;
+      firstActionCell.style.whiteSpace = 'nowrap';
+      if (spanCount > 1) {
+        firstActionCell.setAttribute('rowspan', spanCount);
+      }
+    }
+
+    for (let k = i + 1; k < j; k++) {
+      const actionCell = excelRows[k].children[actionColIndex];
+      if (actionCell) actionCell.remove();
+    }
+
+    i = j;
+  }
+
+
+
+  // Merge Action cell for Conductor rows in downloaded Excel only
+  const conductorActionText = 'This conductor(s) to be replaced with new and healthy one.';
+
+  for (let i = 0; i < excelRows.length; ) {
+    const eqCell = excelRows[i].children[equipmentColIndex];
+    const eqText = eqCell ? eqCell.textContent.trim() : '';
+
+    if (eqText !== 'Conductor') {
+      i++;
+      continue;
+    }
+
+    let j = i;
+    while (j < excelRows.length) {
+      const cell = excelRows[j].children[equipmentColIndex];
+      const text = cell ? cell.textContent.trim() : '';
+      if (text !== 'Conductor') break;
+      j++;
+    }
+
+    const spanCount = j - i;
+    const firstActionCell = excelRows[i].children[actionColIndex];
+
+    if (firstActionCell) {
+      firstActionCell.textContent = conductorActionText;
+      firstActionCell.style.whiteSpace = 'nowrap';
+      if (spanCount > 1) {
+        firstActionCell.setAttribute('rowspan', spanCount);
+      }
+    }
+
+    for (let k = i + 1; k < j; k++) {
+      const actionCell = excelRows[k].children[actionColIndex];
+      if (actionCell) actionCell.remove();
+    }
+
+    i = j;
+  }
+
+
+
+
+  // Merge Action cell for Lightning Arrestor rows in downloaded Excel only
+  const laActionText = 'Earthing of the LA(s) to be checked and necessary action to be taken if the earthing of LA found open. Also, IR of the said LA(s) also needs to be checked and to be replaced if the value found low.';
+
+  for (let i = 0; i < excelRows.length; ) {
+    const eqCell = excelRows[i].children[equipmentColIndex];
+    const eqText = eqCell ? eqCell.textContent.trim() : '';
+
+    if (eqText !== 'Lightning Arrestor') {
+      i++;
+      continue;
+    }
+
+    let j = i;
+    while (j < excelRows.length) {
+      const cell = excelRows[j].children[equipmentColIndex];
+      const text = cell ? cell.textContent.trim() : '';
+      if (text !== 'Lightning Arrestor') break;
+      j++;
+    }
+
+    const spanCount = j - i;
+    const firstActionCell = excelRows[i].children[actionColIndex];
+
+    if (firstActionCell) {
+      firstActionCell.textContent = laActionText;
+      firstActionCell.style.whiteSpace = 'nowrap';
+      if (spanCount > 1) {
+        firstActionCell.setAttribute('rowspan', spanCount);
+      }
+    }
+
+    for (let k = i + 1; k < j; k++) {
+      const actionCell = excelRows[k].children[actionColIndex];
+      if (actionCell) actionCell.remove();
+    }
+
+    i = j;
+  }
+
+
+  // Merge Action cell for Post Insulator rows in downloaded Excel only
+  const postInsulatorActionText = 'Binding of the post insulator(s) should be done properly. IR measurement of these post insulator(s) to be done. If the IR value is found low then these post insulator(s) may be replaced.';
+
+  for (let i = 0; i < excelRows.length; ) {
+    const eqCell = excelRows[i].children[equipmentColIndex];
+    const eqText = eqCell ? eqCell.textContent.trim() : '';
+
+    if (eqText !== 'Post Insulator') {
+      i++;
+      continue;
+    }
+
+    let j = i;
+    while (j < excelRows.length) {
+      const cell = excelRows[j].children[equipmentColIndex];
+      const text = cell ? cell.textContent.trim() : '';
+      if (text !== 'Post Insulator') break;
+      j++;
+    }
+
+    const spanCount = j - i;
+    const firstActionCell = excelRows[i].children[actionColIndex];
+
+    if (firstActionCell) {
+      firstActionCell.textContent = postInsulatorActionText;
+      firstActionCell.style.whiteSpace = 'nowrap';
+      if (spanCount > 1) {
+        firstActionCell.setAttribute('rowspan', spanCount);
+      }
+    }
+
+    for (let k = i + 1; k < j; k++) {
+      const actionCell = excelRows[k].children[actionColIndex];
+      if (actionCell) actionCell.remove();
+    }
+
+    i = j;
+  }
+
+
+
+  // Merge Action cell for 11KV Pin Insulator rows in downloaded Excel only
+  const pin11kvActionText = 'Binding of the pin insulator(s) should be done properly. IR measurement of these pin insulator(s) is to be done. If the IR value is found low then these pin insulator(s) may be replaced.';
+
+  for (let i = 0; i < excelRows.length; ) {
+    const eqCell = excelRows[i].children[equipmentColIndex];
+    const eqText = eqCell ? eqCell.textContent.trim() : '';
+
+    if (eqText !== '11KV Pin Insulator') {
+      i++;
+      continue;
+    }
+
+    let j = i;
+    while (j < excelRows.length) {
+      const cell = excelRows[j].children[equipmentColIndex];
+      const text = cell ? cell.textContent.trim() : '';
+      if (text !== '11KV Pin Insulator') break;
+      j++;
+    }
+
+    const spanCount = j - i;
+    const firstActionCell = excelRows[i].children[actionColIndex];
+
+    if (firstActionCell) {
+      firstActionCell.textContent = pin11kvActionText;
+      firstActionCell.style.whiteSpace = 'nowrap';
+      if (spanCount > 1) {
+        firstActionCell.setAttribute('rowspan', spanCount);
+      }
+    }
+
+    for (let k = i + 1; k < j; k++) {
+      const actionCell = excelRows[k].children[actionColIndex];
+      if (actionCell) actionCell.remove();
+    }
+
+    i = j;
+  }
+
+
+
+  // Unmerge Action cells for specific equipment in downloaded Excel only
+  const unmergeActionEquipments = new Set([
+    '33KV Pin Insulator',
+    'Bushing',
+    '33KV VCB',
+    'Conductor',
+    'Lightning Arrestor',
+    'Post Insulator',
+    '11KV Pin Insulator'
+  ]);
+
+  for (let i = 0; i < excelRows.length; i++) {
+    const eqCell = excelRows[i].children[equipmentColIndex];
+    if (!eqCell) continue;
+
+    const eqText = eqCell.textContent.trim();
+    if (!unmergeActionEquipments.has(eqText)) continue;
+
+    const actionCell = excelRows[i].children[actionColIndex];
+    if (!actionCell) continue;
+
+    const spanCount = parseInt(actionCell.getAttribute('rowspan'), 10) || 1;
+    if (spanCount <= 1) continue;
+
+    const actionText = actionCell.textContent.trim();
+    actionCell.removeAttribute('rowspan');
+    actionCell.textContent = actionText;
+    actionCell.style.whiteSpace = 'nowrap';
+
+    for (let k = 1; k < spanCount; k++) {
+      const targetRow = excelRows[i + k];
+      if (!targetRow) continue;
+
+      const dupActionCell = document.createElement('td');
+      dupActionCell.textContent = actionText;
+      dupActionCell.style.whiteSpace = 'nowrap';
+
+      targetRow.insertBefore(dupActionCell, targetRow.children[actionColIndex] || null);
+    }
+  }
+
+
+
+
+  // Make R/Y/B Phase columns single-line in downloaded Excel only
+  const headerCells = Array.from(liveTable.querySelectorAll('thead th'));
+
+  const rPhaseColIndex = headerCells.findIndex(th =>
+    th.textContent.trim().toLowerCase() === 'r phase (in db)'
+  );
+  const yPhaseColIndex = headerCells.findIndex(th =>
+    th.textContent.trim().toLowerCase() === 'y phase (in db)'
+  );
+  const bPhaseColIndex = headerCells.findIndex(th =>
+    th.textContent.trim().toLowerCase() === 'b phase (in db)'
+  );
+
+  [rPhaseColIndex, yPhaseColIndex, bPhaseColIndex].forEach(colIndex => {
+    if (colIndex === -1) return;
+
+    liveTbody.querySelectorAll('tr').forEach(tr => {
+      const phaseCell = tr.children[colIndex];
+      if (!phaseCell) return;
+
+      const singleLinePhase = phaseCell.innerHTML
+        .replace(/<br\s*\/?>/gi, ' ')
+        .replace(/<\/?(u|strong|b|i|em)[^>]*>/gi, '')
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      phaseCell.textContent = singleLinePhase;
+      phaseCell.style.whiteSpace = 'nowrap';
+    });
+  });
+
+
+
+  // Make all '---' cells blank in downloaded Excel only
+  liveTable.querySelectorAll('td').forEach(cell => {
+    if (cell.textContent.trim() === '---') {
+      cell.textContent = '';
+    }
+  });
+
+
+
+
+
+  // Style downloaded Excel table only
+  liveTable.style.tableLayout = 'fixed';
+  liveTable.style.borderCollapse = 'collapse';
+
+  liveTable.querySelectorAll('tr').forEach(tr => {
+    Array.from(tr.children).forEach((cell, colIndex) => {
+      const isActionCol = colIndex === actionColIndex;
+      const cellText = (cell.textContent || '').trim();
+
+      cell.style.whiteSpace = 'normal';
+      cell.style.wordWrap = 'break-word';
+      cell.style.overflowWrap = 'break-word';
+
+      cell.style.textAlign = 'center';
+      cell.style.verticalAlign = 'middle';
+
+      cell.style.backgroundColor = cellText.length > 250 ? 'red' : '#dce6f2';
+
+      cell.style.border = '1px solid black';
+
+    });
+  });
+
+
+// Force column widths in downloaded Excel only
+const existingColGroup = liveTable.querySelector('colgroup');
+if (existingColGroup) existingColGroup.remove();
+
+const headerCount = liveTable.querySelectorAll('thead th').length;
+const colGroup = document.createElement('colgroup');
+
+for (let i = 0; i < headerCount; i++) {
+  const col = document.createElement('col');
+
+  if (i === actionColIndex) {
+    col.style.width = '75ch';
+    col.style.minWidth = '75ch';
+    col.style.maxWidth = '75ch';
+    col.setAttribute('width', '600');
+  } else {
+    col.style.width = '15ch';
+    col.style.minWidth = '15ch';
+    col.style.maxWidth = '15ch';
+    col.setAttribute('width', '120');
+  }
+
+  col.style.msoWidthSource = 'userset';
+  colGroup.appendChild(col);
+}
+
+liveTable.insertBefore(colGroup, liveTable.firstChild);
+
+
+
+// Delete header row and Sl. No. column in downloaded Excel only
+if (liveThead) liveThead.remove();
+
+liveTbody.querySelectorAll('tr').forEach(tr => {
+  if (tr.children[0]) tr.children[0].remove();
+});
+
+
+// Re-align Excel column widths after removing Sl. No. column
+const excelColGroup = liveTable.querySelector('colgroup');
+if (excelColGroup && excelColGroup.children[0]) {
+  excelColGroup.children[0].remove(); // remove width mapping of Sl. No. column
+}
+
+
+
   // 1) grab your live table HTML
   const tableHTML = document.getElementById('liveTable').outerHTML;
+
+
+
+  liveTbody.innerHTML = originalTbodyHTML;
+
+
+// Restore original header row after Excel download preparation
+if (!liveTable.querySelector('thead') && originalTheadHTML) {
+  const restoredThead = document.createElement('thead');
+  restoredThead.innerHTML = originalTheadHTML;
+  liveTable.insertBefore(restoredThead, liveTable.firstChild);
+}
+
+
+// Remove temporary Excel-only column sizing/styling from live table
+const tempColGroup = liveTable.querySelector('colgroup');
+if (tempColGroup) tempColGroup.remove();
+
+liveTable.style.tableLayout = '';
+liveTable.style.borderCollapse = '';
+liveTable.style.width = '';
+liveTable.style.minWidth = '';
+liveTable.style.maxWidth = '';
+
+
+// Reset temporary Excel-only header styling from live table
+liveTable.querySelectorAll('thead tr, thead th').forEach(el => {
+  el.style.whiteSpace = '';
+  el.style.wordWrap = '';
+  el.style.overflowWrap = '';
+  el.style.textAlign = '';
+  el.style.verticalAlign = '';
+  el.style.backgroundColor = '';
+  el.style.border = '';
+  el.style.width = '';
+  el.style.minWidth = '';
+  el.style.maxWidth = '';
+});
+
+
+
+
+
+
+  makeLiveTableEditable();
+
+
+
+
 
   // 2) wrap it in a full Excel-HTML document
   const preamble =
