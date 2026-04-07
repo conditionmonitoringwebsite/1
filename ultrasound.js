@@ -38,28 +38,28 @@ const prompt2Maps = {
   actionTemplates: {
     '33KV CT': {
       'Corona':                      'Necessary action to be taken care of towards cleaning, maintenance and oil checking of the said CT.',
-      'Destructive Corona':          'Oil checking, cleaning and maintenance of this CT should be done. Check tightness of the said CT secondary wires.',
+      'Destructive Corona':          'Oil checking, cleaning and maintenance of the CT to be done. Check tightness of the CT secondary wires.',
       'Mild Tracking':               'Necessary action to be taken care of towards cleaning, maintenance and oil checking of the said CT.',
-      'Tracking':                    'Necessary cleaning and maintenance are required. Measure IR between CT primary-earth and primary-secondary by 5 kV IR Tester and CT secondary-earth by 500 V IR Tester and if low, appropriate action taken.',
+      'Tracking':                    'Proper cleaning and maintenance are required. Measure IR between CT primary-earth & primary-secondary by 5 kV IR Tester and CT secondary-earth by 500 V IR Tester and if low, take necessary action.',
       'Corona with Mild Tracking':   'Necessary action to be taken care of towards cleaning, maintenance and oil checking of the said CT.',
-      'Corona with Tracking':        'Perform cleaning, maintenance and oil checking of the CT. Also, measure IR between CT primary-earth and primary-secondary by 5 kV IR Tester and CT secondary-earth by 500 V IR Tester and if low, appropriate action taken.',
-      'Destructive Corona with Tracking': 'Perform cleaning, maintenance and oil checking of the CT. Also, measure IR between CT primary-earth and primary-secondary by 5 kV IR Tester and CT secondary-earth by 500 V IR Tester and if low, appropriate action taken.',
-      'Severe Tracking':             'Perform cleaning, maintenance and oil checking of the CT. Also, measure IR between CT primary-earth and primary-secondary by 5 kV IR Tester and CT secondary-earth by 500 V IR Tester and if low, then the CT is to be sent for reconditioning.',
-      'Corona with Severe Tracking': 'Perform cleaning, maintenance and oil checking of the CT. Also, measure IR between CT primary-earth and primary-secondary by 5 kV IR Tester and CT secondary-earth by 500 V IR Tester and if low, then the CT is to be sent for reconditioning.',
-      'Arcing':                      'Necessary action to be taken care of towards replacement of the CT with a healthy one.'
+      'Corona with Tracking':        'Perform cleaning, maintenance and oil checking of the CT. Also, measure IR between CT primary-earth and primary-secondary by 5 kV IR Tester and CT secondary-earth by 500 V IR Tester and if low, take necessary action.',
+      'Destructive Corona with Tracking': 'Perform cleaning, maintenance and oil checking of the CT. Also, measure IR between CT primary-earth and primary-secondary by 5 kV IR Tester and CT secondary-earth by 500 V IR Tester and if low, take necessary action.',
+      'Severe Tracking':             'Perform cleaning, maintenance and oil checking of the CT. Also, measure IR between CT primary-earth & primary-secondary by 5 kV IR Tester and CT secondary-earth by 500 V IR Tester and if low, then the CT is to be sent for reconditioning.',
+      'Corona with Severe Tracking': 'Perform cleaning, maintenance and oil checking of the CT. Also, measure IR between CT primary-earth & primary-secondary by 5 kV IR Tester and CT secondary-earth by 500 V IR Tester and if low, then the CT is to be sent for reconditioning.',
+      'Arcing':                      'Necessary action to be taken care of towards replacement of the CT with a healthy one and this CT is to be sent for re-conditioning.'
     },
     '33KV PT': {
       /* same as CT but “PT” */
       'Corona':                      'Necessary action to be taken care of towards cleaning, maintenance and oil checking of the said PT.',
-      'Destructive Corona':          'Oil checking, cleaning and maintenance of this PT should be done. Check tightness of the said CT secondary wires.',
+      'Destructive Corona':          'Oil checking, cleaning and maintenance of the PT to be done. Check tightness of the CT secondary wires.',
       'Mild Tracking':               'Necessary action to be taken care of towards cleaning, maintenance and oil checking of the said PT.',
-      'Tracking':                    'Necessary cleaning and maintenance are required. Measure IR between PT primary-earth and primary-secondary by 5 kV IR Tester and PT secondary-earth by 500 V IR Tester and if low, appropriate action taken.',
+      'Tracking':                    'Proper cleaning and maintenance are required. Measure IR between PT primary-earth & primary-secondary by 5 kV IR Tester and PT secondary-earth by 500 V IR Tester and if low, take necessary action.',
       'Corona with Mild Tracking':   'Necessary action to be taken care of towards cleaning, maintenance and oil checking of the said PT.',
-      'Corona with Tracking':        'Perform cleaning, maintenance and oil checking of the PT. Also, measure IR between PT primary-earth and primary-secondary by 5 kV IR Tester and PT secondary-earth by 500 V IR Tester and if low, appropriate action taken.',
-      'Destructive Corona with Tracking': 'Perform cleaning, maintenance and oil checking of the PT. Also, measure IR between PT primary-earth and primary-secondary by 5 kV IR Tester and PT secondary-earth by 500 V IR Tester and if low, appropriate action taken.',
-      'Severe Tracking':             'Perform cleaning, maintenance and oil checking of the PT. Also, measure IR between PT primary-earth and primary-secondary by 5 kV IR Tester and PT secondary-earth by 500 V IR Tester and if low, then the PT is to be sent for reconditioning.',
-      'Corona with Severe Tracking': 'Perform cleaning, maintenance and oil checking of the PT. Also, measure IR between PT primary-earth and primary-secondary by 5 kV IR Tester and PT secondary-earth by 500 V IR Tester and if low, then the PT is to be sent for reconditioning.',
-      'Arcing':                      'Necessary action to be taken care of towards replacement of the PT with a healthy one.'
+      'Corona with Tracking':        'Perform cleaning, maintenance and oil checking of the PT. Also, measure IR between PT primary-earth and primary-secondary by 5 kV IR Tester and PT secondary-earth by 500 V IR Tester and if low, take necessary action.',
+      'Destructive Corona with Tracking': 'Perform cleaning, maintenance and oil checking of the PT. Also, measure IR between PT primary-earth and primary-secondary by 5 kV IR Tester and PT secondary-earth by 500 V IR Tester and if low, take necessary action.',
+      'Severe Tracking':             'Perform cleaning, maintenance and oil checking of the PT. Also, measure IR between PT primary-earth & primary-secondary by 5 kV IR Tester and PT secondary-earth by 500 V IR Tester and if low, then the PT is to be sent for reconditioning.',
+      'Corona with Severe Tracking': 'Perform cleaning, maintenance and oil checking of the CT. Also, measure IR between PT primary-earth & primary-secondary by 5 kV IR Tester and PT secondary-earth by 500 V IR Tester and if low, then the PT is to be sent for reconditioning.',
+      'Arcing':                      'Necessary action to be taken care of towards replacement of the PT with a healthy one and this PT is to be sent for re-conditioning.'
     },
     '33KV VCB': {
       default: 'IR to be measured between upper pad and lower pad of the all VCBs for checking of VI insulation and lower pad to earth for tie rod insulation. Meggering should be executed through 5 KV megger. '
@@ -83,10 +83,10 @@ const prompt2Maps = {
       default: 'Earthing of the LA to be checked and necessary action to be taken if the earthing of LA found open.Also, IR of the said LA also needs to be checked and to be replaced if the value found low.'
     },
     'Cable': {
-      default: 'Cleaning, treatment of cable termination joint and subsequent application of amalgamated tape of HV insulation grade must be carried out.',
-      'X-Cbl': 'If possible, avoid the cable crossing by rearrange the cable at both side and increase the electrical clearance between the phases of cable crossing.',
-      'C-Dep': 'Also, carbon deposition has been observed on 33 kV cable terminations.',
-      'Trck Mrk': 'Also, tracking mark has been observed on 33 kV cable terminations.'
+      default: 'Cleaning, treatment of cable termination joint & subsequent application of amalgamated tape of HV insulation grade to be carried out.',
+      'X-Cbl': 'Avoid cable crossing by rearranging the cable. Increase electrical clearance b/w phases.',
+      'C-Dep': 'Carbon deposition observed on cable terminations.',
+      'Trck Mrk': 'Tracking mark observed on cable terminations.'
     }
   }
 };
@@ -405,6 +405,9 @@ e[k]={
   rep:   f.querySelector('input[value="Rep"]').checked,
   ir:    f.querySelector('input[value="IR"]').checked,
   aud:   f.querySelector('input[value="Audible"]').checked,
+  xcbl:  f.querySelector('input[value="X-Cbl"]').checked,
+  cdep:  f.querySelector('input[value="C-Dep"]').checked,
+  trck:  f.querySelector('input[value="Trck Mrk"]').checked,
   rec:   f.querySelector('input[placeholder="Recording No."]').value
 };
     });
@@ -490,20 +493,34 @@ if (precSel) {
     sideSel.replaceWith(inp);
   }
 
+    // Re-show Cable-specific checkboxes after reload
+    if (e.equipment === 'Cable') {
+      r.querySelectorAll('.checkbox-container label').forEach(lab => {
+        const cb = lab.querySelector('input[type="checkbox"]');
+        if (cb && cb.classList.contains('cable-only')) {
+          lab.style.display = 'inline-flex';
+        }
+      });
+    }
 
 
 
 
-    ['R','Y','B','N'].forEach((k,i)=>{
-      const f=r.cells[4+i].firstChild;
-      f.querySelector('input[placeholder="dB"]').value             = e[k].value;
-      f.querySelector('input[placeholder="Recording No."]').value  = e[k].rec || '';
-      f.querySelector('select').value                   = e[k].class;
-      f.querySelector('input[value="Rep"]').checked     = e[k].rep;
-      f.querySelector('input[value="IR"]').checked      = e[k].ir;
-      f.querySelector('input[value="Audible"]').checked = e[k].aud;
-    });
-    r.cells[8].querySelector('input').value = e.remarks;
+
+['R','Y','B','N'].forEach((k,i)=>{
+  const f=r.cells[4+i].firstChild;
+  f.querySelector('input[placeholder="dB"]').value             = e[k].value;
+  f.querySelector('input[placeholder="Recording No."]').value  = e[k].rec || '';
+  f.querySelector('select').value                              = e[k].class;
+  f.querySelector('input[value="Rep"]').checked                = !!e[k].rep;
+  f.querySelector('input[value="IR"]').checked                 = !!e[k].ir;
+  f.querySelector('input[value="Audible"]').checked            = !!e[k].aud;
+  f.querySelector('input[value="X-Cbl"]').checked              = !!e[k].xcbl;
+  f.querySelector('input[value="C-Dep"]').checked              = !!e[k].cdep;
+  f.querySelector('input[value="Trck Mrk"]').checked           = !!e[k].trck;
+});
+
+r.cells[8].querySelector('input').value = e.remarks;
   });
 
   renderLive();
