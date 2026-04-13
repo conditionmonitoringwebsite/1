@@ -669,6 +669,13 @@ if (sideText) {
 rrow.insertCell().textContent = text || '---';
 
 
+const hotspotLocCell = rrow.cells[1];
+if (hotspotLocCell && hotspotLocCell.textContent.trim().length > 249) {
+  hotspotLocCell.style.backgroundColor = 'red';
+  hotspotLocCell.style.color = '#fff';
+}
+
+
 
     // Ambient
     if (i === 0) {const c = rrow.insertCell(); const ambEl = document.getElementById('ambientInput'); c.textContent = (ambEl ? ambEl.value : '') || '---'; c.rowSpan = n;}
@@ -793,6 +800,19 @@ tbl.querySelector('thead')?.remove();
       td.style.textAlign = 'center';
     })
   );
+
+
+// Make Hotspot Location cell red in downloaded Excel if text length > 249
+tbl.querySelectorAll('tbody tr').forEach(tr => {
+  const hotspotCell = tr.cells[0]; // After removing Sl. No., Hotspot Location is column 0
+  if (hotspotCell && hotspotCell.textContent.trim().length > 249) {
+    hotspotCell.style.backgroundColor = 'red';
+    hotspotCell.style.color = '#fff';
+  }
+});
+
+
+
 
 
 // Add single-line border to all cells
